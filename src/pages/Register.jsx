@@ -1,23 +1,44 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Scale } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Scale, ArrowLeft } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
-export default function Login({ onLogin }) {
+export default function Register() {
+  const navigate = useNavigate()
+  const [name,     setName]     = useState('')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
+
+  const inputStyle = {
+    border: '1.5px solid #e8e8e8',
+    background: '#fafafa',
+    color: '#111',
+    outline: 'none',
+    fontFamily: 'inherit',
+  }
+  const focusStyle = {
+    borderColor: '#b83b3d',
+    background: '#fff',
+    boxShadow: '0 0 0 3px rgba(184,59,61,0.08)',
+  }
+  const blurStyle = {
+    borderColor: '#e8e8e8',
+    background: '#fafafa',
+    boxShadow: 'none',
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     try {
-      await api.post('/auth/login', { email, password })
-      onLogin()
+      await api.post('/auth/register', { name, email, password })
+      toast.success('Conta criada! Faça login.')
+      navigate('/login')
     } catch (err) {
-      toast.error(err.message || 'E-mail ou senha incorretos')
+      toast.error(err.message || 'Erro ao criar conta')
     } finally {
       setLoading(false)
     }
@@ -27,13 +48,21 @@ export default function Login({ onLogin }) {
     <div className="min-h-screen bg-white flex flex-col">
 
       {/* Barra superior */}
-      <div className="flex justify-end p-5">
+      <div className="flex items-center justify-between p-5">
         <Link
-          to="/register"
+          to="/login"
+          className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+          style={{ color: '#888' }}
+        >
+          <ArrowLeft size={16} />
+          Voltar
+        </Link>
+        <Link
+          to="/login"
           className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-xl border transition-colors"
           style={{ borderColor: '#e0e0e0', color: '#555' }}
         >
-          Criar conta
+          Entrar
         </Link>
       </div>
 
@@ -55,11 +84,21 @@ export default function Login({ onLogin }) {
           </div>
 
           <h1 className="text-xl font-semibold text-center mb-6" style={{ color: '#111' }}>
-            Entrar
+            Criar conta
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {/* E-mail */}
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Nome completo"
+              required
+              className="w-full px-4 py-3.5 rounded-xl text-sm transition-all"
+              style={inputStyle}
+              onFocus={e => Object.assign(e.target.style, focusStyle)}
+              onBlur={e  => Object.assign(e.target.style, blurStyle)}
+            />
             <input
               type="email"
               value={email}
@@ -67,27 +106,11 @@ export default function Login({ onLogin }) {
               placeholder="E-mail"
               required
               className="w-full px-4 py-3.5 rounded-xl text-sm transition-all"
-              style={{
-                border: '1.5px solid #e8e8e8',
-                background: '#fafafa',
-                color: '#111',
-                outline: 'none',
-                fontFamily: 'inherit',
-              }}
-              onFocus={e => {
-                e.target.style.borderColor = '#b83b3d'
-                e.target.style.background  = '#fff'
-                e.target.style.boxShadow   = '0 0 0 3px rgba(184,59,61,0.08)'
-              }}
-              onBlur={e => {
-                e.target.style.borderColor = '#e8e8e8'
-                e.target.style.background  = '#fafafa'
-                e.target.style.boxShadow   = 'none'
-              }}
+              style={inputStyle}
+              onFocus={e => Object.assign(e.target.style, focusStyle)}
+              onBlur={e  => Object.assign(e.target.style, blurStyle)}
             />
-
-            {/* Senha + Esqueceu */}
-            <div className="relative">
+            <div>
               <input
                 type="password"
                 value={password}
@@ -95,35 +118,14 @@ export default function Login({ onLogin }) {
                 placeholder="Senha"
                 minLength={6}
                 required
-                className="w-full px-4 py-3.5 pr-24 rounded-xl text-sm transition-all"
-                style={{
-                  border: '1.5px solid #e8e8e8',
-                  background: '#fafafa',
-                  color: '#111',
-                  outline: 'none',
-                  fontFamily: 'inherit',
-                }}
-                onFocus={e => {
-                  e.target.style.borderColor = '#b83b3d'
-                  e.target.style.background  = '#fff'
-                  e.target.style.boxShadow   = '0 0 0 3px rgba(184,59,61,0.08)'
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e8e8e8'
-                  e.target.style.background  = '#fafafa'
-                  e.target.style.boxShadow   = 'none'
-                }}
+                className="w-full px-4 py-3.5 rounded-xl text-sm transition-all"
+                style={inputStyle}
+                onFocus={e => Object.assign(e.target.style, focusStyle)}
+                onBlur={e  => Object.assign(e.target.style, blurStyle)}
               />
-              <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: '#b83b3d' }}
-              >
-                Esqueceu?
-              </button>
+              <p className="text-xs mt-1.5" style={{ color: '#bbb' }}>Mínimo 6 caracteres</p>
             </div>
 
-            {/* Botão */}
             <button
               type="submit"
               disabled={loading}
@@ -133,21 +135,19 @@ export default function Login({ onLogin }) {
               {loading ? (
                 <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto"
                      style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
-              ) : 'Entrar'}
+              ) : 'Criar conta'}
             </button>
           </form>
 
-          {/* Link criar conta */}
           <p className="text-center text-sm mt-5" style={{ color: '#888' }}>
-            Não tem conta?{' '}
-            <Link to="/register" className="font-medium" style={{ color: '#b83b3d' }}>
-              Criar conta grátis
+            Já tem conta?{' '}
+            <Link to="/login" className="font-medium" style={{ color: '#b83b3d' }}>
+              Entrar
             </Link>
           </p>
 
-          {/* Termos */}
           <p className="text-center text-xs mt-7 leading-relaxed" style={{ color: '#bbb' }}>
-            Ao entrar, você concorda com nossos{' '}
+            Ao criar sua conta, você concorda com nossos{' '}
             <a href="#" className="underline" style={{ color: '#999' }}>Termos</a>
             {' '}e{' '}
             <a href="#" className="underline" style={{ color: '#999' }}>Política de Privacidade</a>.

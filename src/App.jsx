@@ -7,6 +7,9 @@ import SelectMunicipality from './pages/SelectMunicipality'
 import CreateProposal from './pages/CreateProposal'
 import ProposalEditor from './pages/ProposalEditor'
 import { api } from './utils/api.js'
+import Register from './pages/Register'
+
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -55,6 +58,10 @@ function App() {
           path="/login"
           element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />}
         />
+        <Route
+  path="/register"
+  element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />}
+/>?
 
         <Route
           path="/"
