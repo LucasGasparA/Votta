@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Home, PlusCircle, Settings, LogOut, MapPin, Scale, Menu, X, Zap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+
 function getInitials(name) {
   if (!name) return '?'
   return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
@@ -58,8 +59,8 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         <div className="px-4 pt-4">
           <div className="p-3 bg-primary-50 rounded-xl border border-primary-200">
             <p className="text-xs text-primary-400 font-medium mb-0.5">Município ativo</p>
-            <p className="text-sm font-semibold text-primary-800 leading-tight">{selectedMunicipality.name}</p>
-            <p className="text-xs text-primary-400">{selectedMunicipality.state}</p>
+            <p className="text-sm font-semibold text-primary-800 leading-tight">{selectedMunicipality.nome}</p>
+            <p className="text-xs text-primary-400">{selectedMunicipality.uf}</p>
           </div>
         </div>
       )}
@@ -112,10 +113,14 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           </div>
         )}
 
-        <button className="w-full flex items-center gap-3 px-[13px] py-2.5 text-sm text-primary-500 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all duration-200 font-medium">
+        <Link
+          to="/configuracoes"
+          onClick={() => setSidebarOpen(false)}
+          className="w-full flex items-center gap-3 px-[13px] py-2.5 text-sm text-primary-500 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all duration-200 font-medium"
+        >
           <Settings size={17} />
           <span>Configurações</span>
-        </button>
+        </Link>
         <button
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-[13px] py-2.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all duration-200 font-medium"
@@ -180,7 +185,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         </div>
 
         <main className="flex-1 overflow-auto print:overflow-visible">
-          <Outlet />
+          <Outlet context={{ selectedMunicipality }} />
         </main>
       </div>
     </div>

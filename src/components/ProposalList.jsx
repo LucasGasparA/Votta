@@ -3,9 +3,9 @@ import { PlusCircle, FileText, ArrowRight, Clock, CheckCircle, AlertTriangle } f
 import { motion } from 'framer-motion'
 
 const STATUS_CONFIG = {
-  em_andamento:     { label: 'Em Andamento',    color: 'bg-blue-100 text-blue-700',   bar: 'bg-blue-500',  border: 'border-l-blue-400',   Icon: Clock },
-  pendente_revisao: { label: 'Pendente Revisão', color: 'bg-amber-100 text-amber-700', bar: 'bg-amber-500', border: 'border-l-amber-400',  Icon: AlertTriangle },
-  concluido:        { label: 'Concluído',        color: 'bg-green-100 text-green-700', bar: 'bg-green-500', border: 'border-l-green-400',  Icon: CheckCircle },
+  em_andamento:     { label: 'Em Andamento',    color: 'bg-primary-100 text-primary-700', bar: 'bg-primary-500', border: 'border-l-primary-400', Icon: Clock },
+  pendente_revisao: { label: 'Pendente Revisão', color: 'bg-oro-100 text-oro-700',        bar: 'bg-oro-500',     border: 'border-l-oro-500',    Icon: AlertTriangle },
+  concluido:        { label: 'Concluído',        color: 'bg-primary-50 text-primary-800', bar: 'bg-primary-700', border: 'border-l-primary-700', Icon: CheckCircle },
 }
 
 const EmptyStateSVG = () => (

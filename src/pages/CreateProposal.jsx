@@ -1,12 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FileText, ArrowRight, ArrowLeft, Check, Scale, AlertCircle, X, Info } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
 const CreateProposal = () => {
   const navigate = useNavigate()
+  const { selectedMunicipality } = useOutletContext() ?? {}
+
+  useEffect(() => {
+    if (!selectedMunicipality) {
+      toast.error('Selecione um município antes de criar uma proposição.')
+      navigate('/select-municipality')
+    }
+  }, [selectedMunicipality, navigate])
   const [currentStep, setCurrentStep] = useState(0)
   const [direction, setDirection]     = useState(1)
   const [submitting, setSubmitting]   = useState(false)
@@ -96,7 +104,7 @@ const CreateProposal = () => {
   const blockReason  = triedNext ? getBlockReason() : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-oro-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-oro-50 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}

@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, Clock, CheckCircle, AlertTriangle, TrendingUp, PlusCircle } from 'lucide-react'
+import { FileText, Clock, CheckCircle, AlertTriangle, TrendingUp, PlusCircle, X } from 'lucide-react'
 import { motion } from 'framer-motion'
 import StatCard from '../components/StatCard'
 import ProposalList from '../components/ProposalList'
 import { api } from '../utils/api.js'
+import { calcularProgresso } from '../utils/progresso.js'
 
 const TYPE_LABELS = {
-  pl_ordinaria: 'Projeto de Lei Ordinária',
+  pl_ordinaria:    'Projeto de Lei Ordinária',
   pl_complementar: 'Projeto de Lei Complementar',
-  decreto: 'Decreto Municipal',
-  indicacao: 'Indicação',
+  decreto:         'Decreto Municipal',
+  indicacao:       'Indicação',
 }
 
 const STATUS_MAP = {
@@ -20,50 +21,55 @@ const STATUS_MAP = {
 }
 
 function buildStats(proposals) {
-  const total     = proposals.length
+  const total      = proposals.length
   const inProgress = proposals.filter(p => p.status === 'DRAFT').length
   const completed  = proposals.filter(p => p.status === 'APPROVED').length
   const pending    = proposals.filter(p => p.status === 'REVIEW').length
   const rate       = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return [
-    { label: 'Em Andamento',      value: String(inProgress), icon: Clock,         color: 'bg-blue-500',      trend: `${total} total` },
-    { label: 'Concluídas',        value: String(completed),  icon: CheckCircle,   color: 'bg-green-500',     trend: 'aprovadas' },
-    { label: 'Pendentes Revisão', value: String(pending),    icon: AlertTriangle, color: 'bg-amber-500',     trend: pending > 0 ? 'Requer atenção' : 'Tudo em dia' },
-    { label: 'Taxa de Aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'bg-primary-600',   trend: `${total} proposições` },
+    { label: 'Em Andamento',      value: String(inProgress), icon: Clock,         color: 'bg-primary-500',  trend: `${total} total` },
+    { label: 'Concluídas',        value: String(completed),  icon: CheckCircle,   color: 'bg-primary-700',  trend: 'aprovadas' },
+    { label: 'Pendentes Revisão', value: String(pending),    icon: AlertTriangle, color: 'bg-oro-500',      trend: pending > 0 ? 'Requer atenção' : 'Tudo em dia' },
+    { label: 'Taxa de Aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'bg-primary-600',  trend: `${total} proposições` },
   ]
 }
 
 function toListItem(p) {
   return {
-    id: p.id,
-    title: p.title,
-    type: TYPE_LABELS[p.type] || p.type,
-    status: STATUS_MAP[p.status] || 'em_andamento',
+    id:         p.id,
+    title:      p.title,
+    type:       TYPE_LABELS[p.type] || p.type,
+    status:     STATUS_MAP[p.status] || 'em_andamento',
     lastUpdate: new Date(p.updatedAt).toLocaleDateString('pt-BR'),
-    progress: p.status === 'APPROVED' ? 100 : p.status === 'REVIEW' ? 80 : 30,
+    progress:   calcularProgresso(p.status),
   }
 }
 
 const Dashboard = () => {
-  const [stats, setStats]               = useState(buildStats([]))
-  const [recentProposals, setRecent]    = useState([])
-  const [loading, setLoading]           = useState(true)
-  const [total, setTotal]               = useState(0)
+  const [stats,      setStats]      = useState(buildStats([]))
+  const [proposals,  setProposals]  = useState([])
+  const [loading,    setLoading]    = useState(true)
+  const [total,      setTotal]      = useState(0)
+  const [somentePendentes, setSomentePendentes] = useState(false)
 
   useEffect(() => {
     api.get('/proposals?limit=50')
       .then(({ proposals }) => {
         setStats(buildStats(proposals))
-        setRecent(proposals.slice(0, 5).map(toListItem))
+        setProposals(proposals.slice(0, 5).map(toListItem))
         setTotal(proposals.length)
       })
-      .catch(console.error)
       .finally(() => setLoading(false))
   }, [])
 
+  const pendingCount  = Number(stats[2]?.value ?? 0)
+  const listaExibida  = somentePendentes
+    ? proposals.filter(p => p.status === 'pendente_revisao')
+    : proposals
+
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <h1 className="text-4xl font-display font-bold text-primary-800 mb-1">Dashboard</h1>
         <p className="text-primary-500">Visão geral das suas proposições legislativas</p>
@@ -81,7 +87,6 @@ const Dashboard = () => {
 
       {/* Main Grid */}
       {!loading && total === 0 ? (
-        /* Empty state completo */
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -95,10 +100,7 @@ const Dashboard = () => {
           <p className="text-primary-500 mb-8 max-w-md mx-auto">
             Use o wizard guiado para criar propostas legislativas com conformidade normativa e assistência jurídica inteligente.
           </p>
-          <Link
-            to="/create-proposal"
-            className="inline-flex items-center gap-2 btn-primary"
-          >
+          <Link to="/create-proposal" className="inline-flex items-center gap-2 btn-primary">
             <PlusCircle size={20} />
             Nova Proposição
           </Link>
@@ -117,7 +119,22 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <ProposalList proposals={recentProposals} />
+            <div className="lg:col-span-2">
+              {somentePendentes && (
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <span className="text-sm font-semibold text-oro-700">
+                    Mostrando apenas pendentes de revisão
+                  </span>
+                  <button
+                    onClick={() => setSomentePendentes(false)}
+                    className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-700 transition-colors"
+                  >
+                    <X size={12} /> Ver todas
+                  </button>
+                </div>
+              )}
+              <ProposalList proposals={listaExibida} />
+            </div>
           )}
 
           <motion.div
@@ -142,14 +159,17 @@ const Dashboard = () => {
                   </div>
                 </Link>
 
-                <button className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-primary-100 hover:border-oro-400 hover:shadow-sm transition-all duration-200 group">
+                <button
+                  onClick={() => setSomentePendentes(true)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-primary-100 hover:border-oro-400 hover:shadow-sm transition-all duration-200 group"
+                >
                   <div className="w-9 h-9 bg-oro-100 group-hover:bg-oro-500 rounded-lg flex items-center justify-center transition-colors">
                     <CheckCircle className="text-oro-600 group-hover:text-white transition-colors" size={18} />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-semibold text-primary-800">Revisar Pendências</p>
                     <p className="text-xs text-primary-400">
-                      {stats[2]?.value !== '0' ? `${stats[2]?.value} aguardam` : 'Nenhuma pendente'}
+                      {pendingCount > 0 ? `${pendingCount} aguardam revisão` : 'Nenhuma pendente'}
                     </p>
                   </div>
                 </button>

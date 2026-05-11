@@ -9,6 +9,7 @@ import ProposalEditor from './pages/ProposalEditor'
 import Pricing from './pages/Pricing'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import Configuracoes from './pages/Configuracoes'
 import { api } from './utils/api.js'
 import Register from './pages/Register'
 
@@ -18,8 +19,6 @@ function App() {
   const [loading, setLoading]                 = useState(true)
   const [selectedMunicipality, setSelectedMunicipality] = useState(null)
 
-  const MOCK_USER = { id: 'mock', name: 'Lucas Gaspar', email: 'lucas@legislaapp.com', role: 'USER' }
-
   useEffect(() => {
     api.get('/auth/me')
       .then(({ user }) => {
@@ -27,9 +26,13 @@ function App() {
         setUser(user)
       })
       .catch(() => {
-        // DEV: sem banco, usa mock para navegar pelo app
-        setIsAuthenticated(true)
-        setUser(MOCK_USER)
+        // TODO: remover antes do deploy — substituir pelo contexto de autenticação real
+        if (import.meta.env.DEV) {
+          setIsAuthenticated(true)
+          setUser({ id: 'mock', name: 'Lucas Gaspar', email: 'lucas@legislaapp.com', role: 'USER' })
+        } else {
+          setIsAuthenticated(false)
+        }
       })
       .finally(() => setLoading(false))
   }, [])
@@ -89,6 +92,7 @@ function App() {
           <Route path="create-proposal" element={<CreateProposal />} />
           <Route path="proposal/:id/edit" element={<ProposalEditor />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="configuracoes" element={<Configuracoes />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />
