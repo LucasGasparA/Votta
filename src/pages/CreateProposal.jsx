@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, ArrowRight, ArrowLeft, Check, Scale, AlertCircle, X } from 'lucide-react'
+import { FileText, ArrowRight, ArrowLeft, Check, Scale, AlertCircle, X, Info } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -8,8 +8,10 @@ import { api } from '../utils/api.js'
 const CreateProposal = () => {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
-  const [submitting, setSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
+  const [direction, setDirection]     = useState(1)
+  const [submitting, setSubmitting]   = useState(false)
+  const [triedNext, setTriedNext]     = useState(false)
+  const [formData, setFormData]       = useState({
     type: '',
     theme: '',
     objective: '',
@@ -20,10 +22,10 @@ const CreateProposal = () => {
   })
 
   const proposalTypes = [
-    { value: 'pl_ordinaria',   label: 'Projeto de Lei Ordinária',   description: 'Lei municipal de competência do município (maioria simples)',       icon: '📜' },
-    { value: 'pl_complementar', label: 'Projeto de Lei Complementar', description: 'Complementa a LOM em matérias específicas (maioria absoluta)',       icon: '📋' },
-    { value: 'decreto',        label: 'Decreto Municipal',           description: 'Ato administrativo do Executivo para regulamentar leis',             icon: '📄' },
-    { value: 'indicacao',      label: 'Indicação',                   description: 'Sugestão ao Executivo para realização de melhorias ou serviços',     icon: '💡' },
+    { value: 'pl_ordinaria',    label: 'Projeto de Lei Ordinária',    description: 'Lei municipal de competência do município (maioria simples)',     icon: '📜' },
+    { value: 'pl_complementar', label: 'Projeto de Lei Complementar', description: 'Complementa a LOM em matérias específicas (maioria absoluta)',     icon: '📋' },
+    { value: 'decreto',         label: 'Decreto Municipal',           description: 'Ato administrativo do Executivo para regulamentar leis',           icon: '📄' },
+    { value: 'indicacao',       label: 'Indicação',                   description: 'Sugestão ao Executivo para realização de melhorias ou serviços',   icon: '💡' },
   ]
 
   const steps = [
@@ -35,13 +37,24 @@ const CreateProposal = () => {
   ]
 
   const update = (key, value) => setFormData(prev => ({ ...prev, [key]: value }))
-  const nextStep = () => setCurrentStep(s => Math.min(s + 1, steps.length - 1))
-  const prevStep = () => setCurrentStep(s => Math.max(s - 1, 0))
+
+  const nextStep = () => {
+    if (!canProceed()) { setTriedNext(true); return }
+    setTriedNext(false)
+    setDirection(1)
+    setCurrentStep(s => Math.min(s + 1, steps.length - 1))
+  }
+
+  const prevStep = () => {
+    setTriedNext(false)
+    setDirection(-1)
+    setCurrentStep(s => Math.max(s - 1, 0))
+  }
 
   const canProceed = () => {
     switch (currentStep) {
       case 0: return formData.type !== ''
-      case 1: return formData.theme.trim() && formData.objective.trim()
+      case 1: return formData.theme.trim() !== '' && formData.objective.trim() !== ''
       case 2: return formData.competence !== ''
       case 3: return formData.hasFinancialImpact !== null
       case 4: return formData.justification.length >= 50
@@ -49,25 +62,43 @@ const CreateProposal = () => {
     }
   }
 
+  const getBlockReason = () => {
+    if (canProceed()) return null
+    switch (currentStep) {
+      case 0: return 'Selecione um tipo de proposição para continuar.'
+      case 1:
+        if (!formData.theme.trim())     return 'Preencha o tema da proposição.'
+        if (!formData.objective.trim()) return 'Preencha o objetivo principal.'
+        return null
+      case 2: return 'Selecione a competência municipal.'
+      case 3: return 'Informe se esta proposição tem impacto orçamentário.'
+      case 4: return `A justificativa precisa ter pelo menos 50 caracteres. (${formData.justification.length}/50)`
+      default: return null
+    }
+  }
+
   const handleFinish = async () => {
-    if (submitting) return
+    if (submitting || !canProceed()) return
     setSubmitting(true)
     try {
       const data = await api.post('/proposals', formData)
       toast.success('Proposição criada!')
       navigate(`/proposal/${data.id}/edit`)
     } catch (e) {
-      toast.error('Erro ao criar: ' + e.message)
+      toast.error(e.message)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const justLen = formData.justification.length
+  const justLen      = formData.justification.length
+  const progressPct  = (currentStep / (steps.length - 1)) * 100
+  const blockReason  = triedNext ? getBlockReason() : null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-oro-50 p-8">
       <div className="max-w-3xl mx-auto">
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
           <div>
@@ -77,21 +108,37 @@ const CreateProposal = () => {
             </h1>
             <p className="text-primary-500 text-sm">Wizard guiado com assistência jurídica inteligente</p>
           </div>
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-1.5 text-sm text-primary-400 hover:text-primary-600 transition-colors mt-1"
-          >
+          <Link to="/dashboard" className="flex items-center gap-1.5 text-sm text-primary-400 hover:text-primary-600 transition-colors mt-1">
             <X size={16} />
             Cancelar
           </Link>
         </motion.div>
 
-        {/* Progress Bar */}
+        {/* Progress Card */}
         <motion.div
           initial={{ opacity: 0, scaleX: 0.9 }}
           animate={{ opacity: 1, scaleX: 1 }}
           className="card p-5 mb-6"
         >
+          {/* Indicador textual */}
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-semibold text-primary-700">
+              Etapa {currentStep + 1} de {steps.length} — {steps[currentStep].title}
+            </p>
+            <p className="text-xs text-primary-400 font-medium">
+              {currentStep === steps.length - 1 ? '100' : Math.round(progressPct)}% concluído
+            </p>
+          </div>
+
+          {/* Barra linear */}
+          <div className="w-full bg-primary-100 rounded-full h-1.5 mb-4">
+            <div
+              className="bg-primary-600 h-1.5 rounded-full transition-all duration-500"
+              style={{ width: `${currentStep === steps.length - 1 ? 100 : progressPct}%` }}
+            />
+          </div>
+
+          {/* Círculos de etapas */}
           <div className="flex items-center">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center flex-1">
@@ -126,9 +173,9 @@ const CreateProposal = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: 24 }}
+            initial={{ opacity: 0, x: direction * 40 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -24 }}
+            exit={{ opacity: 0, x: direction * -40 }}
             transition={{ duration: 0.25 }}
             className="card p-8 mb-6"
           >
@@ -142,7 +189,7 @@ const CreateProposal = () => {
                   <button
                     key={type.value}
                     type="button"
-                    onClick={() => update('type', type.value)}
+                    onClick={() => { update('type', type.value); setTriedNext(false) }}
                     className={`text-left p-5 border-2 rounded-xl transition-all duration-200
                       ${formData.type === type.value
                         ? 'border-primary-500 bg-primary-50 shadow-md'
@@ -172,25 +219,29 @@ const CreateProposal = () => {
                     type="text"
                     value={formData.theme}
                     onChange={e => update('theme', e.target.value)}
-                    className="input-field"
+                    className={`input-field ${triedNext && !formData.theme.trim() ? 'border-red-400' : ''}`}
                     placeholder="Ex: Coleta Seletiva de Lixo Reciclável"
                     autoFocus
                   />
+                  {triedNext && !formData.theme.trim() && (
+                    <p className="text-xs text-red-500 mt-1">Campo obrigatório.</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary-700 mb-1.5">Objetivo Principal</label>
                   <textarea
                     value={formData.objective}
                     onChange={e => update('objective', e.target.value)}
-                    className="input-field min-h-[100px] resize-none"
+                    className={`input-field min-h-[100px] resize-none ${triedNext && !formData.objective.trim() ? 'border-red-400' : ''}`}
                     placeholder="Descreva o objetivo principal desta proposição..."
                   />
+                  {triedNext && !formData.objective.trim() && (
+                    <p className="text-xs text-red-500 mt-1">Campo obrigatório.</p>
+                  )}
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600">
-                    Objetivos claros facilitam a análise de competência e a redação da minuta.
-                  </p>
+                  <p className="text-sm text-primary-600">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
                 </div>
               </div>
             )}
@@ -219,9 +270,7 @@ const CreateProposal = () => {
                 {formData.competence === 'Não tenho certeza' && (
                   <div className="flex items-start gap-3 p-4 bg-oro-50 border border-oro-200 rounded-xl">
                     <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={18} />
-                    <p className="text-sm text-oro-800">
-                      O assistente jurídico consultará a Lei Orgânica do Município para verificar a competência.
-                    </p>
+                    <p className="text-sm text-oro-800">O assistente jurídico consultará a Lei Orgânica do Município para verificar a competência.</p>
                   </div>
                 )}
               </div>
@@ -281,17 +330,16 @@ const CreateProposal = () => {
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />
-                  {justLen > 0 && justLen < 50 && (
-                    <div className="mt-1.5 w-full bg-primary-100 rounded-full h-1">
-                      <div className="bg-oro-500 h-1 rounded-full transition-all duration-300" style={{ width: `${(justLen / 50) * 100}%` }} />
-                    </div>
-                  )}
+                  <div className="mt-1.5 w-full bg-primary-100 rounded-full h-1">
+                    <div
+                      className={`h-1 rounded-full transition-all duration-300 ${justLen >= 50 ? 'bg-green-500' : 'bg-oro-500'}`}
+                      style={{ width: `${Math.min((justLen / 50) * 100, 100)}%` }}
+                    />
+                  </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600">
-                    O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.
-                  </p>
+                  <p className="text-sm text-primary-600">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
                 </div>
               </div>
             )}
@@ -304,25 +352,31 @@ const CreateProposal = () => {
             onClick={prevStep}
             disabled={currentStep === 0}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all
-              ${currentStep === 0
-                ? 'text-primary-300 cursor-not-allowed'
-                : 'text-primary-600 hover:bg-primary-100'
-              }`}
+              ${currentStep === 0 ? 'text-primary-300 cursor-not-allowed' : 'text-primary-600 hover:bg-primary-100'}`}
           >
             <ArrowLeft size={18} />
             Anterior
           </button>
 
-          <span className="text-sm text-primary-400">{currentStep + 1} / {steps.length}</span>
+          {/* Motivo de bloqueio */}
+          {blockReason && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg"
+            >
+              <Info size={13} />
+              {blockReason}
+            </motion.div>
+          )}
 
           {currentStep < steps.length - 1 ? (
             <button
               onClick={nextStep}
-              disabled={!canProceed()}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all
                 ${canProceed()
                   ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md'
-                  : 'bg-primary-100 text-primary-300 cursor-not-allowed'
+                  : 'bg-primary-100 text-primary-400 hover:bg-primary-200'
                 }`}
             >
               Próximo
@@ -331,7 +385,7 @@ const CreateProposal = () => {
           ) : (
             <button
               onClick={handleFinish}
-              disabled={!canProceed() || submitting}
+              disabled={submitting}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all
                 ${canProceed() && !submitting
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-lg'

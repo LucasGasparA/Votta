@@ -12,10 +12,12 @@ model User {
   email     String   @unique
   password  String
   name      String
-  role      String   @default("USER")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  proposals Proposal[]
+  role              String    @default("USER")
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  proposals         Proposal[]
 }
 
 model Municipality {

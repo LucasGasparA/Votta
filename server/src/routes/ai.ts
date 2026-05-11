@@ -20,6 +20,7 @@ function zodError(error: z.ZodError): string {
 const PROJECT_ID = process.env.GCP_PROJECT_ID;
 const LOCATION   = process.env.GCP_LOCATION || 'us-central1';
 const MODEL      = process.env.GCP_MODEL    || 'gemini-1.5-pro';
+const LLM_TIMEOUT_MS = 30_000;
 
 const vertexAI = PROJECT_ID
   ? new VertexAI({ project: PROJECT_ID, location: LOCATION })
@@ -47,26 +48,35 @@ router.post('/chat', async (req: Request, res: Response) => {
 Avalie minutas legislativas, sugira melhorias estruturais, verifique viabilidade constitucional e sugira citações.
 Sempre justifique citando fundamentações (ex: LOM Art. 145, CF Art. 30).
 Se identificar vícios de competência, alerte sobre inconstitucionalidade.
+Se não encontrar base normativa clara para um ponto, diga explicitamente que não encontrei referência normativa suficiente e recomende consultar a Procuradoria Municipal antes de prosseguir.
 Seja conciso e objetivo.
 
 Contexto da proposta: ${promptContext || 'Sem contexto fornecido.'}`;
 
-    const model = vertexAI.getGenerativeModel({
-      model: MODEL,
-      systemInstruction,
-    });
+    const model = vertexAI.getGenerativeModel({ model: MODEL, systemInstruction });
+    const chat  = model.startChat();
 
-    const chat = model.startChat();
-    const result = await chat.sendMessage(message);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), LLM_TIMEOUT_MS)
+    );
+
+    const result = await Promise.race([
+      chat.sendMessage(message),
+      timeoutPromise,
+    ]);
 
     const text =
-      result.response.candidates?.[0]?.content?.parts?.[0]?.text ??
+      (result as any).response.candidates?.[0]?.content?.parts?.[0]?.text ??
       'Sem resposta do modelo.';
 
     res.json({ type: 'response', text });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro Vertex AI:', error);
-    res.status(500).json({ error: 'Erro na integração com Vertex AI' });
+    if (error?.message === 'TIMEOUT') {
+      res.status(504).json({ error: 'O assistente demorou mais que o esperado. Tente novamente em alguns instantes.' });
+      return;
+    }
+    res.status(500).json({ error: 'Nosso assistente está temporariamente indisponível. Tente em alguns minutos.' });
   }
 });
 

@@ -125,6 +125,25 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/:id/versions', async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const userId = String((req as AuthRequest).user.userId);
+    const proposal = await prisma.proposal.findFirst({ where: { id, userId } });
+    if (!proposal) {
+      res.status(404).json({ error: 'Proposição não encontrada' });
+      return;
+    }
+    const versions = await prisma.proposalVersion.findMany({
+      where: { proposalId: id },
+      orderBy: { versionNumber: 'desc' },
+    });
+    res.json(versions);
+  } catch {
+    res.status(500).json({ error: 'Erro ao buscar versões' });
+  }
+});
+
 router.put('/:id', async (req: Request, res: Response) => {
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) {

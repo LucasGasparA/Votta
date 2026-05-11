@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Scale, ArrowLeft } from 'lucide-react'
+import { Scale, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
 export default function Register() {
   const navigate = useNavigate()
-  const [name,     setName]     = useState('')
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [name,         setName]         = useState('')
+  const [email,        setEmail]        = useState('')
+  const [password,     setPassword]     = useState('')
+  const [confirm,      setConfirm]      = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm,  setShowConfirm]  = useState(false)
+  const [loading,      setLoading]      = useState(false)
 
   const inputStyle = {
     border: '1.5px solid #e8e8e8',
@@ -32,6 +35,10 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (password !== confirm) {
+      toast.error('As senhas não coincidem')
+      return
+    }
     setLoading(true)
     try {
       await api.post('/auth/register', { name, email, password })
@@ -110,20 +117,56 @@ export default function Register() {
               onFocus={e => Object.assign(e.target.style, focusStyle)}
               onBlur={e  => Object.assign(e.target.style, blurStyle)}
             />
+
+            {/* Senha */}
             <div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Senha"
+                  minLength={6}
+                  required
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm transition-all"
+                  style={inputStyle}
+                  onFocus={e => Object.assign(e.target.style, focusStyle)}
+                  onBlur={e  => Object.assign(e.target.style, blurStyle)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  style={{ color: '#aaa', lineHeight: 0 }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <p className="text-xs mt-1.5" style={{ color: '#bbb' }}>Mínimo 6 caracteres</p>
+            </div>
+
+            {/* Confirmar senha */}
+            <div className="relative">
               <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Senha"
+                type={showConfirm ? 'text' : 'password'}
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                placeholder="Confirmar senha"
                 minLength={6}
                 required
-                className="w-full px-4 py-3.5 rounded-xl text-sm transition-all"
+                className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm transition-all"
                 style={inputStyle}
                 onFocus={e => Object.assign(e.target.style, focusStyle)}
                 onBlur={e  => Object.assign(e.target.style, blurStyle)}
               />
-              <p className="text-xs mt-1.5" style={{ color: '#bbb' }}>Mínimo 6 caracteres</p>
+              <button
+                type="button"
+                onClick={() => setShowConfirm(v => !v)}
+                className="absolute right-4 top-1/2 -translate-y-1/2"
+                style={{ color: '#aaa', lineHeight: 0 }}
+              >
+                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
 
             <button
@@ -146,12 +189,6 @@ export default function Register() {
             </Link>
           </p>
 
-          <p className="text-center text-xs mt-7 leading-relaxed" style={{ color: '#bbb' }}>
-            Ao criar sua conta, você concorda com nossos{' '}
-            <a href="#" className="underline" style={{ color: '#999' }}>Termos</a>
-            {' '}e{' '}
-            <a href="#" className="underline" style={{ color: '#999' }}>Política de Privacidade</a>.
-          </p>
         </motion.div>
       </div>
     </div>

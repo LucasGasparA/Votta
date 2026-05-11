@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Scale } from 'lucide-react'
+import { Scale, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
 export default function Login({ onLogin }) {
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [email,       setEmail]       = useState('')
+  const [password,    setPassword]    = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading,     setLoading]     = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -25,17 +26,6 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-
-      {/* Barra superior */}
-      <div className="flex justify-end p-5">
-        <Link
-          to="/register"
-          className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-xl border transition-colors"
-          style={{ borderColor: '#e0e0e0', color: '#555' }}
-        >
-          Criar conta
-        </Link>
-      </div>
 
       {/* Conteúdo central */}
       <div className="flex-1 flex items-center justify-center px-6 pb-16">
@@ -86,16 +76,16 @@ export default function Login({ onLogin }) {
               }}
             />
 
-            {/* Senha + Esqueceu */}
+            {/* Senha + olho + Esqueceu */}
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="Senha"
                 minLength={6}
                 required
-                className="w-full px-4 py-3.5 pr-24 rounded-xl text-sm transition-all"
+                className="w-full px-4 py-3.5 pr-32 rounded-xl text-sm transition-all"
                 style={{
                   border: '1.5px solid #e8e8e8',
                   background: '#fafafa',
@@ -114,13 +104,22 @@ export default function Login({ onLogin }) {
                   e.target.style.boxShadow   = 'none'
                 }}
               />
-              <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: '#b83b3d' }}
-              >
-                Esqueceu?
-              </button>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  style={{ color: '#aaa', lineHeight: 0 }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: '#b83b3d' }}
+                >
+                  Esqueceu?
+                </Link>
+              </div>
             </div>
 
             {/* Botão */}
@@ -145,13 +144,6 @@ export default function Login({ onLogin }) {
             </Link>
           </p>
 
-          {/* Termos */}
-          <p className="text-center text-xs mt-7 leading-relaxed" style={{ color: '#bbb' }}>
-            Ao entrar, você concorda com nossos{' '}
-            <a href="#" className="underline" style={{ color: '#999' }}>Termos</a>
-            {' '}e{' '}
-            <a href="#" className="underline" style={{ color: '#999' }}>Política de Privacidade</a>.
-          </p>
         </motion.div>
       </div>
     </div>

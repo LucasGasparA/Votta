@@ -1,10 +1,12 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
+import { sendPasswordResetEmail } from '../utils/mailer.js';
 
 const router = Router();
 
@@ -124,6 +126,98 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
 router.post('/logout', (_req: Request, res: Response) => {
   res.clearCookie('token', { path: '/' });
   res.json({ ok: true });
+});
+
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Muitas tentativas. Aguarde 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const forgotSchema = z.object({
+  email: z.string().email('E-mail inválido'),
+});
+
+const resetSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+});
+
+// POST /auth/forgot-password
+router.post('/forgot-password', forgotPasswordLimiter, async (req: Request, res: Response) => {
+  const parsed = forgotSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const { email } = parsed.data;
+
+  // Always respond with success to avoid leaking which emails exist
+  res.json({ ok: true });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return;
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashed = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken: hashed, resetTokenExpiry: expiry },
+    });
+
+    await sendPasswordResetEmail(email, rawToken);
+    console.log('✅ E-mail de recuperação enviado para:', email);
+  } catch (error) {
+    console.error('❌ Erro ao enviar e-mail de recuperação:', error);
+  }
+});
+
+// POST /auth/reset-password
+router.post('/reset-password', async (req: Request, res: Response) => {
+  const parsed = resetSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const { token, password } = parsed.data;
+  const hashed = crypto.createHash('sha256').update(token).digest('hex');
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: hashed,
+        resetTokenExpiry: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      res.status(400).json({ error: 'Link inválido ou expirado. Solicite um novo.' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+
+    console.log('✅ Senha redefinida para:', user.email);
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('❌ Erro ao redefinir senha:', error);
+    res.status(500).json({ error: 'Erro no servidor' });
+  }
 });
 
 export default router;
