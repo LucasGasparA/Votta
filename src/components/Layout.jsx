@@ -26,10 +26,10 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
   const [collapsed, setCollapsed] = useState(false)
 
   const navItems = [
-    { path: '/dashboard',           icon: Home,       label: 'Dashboard' },
-    { path: '/create-proposal',     icon: PlusCircle, label: 'Nova Proposição' },
-    { path: '/select-municipality', icon: MapPin,     label: 'Município' },
-    { path: '/pricing',             icon: Zap,        label: 'Planos' },
+    { path: '/dashboard', icon: Home, label: 'Dashboard' },
+    { path: '/create-proposal', icon: PlusCircle, label: 'Nova Proposição' },
+    { path: '/select-municipality', icon: MapPin, label: 'Município' },
+    { path: '/pricing', icon: Zap, label: 'Planos' },
   ]
 
   const avatarColor = nameToColor(user?.name)
@@ -39,36 +39,63 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
 
     return (
       <>
-        {/* Logo */}
-        <div className={`border-b border-primary-100 flex items-center flex-shrink-0 ${isCollapsed ? 'p-3 justify-center' : 'p-5 justify-between'}`}>
-          {isCollapsed ? (
-            <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
-              <Scale className="text-white" size={20} />
-            </div>
-          ) : (
+        {/* ── Cabeçalho: logo + botão recolher ── */}
+        <div
+          className={`border-b border-primary-100 flex items-center flex-shrink-0 ${isCollapsed ? 'p-3 justify-center' : 'p-4 gap-3'
+            }`}
+        >
+          {/* Logo */}
+          <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Scale className="text-white" size={20} />
+          </div>
+
+          {!isCollapsed && (
             <>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Scale className="text-white" size={20} />
-                </div>
-                <div>
-                  <h1 className="text-base font-display font-bold text-primary-800 leading-tight">Votta</h1>
-                  <p className="text-xs text-primary-400">Assistente Legislativo</p>
-                </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-base font-display font-bold text-primary-800 leading-tight">Votta</h1>
+                <p className="text-xs text-primary-400">Assistente Legislativo</p>
               </div>
+
+              {/* Botão fechar (mobile) */}
               {mobile && (
                 <button
                   onClick={() => setSidebarOpen(false)}
+                  aria-label="Fechar menu"
                   className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
                 >
                   <X size={18} />
                 </button>
               )}
+
+              {/* Botão recolher (desktop) */}
+              {!mobile && (
+                <button
+                  onClick={() => setCollapsed(c => !c)}
+                  aria-label="Recolher menu"
+                  title="Recolher menu"
+                  className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors flex-shrink-0"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              )}
             </>
+          )}
+
+          {/* Botão expandir (desktop, collapsed) */}
+          {isCollapsed && !mobile && (
+            <button
+              onClick={() => setCollapsed(false)}
+              aria-label="Expandir menu"
+              title="Expandir menu"
+              className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+            >
+              <ChevronRight size={18} />
+            </button>
           )}
         </div>
 
-        {/* Município ativo */}
+
+        {/* ── Município ativo ── */}
         {selectedMunicipality && (
           isCollapsed ? (
             <div className="px-2 pt-3">
@@ -90,7 +117,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           )
         )}
 
-        {/* Navegação */}
+        {/* ── Navegação ── */}
         <nav className="flex-1 p-2 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -106,9 +133,9 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   ${isCollapsed
                     ? `justify-center p-3 ${isActive ? 'bg-primary-50 text-primary-700' : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'}`
                     : `gap-3 py-2.5 pr-4 border-l-[3px] pl-[13px] ${isActive
-                        ? 'border-primary-600 bg-primary-50 text-primary-700'
-                        : 'border-transparent text-primary-500 hover:bg-primary-50 hover:text-primary-700'
-                      }`
+                      ? 'border-primary-600 bg-primary-50 text-primary-700'
+                      : 'border-transparent text-primary-500 hover:bg-primary-50 hover:text-primary-700'
+                    }`
                   }
                 `}
               >
@@ -131,34 +158,8 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           })}
         </nav>
 
-        {/* Rodapé usuário */}
+        {/* ── Rodapé: configurações + sair ── */}
         <div className={`border-t border-primary-100 space-y-0.5 ${isCollapsed ? 'p-2' : 'p-3'}`}>
-          {user && (
-            isCollapsed ? (
-              <div className="flex justify-center py-2 mb-1" title={user.name}>
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: avatarColor }}
-                >
-                  {getInitials(user.name)}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 px-3 py-2 rounded-xl mb-1">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                  style={{ background: avatarColor }}
-                >
-                  {getInitials(user.name)}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-primary-800 truncate leading-tight">{user.name}</p>
-                  <p className="text-xs text-primary-400 truncate">{user.email}</p>
-                </div>
-              </div>
-            )
-          )}
-
           <Link
             to="/configuracoes"
             onClick={() => setSidebarOpen(false)}
@@ -179,19 +180,6 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             <LogOut size={17} />
             {!isCollapsed && <span>Sair</span>}
           </button>
-
-          {/* Botão colapsar (desktop only) */}
-          {!mobile && (
-            <button
-              onClick={() => setCollapsed(c => !c)}
-              title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-              className={`w-full flex items-center gap-3 text-sm text-primary-400 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-all duration-200 mt-1
-                ${isCollapsed ? 'justify-center p-3' : 'px-[13px] py-2.5'}`}
-            >
-              {collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
-              {!isCollapsed && <span className="text-xs">Recolher menu</span>}
-            </button>
-          )}
         </div>
       </>
     )
@@ -238,6 +226,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-primary-100 shadow-sm flex-shrink-0 print:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
+            aria-label="Abrir menu"
             className="p-2 rounded-lg text-primary-500 hover:bg-primary-50 hover:text-primary-700 transition-colors"
           >
             <Menu size={22} />
@@ -248,8 +237,36 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             </div>
             <span className="font-display font-bold text-primary-800 text-sm">Votta</span>
           </div>
-          <div className="w-10" />
+          {/* Avatar no mobile top bar */}
+          {user && (
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              style={{ background: avatarColor }}
+              title={user.name}
+            >
+              {getInitials(user.name)}
+            </div>
+          )}
         </div>
+
+        {/* Desktop top bar */}
+        {user && (
+          <div className="hidden lg:flex items-center justify-end px-6 py-3 bg-white border-b border-primary-100 flex-shrink-0 print:hidden">
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-sm font-semibold text-primary-800 leading-tight">{user.name}</p>
+                <p className="text-xs text-primary-400">{user.email}</p>
+              </div>
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-bold cursor-default"
+                style={{ background: avatarColor }}
+                title={user.name}
+              >
+                {getInitials(user.name)}
+              </div>
+            </div>
+          </div>
+        )}
 
         <main className="flex-1 overflow-y-auto print:overflow-visible">
           <Outlet context={{ selectedMunicipality }} />
