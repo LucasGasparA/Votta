@@ -41,7 +41,7 @@ export default function Login({ onLogin }) {
                  style={{ background: '#b83b3d' }}>
               <Scale size={16} color="#fff" />
             </div>
-            <span className="text-lg font-semibold" style={{ color: '#111' }}>LegislaApp</span>
+            <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
           </div>
 
           <h1 className="text-xl font-semibold text-center mb-6" style={{ color: '#111' }}>

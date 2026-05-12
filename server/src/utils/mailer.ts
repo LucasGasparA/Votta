@@ -16,14 +16,14 @@ export async function sendPasswordResetEmail(to: string, token: string) {
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to,
-    subject: 'Redefinição de senha — LegislaApp',
+    subject: 'Redefinição de senha — Votta',
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#111">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
           <div style="width:32px;height:32px;background:#b83b3d;border-radius:8px;display:flex;align-items:center;justify-content:center">
             <span style="color:#fff;font-size:16px">⚖</span>
           </div>
-          <span style="font-size:17px;font-weight:600">LegislaApp</span>
+          <span style="font-size:17px;font-weight:600">Votta</span>
         </div>
 
         <h2 style="font-size:20px;font-weight:700;margin:0 0 12px">Redefinição de senha</h2>

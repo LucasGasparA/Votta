@@ -26,13 +26,7 @@ function App() {
         setUser(user)
       })
       .catch(() => {
-        // TODO: remover antes do deploy — substituir pelo contexto de autenticação real
-        if (import.meta.env.DEV) {
-          setIsAuthenticated(true)
-          setUser({ id: 'mock', name: 'Lucas Gaspar', email: 'lucas@legislaapp.com', role: 'USER' })
-        } else {
-          setIsAuthenticated(false)
-        }
+        setIsAuthenticated(false)
       })
       .finally(() => setLoading(false))
   }, [])

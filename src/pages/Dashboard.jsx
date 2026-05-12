@@ -69,10 +69,10 @@ const Dashboard = () => {
     : proposals
 
   return (
-    <div className="p-4 md:p-8">
-      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <h1 className="text-4xl font-display font-bold text-primary-800 mb-1">Dashboard</h1>
-        <p className="text-primary-500">Visão geral das suas proposições legislativas</p>
+    <div className="p-4 md:p-6">
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
+        <h1 className="text-3xl font-display font-bold text-primary-800 mb-0.5">Dashboard</h1>
+        <p className="text-primary-500 text-sm">Visão geral das suas proposições legislativas</p>
       </motion.div>
 
       {/* Stats */}
@@ -80,7 +80,7 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-5"
       >
         {stats.map((stat, index) => <StatCard key={stat.label} stat={stat} index={index} />)}
       </motion.div>
@@ -143,8 +143,8 @@ const Dashboard = () => {
             transition={{ delay: 0.25 }}
             className="space-y-4"
           >
-            <div className="card p-6">
-              <h2 className="text-lg font-display font-bold text-primary-800 mb-4">Ações Rápidas</h2>
+            <div className="card p-4">
+              <h2 className="text-base font-display font-bold text-primary-800 mb-3">Ações Rápidas</h2>
               <div className="space-y-2">
                 <Link
                   to="/create-proposal"
@@ -176,8 +176,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="card p-5 bg-gradient-to-br from-primary-50 to-oro-50 border-primary-200">
-              <p className="text-xs font-semibold text-primary-500 uppercase tracking-wide mb-2">Dica Jurídica</p>
+            <div className="card p-4 bg-gradient-to-br from-primary-50 to-oro-50 border-primary-200">
+              <p className="text-xs font-semibold text-primary-500 uppercase tracking-wide mb-1.5">Dica Jurídica</p>
               <p className="text-sm text-primary-700 leading-relaxed">
                 Consulte a Lei Orgânica do Município antes de iniciar uma proposição. O assistente jurídico identifica competências e requisitos formais automaticamente.
               </p>

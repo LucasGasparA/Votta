@@ -30,8 +30,8 @@ const ProposalList = ({ proposals }) => {
       transition={{ delay: 0.2 }}
       className="lg:col-span-2"
     >
-      <div className="card p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="card p-4">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-display font-bold text-primary-800">Proposições Recentes</h2>
           <Link
             to="/create-proposal"

@@ -45,7 +45,7 @@ export default function ForgotPassword() {
                style={{ background: '#b83b3d' }}>
             <Scale size={16} color="#fff" />
           </div>
-          <span className="text-lg font-semibold" style={{ color: '#111' }}>LegislaApp</span>
+          <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
         </div>
 
         {sent ? (

@@ -138,7 +138,7 @@ const TESTIMONIALS = [
 
 const FAQS = [
   { q: 'Posso cancelar a qualquer momento?',       a: 'Sim. Sem fidelidade contratual. Você cancela com 1 clique no painel e a cobrança para no próximo ciclo — sem multas, sem burocracia.' },
-  { q: 'O sistema substitui o procurador?',        a: 'Não — e não queremos que substitua. O LegislaApp é uma ferramenta de assistência técnica, não de substituição. O procurador continua sendo responsável pela revisão final. O sistema elimina o trabalho mecânico.' },
+  { q: 'O sistema substitui o procurador?',        a: 'Não — e não queremos que substitua. O Votta é uma ferramenta de assistência técnica, não de substituição. O procurador continua sendo responsável pela revisão final. O sistema elimina o trabalho mecânico.' },
   { q: 'Como funciona a atualização normativa?',   a: 'Nossa equipe atualiza a base normativa (LOM, CF, legislação estadual) mensalmente. Quando uma nova versão é publicada, o sistema notifica os usuários e atualiza as referências automaticamente nas próximas minutas.' },
   { q: 'Os dados ficam seguros? (LGPD)',           a: 'Sim. Todos os dados são armazenados em servidores no Brasil, em conformidade com a LGPD. Utilizamos criptografia TLS 1.3 em trânsito e em repouso. Seus dados nunca são compartilhados com terceiros.' },
   { q: 'Posso testar antes de pagar?',             a: 'Sim. O plano Básico é gratuito para sempre — sem cartão de crédito. Você experimenta com até 3 proposições por mês e faz upgrade quando quiser, sem perder o histórico.' },

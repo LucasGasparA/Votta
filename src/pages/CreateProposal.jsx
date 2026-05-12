@@ -104,14 +104,14 @@ const CreateProposal = () => {
   const blockReason  = triedNext ? getBlockReason() : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-oro-50 p-4 md:p-8">
+    <div className="bg-gradient-to-br from-primary-50 via-white to-oro-50 p-4 md:p-6">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
+        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-5">
           <div>
-            <h1 className="text-3xl font-display font-bold text-primary-800 mb-1 flex items-center gap-3">
-              <FileText className="text-primary-600" size={32} />
+            <h1 className="text-2xl font-display font-bold text-primary-800 mb-0.5 flex items-center gap-3">
+              <FileText className="text-primary-600" size={26} />
               Nova Proposição
             </h1>
             <p className="text-primary-500 text-sm">Wizard guiado com assistência jurídica inteligente</p>
@@ -126,7 +126,7 @@ const CreateProposal = () => {
         <motion.div
           initial={{ opacity: 0, scaleX: 0.9 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          className="card p-5 mb-6"
+          className="card p-4 mb-4"
         >
           {/* Indicador textual */}
           <div className="flex items-center justify-between mb-3">
@@ -185,10 +185,10 @@ const CreateProposal = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -40 }}
             transition={{ duration: 0.25 }}
-            className="card p-8 mb-6"
+            className="card p-5 mb-4"
           >
-            <h2 className="text-2xl font-display font-bold text-primary-800 mb-1">{steps[currentStep].title}</h2>
-            <p className="text-primary-400 text-sm mb-6">{steps[currentStep].description}</p>
+            <h2 className="text-xl font-display font-bold text-primary-800 mb-0.5">{steps[currentStep].title}</h2>
+            <p className="text-primary-400 text-sm mb-4">{steps[currentStep].description}</p>
 
             {/* Passo 0 */}
             {currentStep === 0 && (
@@ -240,7 +240,7 @@ const CreateProposal = () => {
                   <textarea
                     value={formData.objective}
                     onChange={e => update('objective', e.target.value)}
-                    className={`input-field min-h-[100px] resize-none ${triedNext && !formData.objective.trim() ? 'border-red-400' : ''}`}
+                    className={`input-field min-h-[80px] resize-none ${triedNext && !formData.objective.trim() ? 'border-red-400' : ''}`}
                     placeholder="Descreva o objetivo principal desta proposição..."
                   />
                   {triedNext && !formData.objective.trim() && (
@@ -334,7 +334,7 @@ const CreateProposal = () => {
                   <textarea
                     value={formData.justification}
                     onChange={e => update('justification', e.target.value)}
-                    className="input-field min-h-[160px] resize-none"
+                    className="input-field min-h-[120px] resize-none"
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />

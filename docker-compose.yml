@@ -28,8 +28,6 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
-      # Monta a pasta de chaves do Windows para dentro do container do backend
-      - C:\Users\willi\keys:/keys:ro
     depends_on:
       - db
 
