@@ -17,7 +17,14 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser]                       = useState(null)
   const [loading, setLoading]                 = useState(true)
-  const [selectedMunicipality, setSelectedMunicipality] = useState(null)
+  const [selectedMunicipality, setSelectedMunicipality] = useState(() => {
+    try {
+      const saved = localStorage.getItem('legisla:municipality')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
 
   useEffect(() => {
     api.get('/auth/me')
@@ -38,10 +45,25 @@ function App() {
     })
   }
 
+  const handleSelectMunicipality = (municipio) => {
+    setSelectedMunicipality(municipio)
+    try {
+      if (municipio) {
+        localStorage.setItem('legisla:municipality', JSON.stringify(municipio))
+      } else {
+        localStorage.removeItem('legisla:municipality')
+      }
+    } catch {
+      // localStorage indisponível — silencioso
+    }
+  }
+
   const handleLogout = async () => {
     try { await api.post('/auth/logout', {}) } catch { /* ignora */ }
     setIsAuthenticated(false)
     setUser(null)
+    setSelectedMunicipality(null)
+    try { localStorage.removeItem('legisla:municipality') } catch { /* ignora */ }
   }
 
   if (loading) {
@@ -81,7 +103,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route
             path="select-municipality"
-            element={<SelectMunicipality onSelect={setSelectedMunicipality} current={selectedMunicipality} />}
+            element={<SelectMunicipality onSelect={handleSelectMunicipality} current={selectedMunicipality} />}
           />
           <Route path="create-proposal" element={<CreateProposal />} />
           <Route path="proposal/:id/edit" element={<ProposalEditor />} />

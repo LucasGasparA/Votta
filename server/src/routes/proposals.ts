@@ -178,4 +178,20 @@ router.put('/:id', async (req: Request, res: Response) => {
   }
 });
 
+router.delete('/:id', async (req: Request, res: Response) => {
+  const id     = req.params.id as string;
+  const userId = String((req as AuthRequest).user.userId);
+  try {
+    const existing = await prisma.proposal.findFirst({ where: { id, userId } });
+    if (!existing) {
+      res.status(404).json({ error: 'Proposição não encontrada' });
+      return;
+    }
+    await prisma.proposal.delete({ where: { id: existing.id } });
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: 'Erro ao excluir proposição' });
+  }
+});
+
 export default router;

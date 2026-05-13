@@ -6,10 +6,14 @@ const MARGIN_BOT  = 22;
 const USABLE_W    = PAGE_W - MARGIN_H * 2;  // 160mm
 const LINE_H      = 6.5;
 
-export async function exportToPDF(proposalTitle = 'Proposição', doc) {
+export async function exportToPDF(proposalTitle = 'Proposição', doc, municipality = null) {
   const { jsPDF } = await import('jspdf');
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   let y = MARGIN_TOP;
+
+  const municipioNome = municipality?.nomeOficial || municipality?.nome || 'Nova Veneza'
+  const municipioUF   = municipality?.uf || 'SC'
+  const municipioSlug = `${municipioNome}/${municipioUF}`
 
   /* ── helpers ──────────────────────────────────────────────────── */
 
@@ -42,7 +46,7 @@ export async function exportToPDF(proposalTitle = 'Proposição', doc) {
   /* ── Cabeçalho ────────────────────────────────────────────────── */
   text('ESTADO DE SANTA CATARINA',             PAGE_W / 2, { size: 11, style: 'bold', align: 'center' });
   gap(3);
-  text('CÂMARA MUNICIPAL DE NOVA VENEZA',      PAGE_W / 2, { size: 11, style: 'bold', align: 'center' });
+  text(`CÂMARA MUNICIPAL DE ${municipioNome.toUpperCase()}`, PAGE_W / 2, { size: 11, style: 'bold', align: 'center' });
   gap(6);
   hline([0, 0, 0]);
   gap(2);
@@ -106,7 +110,7 @@ export async function exportToPDF(proposalTitle = 'Proposição', doc) {
 
   /* ── Data e assinatura ────────────────────────────────────────── */
   newPageIfNeeded(40);
-  const dateStr = `Nova Veneza/SC, ${new Date().toLocaleDateString('pt-BR')}`;
+  const dateStr = `${municipioSlug}, ${new Date().toLocaleDateString('pt-BR')}`;
   text(dateStr, PAGE_W / 2, { style: 'normal', size: 11, align: 'center' });
   gap(18);
 

@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { PlusCircle, FileText, ArrowRight, Clock, CheckCircle, AlertTriangle } from 'lucide-react'
+import { PlusCircle, FileText, ArrowRight, Clock, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const STATUS_CONFIG = {
@@ -20,7 +21,9 @@ const EmptyStateSVG = () => (
   </svg>
 )
 
-const ProposalList = ({ proposals }) => {
+const ProposalList = ({ proposals, onDelete }) => {
+  const [deleteTarget, setDeleteTarget] = useState(null)
+
   const getStatus = (status) => STATUS_CONFIG[status] ?? STATUS_CONFIG.em_andamento
 
   return (
@@ -61,43 +64,107 @@ const ProposalList = ({ proposals }) => {
               const cfg = getStatus(proposal.status)
               const StatusIcon = cfg.Icon
               return (
-                <Link
+                <div
                   key={proposal.id}
-                  to={`/proposal/${proposal.id}/edit`}
-                  className={`block border border-primary-100 border-l-4 ${cfg.border} rounded-xl p-4 hover:border-primary-200 hover:shadow-md hover:-translate-y-px active:scale-[0.99] transition-all duration-200 group cursor-pointer`}
+                  className={`relative border border-primary-100 border-l-4 ${cfg.border}
+                    rounded-xl hover:border-primary-200 hover:shadow-md transition-all duration-200 group`}
                 >
-                  <div className="flex items-start justify-between mb-2.5">
-                    <div className="flex-1 min-w-0 pr-3">
-                      <h3 className="font-semibold text-primary-800 text-sm mb-0.5 truncate group-hover:text-primary-600 transition-colors">
-                        {proposal.title}
-                      </h3>
-                      <p className="text-xs text-primary-400 truncate">{proposal.type}</p>
+                  <Link
+                    to={`/proposal/${proposal.id}/edit`}
+                    className="block p-4"
+                  >
+                    <div className="flex items-start justify-between mb-2.5">
+                      <div className="flex-1 min-w-0 pr-3">
+                        <h3 className="font-semibold text-primary-800 text-sm mb-0.5 truncate group-hover:text-primary-600 transition-colors">
+                          {proposal.title}
+                        </h3>
+                        <p className="text-xs text-primary-400 truncate">{proposal.type}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 pr-6">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.color}`}>
+                          <StatusIcon size={11} strokeWidth={2.5} />
+                          {cfg.label}
+                        </span>
+                        <ArrowRight size={14} className="text-primary-300 group-hover:text-primary-500 transition-colors" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.color}`}>
-                        <StatusIcon size={11} strokeWidth={2.5} />
-                        {cfg.label}
-                      </span>
-                      <ArrowRight size={14} className="text-primary-300 group-hover:text-primary-500 transition-colors" />
-                    </div>
-                  </div>
 
-                  <div className="w-full bg-primary-100 rounded-full h-1 mb-1.5">
-                    <div
-                      className={`${cfg.bar} h-1 rounded-full transition-all duration-700`}
-                      style={{ width: `${proposal.progress}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-primary-400">Atualizado {proposal.lastUpdate}</p>
-                    <p className="text-xs font-medium text-primary-500">{proposal.progress}%</p>
-                  </div>
-                </Link>
+                    <div className="w-full bg-primary-100 rounded-full h-1 mb-1.5">
+                      <div
+                        className={`${cfg.bar} h-1 rounded-full transition-all duration-700`}
+                        style={{ width: `${proposal.progress}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-primary-400">Atualizado {proposal.lastUpdate}</p>
+                      <p className="text-xs font-medium text-primary-500">{proposal.progress}%</p>
+                    </div>
+                  </Link>
+
+                  <button
+                    onClick={e => {
+                      e.preventDefault()
+                      setDeleteTarget({ id: proposal.id, title: proposal.title })
+                    }}
+                    aria-label="Excluir proposição"
+                    className="absolute top-3 right-3 p-1.5 rounded-lg text-primary-300
+                      hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100
+                      transition-all duration-150"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               )
             })}
           </div>
         )}
       </div>
+
+      {/* Modal de confirmação de exclusão */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <motion.div
+            initial={{ scale: 0.95, y: 16 }}
+            animate={{ scale: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+          >
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-500" />
+            </div>
+            <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+              Excluir proposição?
+            </h2>
+            <p className="text-sm text-primary-500 text-center mb-1 leading-relaxed">
+              Você está prestes a excluir:
+            </p>
+            <p className="text-sm font-semibold text-primary-800 text-center mb-6 px-2 truncate">
+              "{deleteTarget.title}"
+            </p>
+            <p className="text-xs text-red-500 text-center mb-6">
+              Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200
+                  text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  onDelete(deleteTarget.id)
+                  setDeleteTarget(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-red-500 text-white
+                  hover:bg-red-600 active:scale-[0.97] transition-all"
+              >
+                Excluir
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   )
 }

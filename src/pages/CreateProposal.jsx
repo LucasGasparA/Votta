@@ -5,6 +5,15 @@ import { useNavigate, Link, useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
+const LOADING_STEPS = [
+  { icon: '📋', text: 'Registrando sua proposição...' },
+  { icon: '🔍', text: 'Analisando competência municipal...' },
+  { icon: '⚖️',  text: 'Consultando a Lei Orgânica Municipal...' },
+  { icon: '✍️',  text: 'Redigindo ementa e preâmbulo...' },
+  { icon: '📜', text: 'Estruturando os artigos...' },
+  { icon: '✅', text: 'Finalizando a minuta...' },
+]
+
 const CreateProposal = () => {
   const navigate = useNavigate()
   const { selectedMunicipality } = useOutletContext() ?? {}
@@ -15,10 +24,12 @@ const CreateProposal = () => {
       navigate('/select-municipality')
     }
   }, [selectedMunicipality, navigate])
-  const [currentStep, setCurrentStep] = useState(0)
-  const [direction, setDirection]     = useState(1)
-  const [submitting, setSubmitting]   = useState(false)
-  const [triedNext, setTriedNext]     = useState(false)
+  const [currentStep, setCurrentStep]     = useState(0)
+  const [direction, setDirection]         = useState(1)
+  const [submitting, setSubmitting]       = useState(false)
+  const [triedNext, setTriedNext]         = useState(false)
+  const [generating, setGenerating]       = useState(false)
+  const [generatingStep, setGeneratingStep] = useState(0)
   const [formData, setFormData]       = useState({
     type: '',
     theme: '',
@@ -88,11 +99,31 @@ const CreateProposal = () => {
   const handleFinish = async () => {
     if (submitting || !canProceed()) return
     setSubmitting(true)
+    setGenerating(true)
+    setGeneratingStep(0)
+
+    const stepInterval = setInterval(() => {
+      setGeneratingStep(s => Math.min(s + 1, LOADING_STEPS.length - 1))
+    }, 3000)
+
     try {
-      const data = await api.post('/proposals', formData)
-      toast.success('Proposição criada!')
+      const data = await api.post('/proposals', {
+        ...formData,
+        municipalityId: selectedMunicipality?.id,
+      })
+
+      await api.post('/ai/generate', { proposalId: data.id })
+
+      clearInterval(stepInterval)
+      setGeneratingStep(LOADING_STEPS.length - 1)
+
+      await new Promise(r => setTimeout(r, 800))
+
+      toast.success('Minuta gerada com sucesso!')
       navigate(`/proposal/${data.id}/edit`)
     } catch (e) {
+      clearInterval(stepInterval)
+      setGenerating(false)
       toast.error(e.message)
     } finally {
       setSubmitting(false)
@@ -102,6 +133,76 @@ const CreateProposal = () => {
   const justLen      = formData.justification.length
   const progressPct  = (currentStep / (steps.length - 1)) * 100
   const blockReason  = triedNext ? getBlockReason() : null
+
+  if (generating) {
+    const step = LOADING_STEPS[generatingStep]
+    const pct  = Math.round(((generatingStep + 1) / LOADING_STEPS.length) * 100)
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 flex flex-col items-center justify-center p-6 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
+
+          {/* Ícone animado */}
+          <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mb-5 animate-pulse">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={generatingStep}
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.25 }}
+                className="text-4xl"
+              >
+                {step.icon}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+
+          <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
+            Gerando sua minuta...
+          </h2>
+
+          {/* Texto da etapa com transição */}
+          <div className="h-5 mb-5">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={generatingStep}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="text-sm text-primary-500"
+              >
+                {step.text}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+
+          {/* Barra de progresso */}
+          <div className="w-full bg-primary-100 rounded-full h-2 mb-5">
+            <div
+              className="bg-primary-600 h-2 rounded-full transition-all duration-700"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+
+          <p className="text-xs text-primary-400 leading-relaxed">
+            Isso pode levar até 30 segundos.<br />Não feche esta página.
+          </p>
+        </div>
+
+        {/* Três pontinhos abaixo do card */}
+        <div className="flex items-center gap-2 mt-6">
+          {[0, 1, 2].map(i => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full bg-primary-300 animate-bounce"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-gradient-to-br from-primary-50 via-white to-oro-50 p-4 md:p-6">
@@ -401,7 +502,7 @@ const CreateProposal = () => {
                 }`}
             >
               <Check size={18} />
-              {submitting ? 'Criando...' : 'Gerar Minuta'}
+              {submitting ? 'Gerando...' : 'Gerar Minuta'}
             </button>
           )}
         </div>

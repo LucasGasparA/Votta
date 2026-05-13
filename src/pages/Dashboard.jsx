@@ -6,6 +6,7 @@ import StatCard from '../components/StatCard'
 import ProposalList from '../components/ProposalList'
 import { api } from '../utils/api.js'
 import { calcularProgresso } from '../utils/progresso.js'
+import toast from 'react-hot-toast'
 
 const TYPE_LABELS = {
   pl_ordinaria:    'Projeto de Lei Ordinária',
@@ -62,6 +63,17 @@ const Dashboard = () => {
       })
       .finally(() => setLoading(false))
   }, [])
+
+  const handleDelete = async (proposalId) => {
+    try {
+      await api.del('/proposals/' + proposalId)
+      setProposals(prev => prev.filter(p => p.id !== proposalId))
+      setTotal(t => t - 1)
+      toast.success('Proposição excluída.')
+    } catch (e) {
+      toast.error(e.message)
+    }
+  }
 
   const pendingCount  = Number(stats[2]?.value ?? 0)
   const listaExibida  = somentePendentes
@@ -133,7 +145,7 @@ const Dashboard = () => {
                   </button>
                 </div>
               )}
-              <ProposalList proposals={listaExibida} />
+              <ProposalList proposals={listaExibida} onDelete={handleDelete} />
             </div>
           )}
 

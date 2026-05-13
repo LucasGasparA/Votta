@@ -220,4 +220,59 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   }
 });
 
+const updateProfileSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres').max(100),
+});
+
+router.put('/me', requireAuth, async (req: Request, res: Response) => {
+  const parsed = updateProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+  const userId = String((req as AuthRequest).user.userId);
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { name: parsed.data.name },
+      select: { id: true, name: true, email: true, role: true },
+    });
+    res.json({ user });
+  } catch {
+    res.status(500).json({ error: 'Erro ao atualizar perfil' });
+  }
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Informe a senha atual'),
+  newPassword:     z.string().min(6, 'Nova senha deve ter no mínimo 6 caracteres'),
+});
+
+router.put('/password', requireAuth, async (req: Request, res: Response) => {
+  const parsed = changePasswordSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+  const userId = String((req as AuthRequest).user.userId);
+  const { currentPassword, newPassword } = parsed.data;
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      res.status(404).json({ error: 'Usuário não encontrado' });
+      return;
+    }
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) {
+      res.status(400).json({ error: 'Senha atual incorreta' });
+      return;
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { id: userId }, data: { password: hashed } });
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: 'Erro ao atualizar senha' });
+  }
+});
+
 export default router;

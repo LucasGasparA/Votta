@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import {
-  Save, Download, MessageSquare, AlertTriangle, CheckCircle,
-  FileText, Scale, ExternalLink, Send, ArrowLeft,
+  Save, Download, AlertTriangle, CheckCircle,
+  FileText, Scale, Send, ArrowLeft,
   BookOpen, List, Calendar, Minus, AlignLeft,
   Clock, RotateCcw, X, ClipboardCheck, Bold, Italic, ListOrdered,
+  ChevronDown, ChevronUp, ExternalLink,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -19,11 +20,29 @@ const SECTIONS = [
   { id: 'revogacao', label: 'Revogação', icon: Minus,      hint: null },
 ]
 
-const ASSISTANT_SUGGESTIONS = [
-  { type: 'citation',    text: 'LOM, Art. 145, VI: "Compete ao Município proteger o meio ambiente e combater a poluição em qualquer de suas formas."', action: 'Ver citação' },
-  { type: 'improvement', text: 'Sugestão: Incluir artigo definindo prazo para implementação gradual do programa.', action: 'Aplicar sugestão' },
-  { type: 'alert',       text: 'Programas com impacto orçamentário requerem anexo com estimativa de custos conforme LRF.', action: 'Ver detalhes' },
-]
+const STATUS_CONFIG = {
+  DRAFT: {
+    label:     'Rascunho',
+    color:     'bg-primary-100 text-primary-700',
+    next:      'REVIEW',
+    nextLabel: 'Enviar para revisão',
+    nextColor: 'bg-oro-500 hover:bg-oro-600 text-white',
+  },
+  REVIEW: {
+    label:     'Em revisão',
+    color:     'bg-oro-100 text-oro-700',
+    next:      'APPROVED',
+    nextLabel: 'Marcar como aprovada',
+    nextColor: 'bg-green-600 hover:bg-green-700 text-white',
+  },
+  APPROVED: {
+    label:     'Aprovada',
+    color:     'bg-green-100 text-green-700',
+    next:      null,
+    nextLabel: null,
+    nextColor: null,
+  },
+}
 
 const PROPOSAL_TYPE_LABELS = {
   pl_ordinaria:    'Projeto de Lei Ordinária',
@@ -39,6 +58,48 @@ const UNCERTAINTY_PATTERNS = [
   'incerto', 'não identifico base',
 ]
 
+const QUICK_SUGGESTIONS = {
+  pl_ordinaria: [
+    'Verifique a constitucionalidade desta proposta',
+    'Quais artigos da LOM se aplicam aqui?',
+    'Esta lei precisa de estudo de impacto fiscal?',
+    'Sugira uma cláusula de vigência adequada',
+  ],
+  pl_complementar: [
+    'Qual o quórum exigido para lei complementar?',
+    'Verifique os requisitos formais desta proposta',
+    'Esta matéria exige lei complementar?',
+    'Sugira artigos de transição adequados',
+  ],
+  decreto: [
+    'O prefeito tem competência para este decreto?',
+    'Verifique se não há reserva de lei aqui',
+    'Qual a diferença para um decreto regulamentar?',
+    'Sugira fundamentos normativos adequados',
+  ],
+  indicacao: [
+    'Quem é o destinatário correto desta indicação?',
+    'A câmara tem competência para indicar isto?',
+    'Sugira fundamentos normativos para a indicação',
+    'Qual o efeito jurídico de uma indicação?',
+  ],
+}
+
+const DEFAULT_SUGGESTIONS = [
+  'Verifique a conformidade com a LOM',
+  'Quais artigos da CF/88 se aplicam?',
+  'Esta proposta tem impacto orçamentário?',
+  'Revise a técnica redacional desta minuta',
+]
+
+const THINKING_MESSAGES = [
+  'Consultando a Lei Orgânica Municipal...',
+  'Verificando conformidade constitucional...',
+  'Analisando jurisprudência aplicável...',
+  'Buscando referências normativas...',
+  'Revisando técnica legislativa...',
+]
+
 function detectUncertainty(text) {
   const lower = text.toLowerCase()
   return UNCERTAINTY_PATTERNS.some(p => lower.includes(p))
@@ -51,6 +112,67 @@ function hasCitation(text) {
 function formatVersionDate(dateStr) {
   const d = new Date(dateStr)
   return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
+
+function getDynamicSuggestions(proposalType) {
+  const base = [
+    {
+      type: 'alert',
+      text: 'Verifique se há impacto orçamentário. Proposições com custo exigem anexo de estimativa conforme LRF Art. 17.',
+      action: 'Ver detalhes',
+    },
+  ]
+  const byType = {
+    pl_ordinaria: [
+      {
+        type: 'citation',
+        text: 'CF/88, Art. 30, I: "Compete aos Municípios legislar sobre assuntos de interesse local."',
+        action: 'Ver citação',
+      },
+      {
+        type: 'improvement',
+        text: 'Sugestão: Incluir artigo com prazo de regulamentação (recomendado: 90 dias após publicação).',
+        action: 'Aplicar sugestão',
+      },
+    ],
+    pl_complementar: [
+      {
+        type: 'citation',
+        text: 'LOM — Leis complementares exigem aprovação por maioria absoluta dos vereadores (quórum qualificado).',
+        action: 'Ver citação',
+      },
+      {
+        type: 'improvement',
+        text: 'Sugestão: Indicar expressamente qual dispositivo da LOM esta lei complementa.',
+        action: 'Aplicar sugestão',
+      },
+    ],
+    decreto: [
+      {
+        type: 'citation',
+        text: 'CF/88, Art. 84, IV: Decreto regulamentar não pode criar direitos ou obrigações além da lei que regulamenta.',
+        action: 'Ver citação',
+      },
+      {
+        type: 'improvement',
+        text: 'Sugestão: Referenciar expressamente a lei municipal que este decreto regulamenta.',
+        action: 'Aplicar sugestão',
+      },
+    ],
+    indicacao: [
+      {
+        type: 'improvement',
+        text: 'Sugestão: Indicações devem ser endereçadas ao Poder Executivo Municipal com destinatário explícito.',
+        action: 'Aplicar sugestão',
+      },
+      {
+        type: 'citation',
+        text: 'Regimento Interno — Indicações não têm força de lei; são sugestões ao Executivo sem prazo de resposta obrigatório.',
+        action: 'Ver citação',
+      },
+    ],
+  }
+  return [...(byType[proposalType] || []), ...base]
 }
 
 // Aplica formatação no textarea: envolve seleção com prefixo/sufixo
@@ -69,16 +191,26 @@ function applyFormat(ref, prefix, suffix = prefix) {
 
 const ProposalEditor = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { selectedMunicipality } = useOutletContext() ?? {}
   const [loading, setLoading]                   = useState(true)
   const [saving, setSaving]                     = useState(false)
   const [isDirty, setIsDirty]                   = useState(false)
   const [proposalTitle, setProposalTitle]       = useState('Proposição')
   const [proposalType, setProposalType]         = useState('')
+  const [proposalStatus, setProposalStatus]     = useState('DRAFT')
   const [activeSection, setActiveSection]       = useState('ementa')
-  const [showAssistant, setShowAssistant]       = useState(true)
+  const [isChatOpen, setIsChatOpen]             = useState(false)
+  const [isMinimized, setIsMinimized]           = useState(false)
   const [assistantMessage, setAssistantMessage] = useState('')
-  const [chatHistory, setChatHistory]           = useState([])
+  const [chatHistory, setChatHistory]           = useState(() => {
+    try {
+      const saved = localStorage.getItem(`legisla:chat:${id}`)
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
+  })
   const [chatLoading, setChatLoading]           = useState(false)
+  const [thinkingMsg, setThinkingMsg]           = useState(THINKING_MESSAGES[0])
   const [uncertaintyBanner, setUncertaintyBanner] = useState(null)
 
   const [showVersionsModal, setShowVersionsModal] = useState(false)
@@ -88,29 +220,31 @@ const ProposalEditor = () => {
 
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportReviewed, setExportReviewed]   = useState(false)
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false)
+  const [pendingNavTarget, setPendingNavTarget] = useState(null)
+  const [editingTitle, setEditingTitle]         = useState(false)
+
+  const titleInputRef = useRef(null)
 
   const chatEndRef      = useRef(null)
   const activeTextareaRef = useRef(null)
 
   const [doc, setDoc] = useState({
-    ementa:    'Dispõe sobre a criação do Programa Municipal de Coleta Seletiva de Resíduos Recicláveis.',
-    preambulo: 'O Prefeito Municipal, faz saber que a Câmara aprovou a seguinte Lei:',
+    ementa:    '',
+    preambulo: '',
     artigos:   [],
-    vigencia:  'Entra em vigor na data de sua publicação.',
-    revogacao: 'Revogam-se as disposições em contrário.',
+    vigencia:  '',
+    revogacao: '',
   })
 
-  const [validations] = useState([
-    { type: 'success', message: 'Competência municipal verificada — Art. 145, VI da LOM' },
-    { type: 'success', message: 'Estrutura conforme técnica legislativa' },
-    { type: 'warning', message: 'Recomenda-se anexar estimativa de impacto orçamentário' },
-  ])
+  const [validations] = useState([])
 
   useEffect(() => {
     api.get('/proposals/' + id)
       .then(data => {
-        if (data.title) setProposalTitle(data.title)
-        if (data.type)  setProposalType(data.type)
+        if (data.title)  setProposalTitle(data.title)
+        if (data.type)   setProposalType(data.type)
+        if (data.status) setProposalStatus(data.status)
         if (data.content && data.content !== '{}') {
           try { setDoc(JSON.parse(data.content)) } catch { /* mantém padrão */ }
         }
@@ -123,8 +257,73 @@ const ProposalEditor = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatHistory])
 
+  useEffect(() => {
+    try {
+      const limited = chatHistory.slice(-50)
+      localStorage.setItem(`legisla:chat:${id}`, JSON.stringify(limited))
+    } catch { /* quota exceeded — ignore */ }
+  }, [chatHistory, id])
+
+  useEffect(() => {
+    if (!chatLoading) return
+    let idx = 0
+    const timer = setInterval(() => {
+      idx = (idx + 1) % THINKING_MESSAGES.length
+      setThinkingMsg(THINKING_MESSAGES[idx])
+    }, 2500)
+    return () => clearInterval(timer)
+  }, [chatLoading])
+
+  useEffect(() => {
+    const onBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [isDirty])
+
   const docRef = useRef(doc)
   useEffect(() => { docRef.current = doc }, [doc])
+
+  const handleTitleSave = async (newTitle) => {
+    const trimmed = newTitle.trim()
+    if (!trimmed || trimmed === proposalTitle) {
+      setEditingTitle(false)
+      return
+    }
+    try {
+      await api.put('/proposals/' + id, { title: trimmed })
+      setProposalTitle(trimmed)
+      toast.success('Título atualizado!')
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setEditingTitle(false)
+    }
+  }
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      await api.put('/proposals/' + id, { status: newStatus })
+      setProposalStatus(newStatus)
+      const labels = { DRAFT: 'Rascunho', REVIEW: 'Em revisão', APPROVED: 'Aprovada' }
+      toast.success(`Status atualizado: ${labels[newStatus] || newStatus}`)
+    } catch (e) {
+      toast.error(e.message)
+    }
+  }
+
+  const safeNavigate = (target) => {
+    if (isDirty) {
+      setPendingNavTarget(target)
+      setShowUnsavedModal(true)
+    } else {
+      navigate(target)
+    }
+  }
 
   const setDocDirty = (updater) => {
     setDoc(updater)
@@ -185,10 +384,16 @@ const ProposalEditor = () => {
     }
   }
 
-  const handleAskAssistant = async () => {
-    const msg = assistantMessage.trim()
+  const clearChat = () => {
+    setChatHistory([])
+    try { localStorage.removeItem(`legisla:chat:${id}`) } catch { /* noop */ }
+  }
+
+  const handleAskAssistantWithMessage = async (overrideMsg) => {
+    const msg = (overrideMsg ?? assistantMessage).trim()
     if (!msg || chatLoading) return
-    setAssistantMessage('')
+    if (!overrideMsg) setAssistantMessage('')
+    setThinkingMsg(THINKING_MESSAGES[0])
     setChatHistory(prev => [...prev, { role: 'user', text: msg }])
     setChatLoading(true)
     try {
@@ -214,6 +419,23 @@ const ProposalEditor = () => {
     }
   }
 
+  const handleQuickSuggestion = (text) => handleAskAssistantWithMessage(text)
+
+  const handleSuggestionAction = (suggestion) => {
+    setIsChatOpen(true)
+    setIsMinimized(false)
+    if (suggestion.type === 'citation') {
+      setChatHistory(prev => [...prev, { role: 'assistant', text: suggestion.text, hasCit: true }])
+      setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+      toast.success('Citação adicionada ao chat.')
+    } else {
+      const prefix = suggestion.type === 'improvement'
+        ? 'Por favor, elabore esta sugestão para a minuta atual: '
+        : 'Preciso de mais detalhes sobre este alerta: '
+      handleAskAssistantWithMessage(prefix + suggestion.text)
+    }
+  }
+
   const addArticle = () => {
     const n = doc.artigos.length + 1
     setDocDirty(prev => ({
@@ -230,16 +452,13 @@ const ProposalEditor = () => {
   }
 
   const pendingAlerts  = validations.filter(v => v.type === 'warning' || v.type === 'error')
-  const usedCitations  = [
-    ...ASSISTANT_SUGGESTIONS.filter(s => s.type === 'citation').map(s => s.text),
-    ...doc.artigos.flatMap(a => a.citacoes || []),
-  ]
+  const usedCitations  = doc.artigos.flatMap(a => a.citacoes || [])
 
   const handleExportClick = () => { setExportReviewed(false); setShowExportModal(true) }
   const confirmExport = () => {
     setShowExportModal(false)
     toast.promise(
-      exportToPDF(proposalTitle, docRef.current),
+      exportToPDF(proposalTitle, docRef.current, selectedMunicipality),
       { loading: 'Gerando PDF...', success: 'PDF exportado!', error: 'Erro ao gerar PDF' }
     )
   }
@@ -256,16 +475,46 @@ const ProposalEditor = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primary-50 print:bg-white">
+    <div className="h-screen flex flex-col bg-primary-50 print:bg-white">
       {/* Top Bar */}
-      <div className="bg-white border-b border-primary-200 px-6 py-3 sticky top-0 z-10 shadow-sm print:hidden">
+      <div className="bg-white border-b border-primary-200 px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Link to="/dashboard" className="text-primary-400 hover:text-primary-600 transition-colors flex-shrink-0">
+            <button
+              onClick={() => safeNavigate('/dashboard')}
+              className="text-primary-400 hover:text-primary-600 transition-colors flex-shrink-0"
+              aria-label="Voltar ao dashboard"
+            >
               <ArrowLeft size={20} />
-            </Link>
+            </button>
             <div className="min-w-0 flex items-center gap-2">
-              <h1 className="text-base font-display font-bold text-primary-800 truncate">{proposalTitle}</h1>
+              {editingTitle ? (
+                <input
+                  ref={titleInputRef}
+                  defaultValue={proposalTitle}
+                  onBlur={e => handleTitleSave(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleTitleSave(e.target.value)
+                    if (e.key === 'Escape') setEditingTitle(false)
+                  }}
+                  className="text-base font-display font-bold text-primary-800 bg-primary-50
+                    border-b-2 border-primary-400 outline-none px-1 min-w-0 w-48 md:w-64"
+                  autoFocus
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    setEditingTitle(true)
+                    setTimeout(() => titleInputRef.current?.select(), 50)
+                  }}
+                  title="Clique para renomear"
+                  className="text-base font-display font-bold text-primary-800 truncate
+                    hover:text-primary-600 hover:underline decoration-dashed underline-offset-2
+                    transition-colors text-left max-w-[200px] md:max-w-xs"
+                >
+                  {proposalTitle}
+                </button>
+              )}
               {isDirty && (
                 <motion.span
                   initial={{ opacity: 0, scale: 0 }}
@@ -274,6 +523,17 @@ const ProposalEditor = () => {
                   className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"
                 />
               )}
+            </div>
+            {/* Status visível no mobile */}
+            <div className="flex items-center gap-2 md:hidden">
+              {(() => {
+                const cfg = STATUS_CONFIG[proposalStatus] || STATUS_CONFIG.DRAFT
+                return (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.color}`}>
+                    {cfg.label}
+                  </span>
+                )
+              })()}
             </div>
           </div>
 
@@ -296,6 +556,27 @@ const ProposalEditor = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Badge de status + botão avançar */}
+            {(() => {
+              const cfg = STATUS_CONFIG[proposalStatus] || STATUS_CONFIG.DRAFT
+              return (
+                <div className="hidden md:flex items-center gap-2">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.color}`}>
+                    {cfg.label}
+                  </span>
+                  {cfg.next && (
+                    <button
+                      onClick={() => handleStatusChange(cfg.next)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold
+                        rounded-lg transition-all active:scale-[0.97] ${cfg.nextColor}`}
+                    >
+                      <CheckCircle size={13} />
+                      {cfg.nextLabel}
+                    </button>
+                  )}
+                </div>
+              )
+            })()}
             <span className="text-xs text-primary-400 hidden lg:block">Ctrl+S</span>
             <button onClick={openVersionsModal} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 border border-primary-200 rounded-lg transition-all">
               <Clock size={14} />
@@ -320,9 +601,9 @@ const ProposalEditor = () => {
         </div>
       </div>
 
-      <div className="flex print:block">
+      <div className="flex flex-1 overflow-hidden print:block">
         {/* Main Editor */}
-        <div className={`flex-1 p-6 transition-all duration-300 ${showAssistant ? 'mr-96' : ''} print:hidden`}>
+        <div className="flex-1 overflow-y-auto p-6 print:hidden">
 
           {/* Banner de incerteza */}
           <AnimatePresence>
@@ -467,149 +748,283 @@ const ProposalEditor = () => {
           </div>
         </div>
 
-        {/* ── Sidebar Assistente ── */}
-        {showAssistant && (
+        {/* Painel lateral de sugestões */}
+        {(() => {
+          const suggestions = getDynamicSuggestions(proposalType)
+          if (!suggestions.length) return null
+          return (
+            <aside className="hidden xl:flex flex-col w-64 border-l border-primary-200 bg-white overflow-y-auto flex-shrink-0 print:hidden">
+              <div className="p-4 border-b border-primary-100">
+                <p className="text-[10px] text-primary-400 uppercase tracking-wide font-semibold">
+                  Sugestões para esta proposição
+                </p>
+              </div>
+              <div className="p-3 space-y-2.5">
+                {suggestions.map((s, i) => (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-xl border-l-4 text-xs ${
+                      s.type === 'citation'
+                        ? 'bg-oro-50 border-oro-400'
+                        : s.type === 'improvement'
+                        ? 'bg-amber-50 border-amber-400'
+                        : 'bg-red-50 border-red-400'
+                    }`}
+                  >
+                    <p className="text-primary-700 mb-2 leading-relaxed">{s.text}</p>
+                    <button
+                      onClick={() => handleSuggestionAction(s)}
+                      className="flex items-center gap-1 text-primary-500 hover:text-primary-700 font-medium transition-colors"
+                    >
+                      <ExternalLink size={11} />
+                      {s.action}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </aside>
+          )
+        })()}
+      </div>
+
+      {/* ── Widget Assistente Jurídico ── */}
+
+      {/* Popup */}
+      <AnimatePresence>
+        {isChatOpen && (
           <motion.div
-            initial={{ x: 400, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="fixed right-0 top-0 w-96 h-screen bg-white border-l border-primary-200 shadow-2xl flex flex-col print:hidden"
-            style={{ minWidth: 320, maxWidth: 400 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 right-6 w-[340px] bg-white rounded-2xl shadow-2xl border border-primary-100 flex flex-col overflow-hidden z-50 print:hidden"
+            style={{ height: isMinimized ? 'auto' : '440px' }}
           >
-            <div className="bg-gradient-to-r from-primary-700 to-primary-600 px-5 py-4 text-white flex-shrink-0">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary-800 to-primary-600 px-4 py-3 text-white flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Scale size={18} />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Scale size={15} />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-sm">Assistente Jurídico</h3>
-                    <p className="text-xs text-primary-200">Citações normativas em tempo real</p>
+                    <h3 className="font-display font-bold text-sm leading-tight">Assistente Jurídico</h3>
+                    <p className="text-[10px] text-primary-200 leading-tight">Citações normativas em tempo real</p>
                   </div>
                 </div>
-                <button onClick={() => setShowAssistant(false)} className="text-white/70 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all">
-                  <X size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Sugestões estáticas */}
-            <div className="p-4 space-y-2 border-b border-primary-100 flex-shrink-0">
-              {ASSISTANT_SUGGESTIONS.map((s, i) => (
-                <div key={i} className={`p-3 rounded-lg border-l-4 text-xs ${
-                  s.type === 'citation' ? 'bg-oro-50 border-oro-400' : s.type === 'improvement' ? 'bg-amber-50 border-amber-400' : 'bg-red-50 border-red-400'
-                }`}>
-                  <p className="text-primary-700 mb-2 leading-relaxed">{s.text}</p>
-                  <button className="flex items-center gap-1 text-primary-500 hover:text-primary-700 font-medium transition-colors">
-                    <ExternalLink size={11} />{s.action}
+                <div className="flex items-center gap-0.5">
+                  {chatHistory.length > 0 && (
+                    <button
+                      onClick={clearChat}
+                      aria-label="Limpar conversa"
+                      title="Limpar conversa"
+                      className="text-white/60 hover:text-white hover:bg-white/10 px-2 py-1.5 rounded-lg transition-all text-[10px] font-medium"
+                    >
+                      Limpar
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsMinimized(p => !p)}
+                    aria-label={isMinimized ? 'Expandir' : 'Minimizar'}
+                    className="text-white/70 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
+                  >
+                    {isMinimized ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                  </button>
+                  <button
+                    onClick={() => { setIsChatOpen(false); setIsMinimized(false) }}
+                    aria-label="Fechar assistente"
+                    className="text-white/70 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
+                  >
+                    <X size={15} />
                   </button>
                 </div>
-              ))}
-            </div>
-
-            {/* Chat area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {/* Estado 1: Aguardando */}
-              {chatHistory.length === 0 && !chatLoading && (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-center">
-                  <div className="w-12 h-12 rounded-full bg-primary-50 border-2 border-primary-100 flex items-center justify-center mb-3">
-                    <Scale size={20} className="text-primary-300" />
-                  </div>
-                  <p className="text-sm font-medium text-primary-500 mb-1">Assistente aguardando</p>
-                  <p className="text-xs text-primary-300 leading-relaxed max-w-[180px]">
-                    Pergunte sobre competências, constitucionalidade ou citações legais
-                  </p>
-                </div>
-              )}
-
-              {chatHistory.map((msg, i) => {
-                if (msg.role === 'user') {
-                  return (
-                    <div key={i} className="bg-primary-600 text-white rounded-xl p-3 text-xs ml-6 leading-relaxed">
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
-                    </div>
-                  )
-                }
-                if (msg.role === 'error') {
-                  return (
-                    <div key={i} className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs mr-6 leading-relaxed">
-                      <p className="text-amber-600 font-semibold mb-1 text-[10px] uppercase tracking-wide">Aviso</p>
-                      <p className="text-amber-800">{msg.text}</p>
-                    </div>
-                  )
-                }
-                // Estado 3: Resposta com citação (borda oro) vs resposta simples
-                return (
-                  <div key={i} className={`rounded-xl p-3 text-xs mr-6 leading-relaxed ${
-                    msg.hasCit
-                      ? 'bg-oro-50 border-l-4 border-oro-400 text-primary-800'
-                      : 'bg-primary-50 text-primary-800'
-                  }`}>
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      {msg.hasCit && <Scale size={10} className="text-oro-500 flex-shrink-0" />}
-                      <p className={`font-semibold text-[10px] uppercase tracking-wide ${msg.hasCit ? 'text-oro-600' : 'text-primary-400'}`}>
-                        {msg.hasCit ? 'Com referência normativa' : 'Assistente'}
-                      </p>
-                    </div>
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                  </div>
-                )
-              })}
-
-              {/* Estado 2: Pensando — skeleton animado */}
-              {chatLoading && (
-                <div className="bg-primary-50 rounded-xl p-4 mr-6">
-                  <div className="space-y-2 mb-2">
-                    <div className="h-2.5 bg-primary-200 rounded-full animate-pulse" style={{ width: '75%' }} />
-                    <div className="h-2.5 bg-primary-200 rounded-full animate-pulse" style={{ width: '90%', animationDelay: '0.1s' }} />
-                    <div className="h-2.5 bg-primary-200 rounded-full animate-pulse" style={{ width: '55%', animationDelay: '0.2s' }} />
-                  </div>
-                  <p className="text-[10px] text-primary-400">Analisando normativas...</p>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="p-4 border-t border-primary-100 flex-shrink-0">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={assistantMessage}
-                  onChange={e => setAssistantMessage(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleAskAssistant()}
-                  className="flex-1 px-3 py-2 border-2 border-primary-200 rounded-lg focus:border-primary-400 focus:outline-none text-sm transition-colors"
-                  placeholder="Faça uma pergunta jurídica..."
-                  disabled={chatLoading}
-                />
-                <button
-                  onClick={handleAskAssistant}
-                  disabled={chatLoading || !assistantMessage.trim()}
-                  className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all disabled:opacity-40"
-                >
-                  <Send size={16} />
-                </button>
               </div>
             </div>
+
+            {/* Corpo */}
+            <AnimatePresence initial={false}>
+              {!isMinimized && (
+                <motion.div
+                  key="body"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex flex-col flex-1 overflow-hidden min-h-0"
+                >
+                  {/* Mensagens */}
+                  <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
+
+                    {/* Estado vazio — chips de sugestão */}
+                    {chatHistory.length === 0 && !chatLoading && (
+                      <div className="flex flex-col h-full">
+                        <div className="flex-1 flex flex-col items-center justify-center gap-3 pb-2">
+                          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center">
+                            <Scale size={22} className="text-primary-500" />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm font-semibold text-primary-700">Assistente Jurídico</p>
+                            <p className="text-xs text-primary-400 mt-0.5">Faça uma pergunta ou escolha uma sugestão</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {(QUICK_SUGGESTIONS[proposalType] ?? DEFAULT_SUGGESTIONS).map((s, i) => (
+                            <motion.button
+                              key={i}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => handleQuickSuggestion(s)}
+                              className="text-left px-2.5 py-2 bg-primary-50 hover:bg-primary-100 border border-primary-100 hover:border-primary-200 rounded-xl text-[11px] text-primary-700 leading-tight transition-all"
+                            >
+                              {s}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mensagens */}
+                    {chatHistory.map((msg, i) => {
+                      if (msg.role === 'user') return (
+                        <div key={i} className="flex justify-end items-end gap-1.5">
+                          <div className="bg-primary-600 text-white rounded-2xl rounded-br-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed">
+                            <p className="whitespace-pre-wrap">{msg.text}</p>
+                          </div>
+                          <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-primary-600">
+                            EU
+                          </div>
+                        </div>
+                      )
+                      if (msg.role === 'error') return (
+                        <div key={i} className="flex justify-start items-end gap-1.5">
+                          <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <AlertTriangle size={12} className="text-amber-600" />
+                          </div>
+                          <div className="bg-amber-50 border border-amber-200 rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed">
+                            <p className="text-amber-700 font-semibold mb-0.5 text-[10px] uppercase tracking-wide">Aviso</p>
+                            <p className="text-amber-800">{msg.text}</p>
+                          </div>
+                        </div>
+                      )
+                      return (
+                        <div key={i} className="flex justify-start items-end gap-1.5">
+                          <div className="w-6 h-6 bg-primary-700 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Scale size={11} className="text-white" />
+                          </div>
+                          <div className={`rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed ${
+                            msg.hasCit
+                              ? 'bg-oro-50 border-l-4 border-oro-400 text-primary-800'
+                              : 'bg-white border border-primary-100 text-primary-800 shadow-sm'
+                          }`}>
+                            {msg.hasCit && (
+                              <p className="font-semibold text-[10px] uppercase tracking-wide text-oro-600 mb-1 flex items-center gap-1">
+                                <BookOpen size={9} /> Com referência normativa
+                              </p>
+                            )}
+                            <p className="whitespace-pre-wrap">{msg.text}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {/* Loading — mensagem animada */}
+                    {chatLoading && (
+                      <div className="flex justify-start items-end gap-1.5">
+                        <div className="w-6 h-6 bg-primary-700 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Scale size={11} className="text-white" />
+                        </div>
+                        <div className="bg-white border border-primary-100 rounded-2xl rounded-bl-sm px-3 py-2.5 shadow-sm max-w-[80%]">
+                          <div className="flex items-center gap-1 mb-1.5">
+                            {[0, 1, 2].map(d => (
+                              <span
+                                key={d}
+                                className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce"
+                                style={{ animationDelay: `${d * 0.15}s` }}
+                              />
+                            ))}
+                          </div>
+                          <AnimatePresence mode="wait">
+                            <motion.p
+                              key={thinkingMsg}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.3 }}
+                              className="text-[10px] text-primary-400 italic"
+                            >
+                              {thinkingMsg}
+                            </motion.p>
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    )}
+
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Input */}
+                  <div className="p-3 border-t border-primary-100 flex-shrink-0 bg-primary-50/50">
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1">
+                        <textarea
+                          rows={2}
+                          value={assistantMessage}
+                          onChange={e => setAssistantMessage(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault()
+                              handleAskAssistantWithMessage()
+                            }
+                          }}
+                          className="w-full px-3 py-2 border-2 border-primary-200 rounded-xl focus:border-primary-500 focus:outline-none text-xs transition-colors resize-none leading-relaxed"
+                          placeholder="Faça uma pergunta jurídica..."
+                          disabled={chatLoading}
+                        />
+                        <p className="text-[9px] text-primary-300 mt-0.5 text-right">Enter para enviar · Shift+Enter para nova linha</p>
+                      </div>
+                      <button
+                        onClick={() => handleAskAssistantWithMessage()}
+                        disabled={chatLoading || !assistantMessage.trim()}
+                        aria-label="Enviar pergunta"
+                        className="p-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 active:scale-[0.97] transition-all disabled:opacity-40 mb-4 flex-shrink-0"
+                      >
+                        <Send size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
+      </AnimatePresence>
 
-        {!showAssistant && (
+      {/* FAB — some quando o chat está aberto */}
+      <AnimatePresence>
+        {!isChatOpen && (
           <motion.button
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            onClick={() => setShowAssistant(true)}
-            className="fixed right-6 bottom-6 w-12 h-12 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 hover:shadow-xl active:scale-[0.97] transition-all flex items-center justify-center print:hidden"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.93 }}
+            onClick={() => setIsChatOpen(true)}
+            aria-label="Abrir Assistente Jurídico"
+            className="fixed bottom-6 right-6 w-14 h-14 bg-primary-700 hover:bg-primary-800 text-white rounded-full shadow-xl flex items-center justify-center transition-colors z-50 print:hidden"
           >
-            <MessageSquare size={22} />
+            <Scale size={22} />
           </motion.button>
         )}
-      </div>
+      </AnimatePresence>
 
       {/* Print layout */}
       <div className="hidden print:block font-serif text-black bg-white p-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-2xl font-bold uppercase tracking-wide">Estado de Santa Catarina</h1>
-          <h2 className="text-xl font-bold uppercase tracking-wide">Câmara Municipal de Nova Veneza</h2>
+          <h2 className="text-xl font-bold uppercase tracking-wide">
+            Câmara Municipal de {selectedMunicipality?.nomeOficial || selectedMunicipality?.nome || 'Nova Veneza'}
+          </h2>
           <div className="mt-4 border-t border-black pt-4 text-right w-1/2 ml-auto">
             <p className="italic font-bold">{doc.ementa}</p>
           </div>
@@ -623,7 +1038,9 @@ const ProposalEditor = () => {
         <div className="mb-6 text-justify leading-relaxed"><p>{doc.vigencia}</p></div>
         <div className="mb-12 text-justify leading-relaxed"><p>{doc.revogacao}</p></div>
         <div className="mt-24 text-center">
-          <p>Nova Veneza/SC, {new Date().toLocaleDateString('pt-BR')}</p>
+          <p>
+            {selectedMunicipality?.nomeOficial || selectedMunicipality?.nome || 'Nova Veneza'}/{selectedMunicipality?.uf || 'SC'}, {new Date().toLocaleDateString('pt-BR')}
+          </p>
           <div className="mt-12 border-t border-black w-64 mx-auto pt-2">
             <p className="font-bold">Assinatura</p>
           </div>
@@ -796,6 +1213,62 @@ const ProposalEditor = () => {
                   className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed"
                   style={{ background: exportReviewed ? '#1e40af' : '#e8e8e8', color: exportReviewed ? '#fff' : '#aaa' }}>
                   <Download size={15} /> Gerar PDF
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal Alterações Não Salvas ── */}
+      <AnimatePresence>
+        {showUnsavedModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            >
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={22} className="text-amber-500" />
+              </div>
+              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+                Alterações não salvas
+              </h2>
+              <p className="text-sm text-primary-500 text-center mb-6 leading-relaxed">
+                Você tem alterações que ainda não foram salvas. Se sair agora, elas serão perdidas.
+              </p>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={async () => {
+                    setShowUnsavedModal(false)
+                    await handleSave()
+                    if (pendingNavTarget) navigate(pendingNavTarget)
+                  }}
+                  className="w-full py-2.5 rounded-xl text-sm font-semibold bg-primary-600 text-white
+                    hover:bg-primary-700 active:scale-[0.97] transition-all"
+                >
+                  Salvar e sair
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUnsavedModal(false)
+                    setIsDirty(false)
+                    if (pendingNavTarget) navigate(pendingNavTarget)
+                  }}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium border border-primary-200
+                    text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                >
+                  Sair sem salvar
+                </button>
+                <button
+                  onClick={() => { setShowUnsavedModal(false); setPendingNavTarget(null) }}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium text-primary-400
+                    hover:text-primary-600 transition-colors"
+                >
+                  Cancelar
                 </button>
               </div>
             </motion.div>

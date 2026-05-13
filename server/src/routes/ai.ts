@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
+import { prisma } from '../utils/db.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -77,6 +78,145 @@ Contexto da proposta: ${promptContext || 'Sem contexto fornecido.'}`;
       return;
     }
     res.status(500).json({ error: 'Nosso assistente está temporariamente indisponível. Tente em alguns minutos.' });
+  }
+});
+
+const generateSchema = z.object({
+  proposalId: z.string().uuid(),
+});
+
+const GENERATE_TIMEOUT_MS = 90_000;
+
+const ORDINAL = ['1º','2º','3º','4º','5º','6º','7º','8º','9º','10º'];
+
+function ordinal(n: number): string {
+  return ORDINAL[n - 1] ?? `${n}º`;
+}
+
+function extractJson(raw: string): string {
+  // Tenta extrair o primeiro objeto JSON do texto caso o modelo adicione markdown
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (match) return match[0];
+  throw new Error('JSON_NOT_FOUND');
+}
+
+function buildDemoContent(proposal: any) {
+  const muni = proposal.municipality?.name ?? 'Nova Veneza';
+  const theme = proposal.theme ?? 'Assunto municipal';
+  return {
+    ementa: `Dispõe sobre ${theme.toLowerCase()} no Município de ${muni} e dá outras providências.`,
+    preambulo: `O Prefeito Municipal de ${muni}, Estado de Santa Catarina, faz saber que a Câmara Municipal aprovou e ele sanciona a seguinte Lei:`,
+    artigos: [
+      { id: 1, numero: 'Art. 1º', texto: `Fica instituído, no âmbito do Município de ${muni}, o programa relativo a ${theme.toLowerCase()}, nos termos desta Lei.`, citacoes: [] },
+      { id: 2, numero: 'Art. 2º', texto: `A Administração Municipal adotará as medidas necessárias para a implantação e acompanhamento das ações previstas nesta Lei, podendo firmar convênios e parcerias com entidades públicas e privadas.`, citacoes: [] },
+      { id: 3, numero: 'Art. 3º', texto: `As despesas decorrentes desta Lei correrão por conta das dotações orçamentárias próprias, suplementadas se necessário.`, citacoes: [] },
+    ],
+    vigencia: `Esta Lei entra em vigor na data de sua publicação.`,
+    revogacao: `Revogam-se as disposições em contrário.`,
+  };
+}
+
+router.post('/generate', async (req: Request, res: Response) => {
+  const parsed = generateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: zodError(parsed.error) });
+    return;
+  }
+
+  const { proposalId } = parsed.data;
+
+  const proposal = await prisma.proposal.findUnique({
+    where: { id: proposalId },
+    include: { municipality: true },
+  });
+
+  if (!proposal) {
+    res.status(404).json({ error: 'Proposição não encontrada.' });
+    return;
+  }
+
+  // Modo demonstração — Vertex AI não configurado
+  if (!vertexAI) {
+    const content = buildDemoContent(proposal);
+    await prisma.proposal.update({ where: { id: proposalId }, data: { content: JSON.stringify(content) } });
+    await prisma.proposalVersion.create({ data: { proposalId, content: JSON.stringify(content), versionNumber: 1 } });
+    res.json({ content });
+    return;
+  }
+
+  const muni = proposal.municipality?.name ?? 'município';
+
+  const systemInstruction = `Você é um especialista em técnica legislativa municipal brasileira.
+Gere uma minuta legislativa completa e tecnicamente correta para a Câmara Municipal de ${muni}.
+Use linguagem jurídica formal, respeite as normas da ABNT NBR 6544 e da Lei Complementar nº 95/1998.
+Baseie-se na Lei Orgânica Municipal e na competência municipal conforme CF/88 Art. 30.
+Retorne SOMENTE o JSON solicitado, sem nenhum texto antes ou depois, sem blocos de código markdown.`;
+
+  const userMessage = `Gere a minuta legislativa com base nos seguintes dados:
+
+Município: ${muni}
+Tipo: ${proposal.type}
+Tema: ${proposal.theme ?? 'Não informado'}
+Objetivo: ${proposal.objective ?? 'Não informado'}
+Competência municipal: ${proposal.competence ?? 'Não informada'}
+Impacto financeiro: ${proposal.hasFinancialImpact ? `Sim — ${proposal.estimatedImpact ?? 'sem estimativa'}` : 'Não'}
+Justificativa: ${proposal.justification ?? 'Não informada'}
+
+Retorne exatamente neste formato JSON, sem nenhum texto adicional:
+{
+  "ementa": "resumo objetivo em uma frase",
+  "preambulo": "fórmula legislativa padrão",
+  "artigos": [
+    { "id": 1, "numero": "Art. 1º", "texto": "...", "citacoes": [] }
+  ],
+  "vigencia": "cláusula de vigência",
+  "revogacao": "cláusula revogatória"
+}`;
+
+  try {
+    const model = vertexAI.getGenerativeModel({ model: MODEL, systemInstruction });
+    const chat  = model.startChat();
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), GENERATE_TIMEOUT_MS)
+    );
+
+    const result = await Promise.race([chat.sendMessage(userMessage), timeoutPromise]);
+
+    const raw = (result as any).response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+
+    let content: any;
+    try {
+      content = JSON.parse(raw);
+    } catch {
+      content = JSON.parse(extractJson(raw));
+    }
+
+    // Garante que artigos têm id e numero corretos
+    if (Array.isArray(content.artigos)) {
+      content.artigos = content.artigos.map((a: any, i: number) => ({
+        ...a,
+        id: i + 1,
+        numero: a.numero ?? `Art. ${ordinal(i + 1)}`,
+        citacoes: a.citacoes ?? [],
+      }));
+    }
+
+    await prisma.proposal.update({ where: { id: proposalId }, data: { content: JSON.stringify(content) } });
+    await prisma.proposalVersion.create({ data: { proposalId, content: JSON.stringify(content), versionNumber: 1 } });
+
+    res.json({ content });
+  } catch (error: any) {
+    console.error('Erro geração Vertex AI:', error);
+    if (error?.message === 'TIMEOUT') {
+      res.status(504).json({ error: 'A geração da minuta demorou mais que o esperado. Tente novamente.' });
+      return;
+    }
+    if (error?.message === 'JSON_NOT_FOUND') {
+      res.status(500).json({ error: 'O modelo retornou um formato inesperado. Tente novamente.' });
+      return;
+    }
+    res.status(500).json({ error: 'Não foi possível gerar a minuta. Tente novamente em alguns minutos.' });
   }
 });
 
