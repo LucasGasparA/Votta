@@ -7,6 +7,14 @@ const USABLE_W    = PAGE_W - MARGIN_H * 2;  // 160mm
 const LINE_H      = 6.5;
 
 export async function exportToPDF(proposalTitle = 'Proposição', doc, municipality = null) {
+  let settings = {}
+  try {
+    const saved = localStorage.getItem('legisla:settings')
+    if (saved) settings = JSON.parse(saved)
+  } catch { /* usa padrões */ }
+  const includePageNumbers    = settings.includePageNumbers    !== false
+  const includeGenerationDate = settings.includeGenerationDate !== false
+
   const { jsPDF } = await import('jspdf');
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   let y = MARGIN_TOP;
@@ -110,7 +118,9 @@ export async function exportToPDF(proposalTitle = 'Proposição', doc, municipal
 
   /* ── Data e assinatura ────────────────────────────────────────── */
   newPageIfNeeded(40);
-  const dateStr = `${municipioSlug}, ${new Date().toLocaleDateString('pt-BR')}`;
+  const dateStr = includeGenerationDate
+    ? `${municipioSlug}, ${new Date().toLocaleDateString('pt-BR')}`
+    : `${municipioSlug}, ____/____/________`;
   text(dateStr, PAGE_W / 2, { style: 'normal', size: 11, align: 'center' });
   gap(18);
 
@@ -122,13 +132,15 @@ export async function exportToPDF(proposalTitle = 'Proposição', doc, municipal
   text(proposalTitle.length > 40 ? 'Assinatura' : proposalTitle, PAGE_W / 2, { style: 'bold', size: 10, align: 'center' });
 
   /* ── Número da página ─────────────────────────────────────────── */
-  const totalPages = pdf.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    pdf.setPage(i);
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(150, 150, 150);
-    pdf.text(`Página ${i} de ${totalPages}`, PAGE_W - MARGIN_H, PAGE_H - 10, { align: 'right' });
+  if (includePageNumbers) {
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(`Página ${i} de ${totalPages}`, PAGE_W - MARGIN_H, PAGE_H - 10, { align: 'right' });
+    }
   }
 
   /* ── Salvar ───────────────────────────────────────────────────── */

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import {
   Save, Download, AlertTriangle, CheckCircle,
@@ -33,11 +33,11 @@ const STATUS_CONFIG = {
     color:     'bg-oro-100 text-oro-700',
     next:      'APPROVED',
     nextLabel: 'Marcar como aprovada',
-    nextColor: 'bg-green-600 hover:bg-green-700 text-white',
+    nextColor: 'bg-primary-700 hover:bg-primary-800 text-white',
   },
   APPROVED: {
     label:     'Aprovada',
-    color:     'bg-green-100 text-green-700',
+    color:     'bg-primary-100 text-primary-700',
     next:      null,
     nextLabel: null,
     nextColor: null,
@@ -223,6 +223,8 @@ const ProposalEditor = () => {
   const [showUnsavedModal, setShowUnsavedModal] = useState(false)
   const [pendingNavTarget, setPendingNavTarget] = useState(null)
   const [editingTitle, setEditingTitle]         = useState(false)
+  const [docKey, setDocKey]                     = useState(0)
+  const [isExporting, setIsExporting]           = useState(false)
 
   const titleInputRef = useRef(null)
 
@@ -237,7 +239,20 @@ const ProposalEditor = () => {
     revogacao: '',
   })
 
-  const [validations] = useState([])
+  const validations = useMemo(() => {
+    const results = []
+    if (!doc.ementa?.trim())
+      results.push({ type: 'warning', message: 'Ementa não preenchida — obrigatória para publicação.' })
+    if (!doc.preambulo?.trim())
+      results.push({ type: 'warning', message: 'Preâmbulo não preenchido.' })
+    if (!doc.artigos?.length)
+      results.push({ type: 'error', message: 'Nenhum artigo cadastrado. Toda lei deve ter ao menos um artigo.' })
+    else if (doc.artigos.some(a => !a.texto?.trim()))
+      results.push({ type: 'warning', message: 'Há artigos sem texto. Preencha ou remova os artigos vazios.' })
+    if (!doc.vigencia?.trim())
+      results.push({ type: 'warning', message: 'Cláusula de vigência não preenchida.' })
+    return results
+  }, [doc])
 
   useEffect(() => {
     api.get('/proposals/' + id)
@@ -246,7 +261,12 @@ const ProposalEditor = () => {
         if (data.type)   setProposalType(data.type)
         if (data.status) setProposalStatus(data.status)
         if (data.content && data.content !== '{}') {
-          try { setDoc(JSON.parse(data.content)) } catch { /* mantém padrão */ }
+          try {
+            const loaded = JSON.parse(data.content)
+            pendingDocRef.current = loaded
+            setDoc(loaded)
+            setDocKey(k => k + 1)
+          } catch { /* mantém padrão */ }
         }
       })
       .catch(() => toast.error('Não foi possível carregar a proposição.'))
@@ -285,8 +305,29 @@ const ProposalEditor = () => {
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
   }, [isDirty])
 
-  const docRef = useRef(doc)
-  useEffect(() => { docRef.current = doc }, [doc])
+  const pendingDocRef = useRef({ ementa: '', preambulo: '', artigos: [], vigencia: '', revogacao: '' })
+  const flushTimerRef = useRef(null)
+
+  const scheduleDocFlush = useCallback(() => {
+    clearTimeout(flushTimerRef.current)
+    flushTimerRef.current = setTimeout(() => {
+      setDoc({ ...pendingDocRef.current })
+      setIsDirty(true)
+    }, 300)
+  }, [])
+
+  const handleFieldChange = useCallback((field, value) => {
+    pendingDocRef.current = { ...pendingDocRef.current, [field]: value }
+    scheduleDocFlush()
+  }, [scheduleDocFlush])
+
+  const handleArticleChange = useCallback((artId, newText) => {
+    pendingDocRef.current = {
+      ...pendingDocRef.current,
+      artigos: pendingDocRef.current.artigos.map(a => a.id === artId ? { ...a, texto: newText } : a),
+    }
+    scheduleDocFlush()
+  }, [scheduleDocFlush])
 
   const handleTitleSave = async (newTitle) => {
     const trimmed = newTitle.trim()
@@ -325,15 +366,12 @@ const ProposalEditor = () => {
     }
   }
 
-  const setDocDirty = (updater) => {
-    setDoc(updater)
-    setIsDirty(true)
-  }
-
   const handleSave = useCallback(async () => {
+    clearTimeout(flushTimerRef.current)
     setSaving(true)
     try {
-      await api.put('/proposals/' + id, { content: JSON.stringify(docRef.current) })
+      await api.put('/proposals/' + id, { content: JSON.stringify(pendingDocRef.current) })
+      setDoc({ ...pendingDocRef.current })
       setIsDirty(false)
       toast.success('Salvo!')
     } catch (e) {
@@ -375,7 +413,9 @@ const ProposalEditor = () => {
   const restoreVersion = (version) => {
     try {
       const restored = JSON.parse(version.content)
+      pendingDocRef.current = restored
       setDoc(restored)
+      setDocKey(k => k + 1)
       setIsDirty(true)
       setShowVersionsModal(false)
       toast.success(`Versão ${version.versionNumber} restaurada. Salve para confirmar.`)
@@ -400,7 +440,7 @@ const ProposalEditor = () => {
       const res = await api.post('/ai/chat', {
         proposalId: id,
         message: msg,
-        promptContext: JSON.stringify(docRef.current),
+        promptContext: JSON.stringify(pendingDocRef.current),
       })
       setChatHistory(prev => [...prev, { role: 'assistant', text: res.text, hasCit: hasCitation(res.text) }])
       if (detectUncertainty(res.text)) {
@@ -437,28 +477,26 @@ const ProposalEditor = () => {
   }
 
   const addArticle = () => {
-    const n = doc.artigos.length + 1
-    setDocDirty(prev => ({
-      ...prev,
-      artigos: [...prev.artigos, { id: n, numero: `Art. ${n}º`, texto: '', citacoes: [] }],
-    }))
+    const n = pendingDocRef.current.artigos.length + 1
+    const newArticle = { id: n, numero: `Art. ${n}º`, texto: '', citacoes: [] }
+    pendingDocRef.current = {
+      ...pendingDocRef.current,
+      artigos: [...pendingDocRef.current.artigos, newArticle],
+    }
+    setDoc({ ...pendingDocRef.current })
+    setIsDirty(true)
   }
 
-  const updateArticle = (artId, newText) => {
-    setDocDirty(prev => ({
-      ...prev,
-      artigos: prev.artigos.map(a => a.id === artId ? { ...a, texto: newText } : a),
-    }))
-  }
-
-  const pendingAlerts  = validations.filter(v => v.type === 'warning' || v.type === 'error')
-  const usedCitations  = doc.artigos.flatMap(a => a.citacoes || [])
+  const pendingAlerts  = useMemo(() => validations.filter(v => v.type === 'warning' || v.type === 'error'), [validations])
+  const usedCitations  = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
 
   const handleExportClick = () => { setExportReviewed(false); setShowExportModal(true) }
   const confirmExport = () => {
     setShowExportModal(false)
+    setIsExporting(true)
     toast.promise(
-      exportToPDF(proposalTitle, docRef.current, selectedMunicipality),
+      exportToPDF(proposalTitle, pendingDocRef.current, selectedMunicipality)
+        .finally(() => setIsExporting(false)),
       { loading: 'Gerando PDF...', success: 'PDF exportado!', error: 'Erro ao gerar PDF' }
     )
   }
@@ -520,7 +558,7 @@ const ProposalEditor = () => {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   title="Alterações não salvas"
-                  className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0"
+                  className="w-2 h-2 rounded-full bg-oro-400 flex-shrink-0"
                 />
               )}
             </div>
@@ -547,6 +585,7 @@ const ProposalEditor = () => {
               <button
                 key={title}
                 title={title}
+                aria-label={title}
                 onClick={() => applyFormat(activeTextareaRef, prefix, suffix)}
                 className="p-1.5 rounded text-primary-500 hover:bg-white hover:text-primary-700 hover:shadow-sm transition-all"
               >
@@ -592,10 +631,11 @@ const ProposalEditor = () => {
             </button>
             <button
               onClick={handleExportClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm"
+              disabled={isExporting}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download size={14} />
-              <span className="hidden md:inline">Exportar PDF</span>
+              <span className="hidden md:inline">{isExporting ? 'Gerando...' : 'Exportar PDF'}</span>
             </button>
           </div>
         </div>
@@ -649,20 +689,20 @@ const ProposalEditor = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
                 className={`p-3 rounded-lg border-l-4 flex items-center gap-2.5 ${
-                  v.type === 'success' ? 'bg-green-50 border-green-500' : v.type === 'warning' ? 'bg-amber-50 border-amber-400' : 'bg-red-50 border-red-500'
+                  v.type === 'success' ? 'bg-primary-50 border-primary-400' : v.type === 'warning' ? 'bg-amber-50 border-amber-400' : 'bg-rosso-50 border-rosso-500'
                 }`}
               >
                 {v.type === 'success'
-                  ? <CheckCircle className="text-green-600 flex-shrink-0" size={15} />
-                  : <AlertTriangle className={v.type === 'warning' ? 'text-amber-500 flex-shrink-0' : 'text-red-600 flex-shrink-0'} size={15} />
+                  ? <CheckCircle className="text-primary-600 flex-shrink-0" size={15} />
+                  : <AlertTriangle className={v.type === 'warning' ? 'text-amber-500 flex-shrink-0' : 'text-rosso-600 flex-shrink-0'} size={15} />
                 }
-                <p className={`text-xs ${v.type === 'success' ? 'text-green-800' : v.type === 'warning' ? 'text-amber-800' : 'text-red-800'}`}>{v.message}</p>
+                <p className={`text-xs ${v.type === 'success' ? 'text-primary-800' : v.type === 'warning' ? 'text-amber-800' : 'text-rosso-800'}`}>{v.message}</p>
               </motion.div>
             ))}
           </div>
 
           {/* Conteúdo */}
-          <div className="card p-8">
+          <div className="card p-8" key={docKey}>
             {(() => {
               const section = SECTIONS.find(s => s.id === activeSection)
               const Icon = section?.icon ?? FileText
@@ -676,8 +716,8 @@ const ProposalEditor = () => {
 
             {activeSection === 'ementa' && (
               <div>
-                <textarea ref={activeTextareaRef} value={doc.ementa}
-                  onChange={e => setDocDirty(p => ({ ...p, ementa: e.target.value }))}
+                <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
+                  onChange={e => handleFieldChange('ementa', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Resumo do objeto da lei..." />
                 <p className="text-xs text-primary-400 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
               </div>
@@ -685,8 +725,8 @@ const ProposalEditor = () => {
 
             {activeSection === 'preambulo' && (
               <div>
-                <textarea ref={activeTextareaRef} value={doc.preambulo}
-                  onChange={e => setDocDirty(p => ({ ...p, preambulo: e.target.value }))}
+                <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
+                  onChange={e => handleFieldChange('preambulo', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Texto introdutório..." />
                 <p className="text-xs text-primary-400 mt-2">Fórmula legislativa padrão conforme LOM.</p>
               </div>
@@ -713,7 +753,7 @@ const ProposalEditor = () => {
                         <div className="flex items-start gap-4">
                           <span className="px-2.5 py-1 bg-primary-100 text-primary-700 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
                           <div className="flex-1">
-                            <textarea value={artigo.texto} onChange={e => updateArticle(artigo.id, e.target.value)}
+                            <textarea defaultValue={artigo.texto} onChange={e => handleArticleChange(artigo.id, e.target.value)}
                               className="w-full px-3 py-2.5 border-2 border-primary-100 rounded-lg focus:border-primary-400 focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
                               placeholder="Texto do artigo..." />
                             {artigo.citacoes?.length > 0 && (
@@ -735,14 +775,14 @@ const ProposalEditor = () => {
             )}
 
             {activeSection === 'vigencia' && (
-              <textarea ref={activeTextareaRef} value={doc.vigencia}
-                onChange={e => setDocDirty(p => ({ ...p, vigencia: e.target.value }))}
+              <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.vigencia}
+                onChange={e => handleFieldChange('vigencia', e.target.value)}
                 className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula de vigência..." />
             )}
 
             {activeSection === 'revogacao' && (
-              <textarea ref={activeTextareaRef} value={doc.revogacao}
-                onChange={e => setDocDirty(p => ({ ...p, revogacao: e.target.value }))}
+              <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.revogacao}
+                onChange={e => handleFieldChange('revogacao', e.target.value)}
                 className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula revogatória..." />
             )}
           </div>
@@ -768,7 +808,7 @@ const ProposalEditor = () => {
                         ? 'bg-oro-50 border-oro-400'
                         : s.type === 'improvement'
                         ? 'bg-amber-50 border-amber-400'
-                        : 'bg-red-50 border-red-400'
+                        : 'bg-rosso-50 border-rosso-400'
                     }`}
                   >
                     <p className="text-primary-700 mb-2 leading-relaxed">{s.text}</p>
@@ -966,7 +1006,11 @@ const ProposalEditor = () => {
                   <div className="p-3 border-t border-primary-100 flex-shrink-0 bg-primary-50/50">
                     <div className="flex gap-2 items-end">
                       <div className="flex-1">
+                        <label htmlFor="chat-input" className="sr-only">
+                          Mensagem ao assistente jurídico
+                        </label>
                         <textarea
+                          id="chat-input"
                           rows={2}
                           value={assistantMessage}
                           onChange={e => setAssistantMessage(e.target.value)}
@@ -1167,7 +1211,7 @@ const ProposalEditor = () => {
                 <div>
                   <p className="text-xs text-primary-400 uppercase tracking-wide font-bold mb-2">Alertas Pendentes ({pendingAlerts.length})</p>
                   {pendingAlerts.length === 0 ? (
-                    <div className="flex items-center gap-2 text-green-700 bg-green-50 rounded-lg px-3 py-2.5 text-sm">
+                    <div className="flex items-center gap-2 text-primary-700 bg-primary-50 rounded-lg px-3 py-2.5 text-sm">
                       <CheckCircle size={15} /> Nenhum alerta pendente
                     </div>
                   ) : (
@@ -1210,8 +1254,8 @@ const ProposalEditor = () => {
                   Voltar ao Editor
                 </button>
                 <button onClick={confirmExport} disabled={!exportReviewed}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed"
-                  style={{ background: exportReviewed ? '#1e40af' : '#e8e8e8', color: exportReviewed ? '#fff' : '#aaa' }}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed
+                    ${exportReviewed ? 'bg-primary-800 hover:bg-primary-900 text-white' : 'bg-primary-100 text-primary-300'}`}>
                   <Download size={15} /> Gerar PDF
                 </button>
               </div>

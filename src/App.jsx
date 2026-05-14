@@ -1,17 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/Layout'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import SelectMunicipality from './pages/SelectMunicipality'
-import CreateProposal from './pages/CreateProposal'
-import ProposalEditor from './pages/ProposalEditor'
-import Pricing from './pages/Pricing'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
-import Configuracoes from './pages/Configuracoes'
 import { api } from './utils/api.js'
-import Register from './pages/Register'
+
+const Login              = lazy(() => import('./pages/Login'))
+const Dashboard          = lazy(() => import('./pages/Dashboard'))
+const SelectMunicipality = lazy(() => import('./pages/SelectMunicipality'))
+const CreateProposal     = lazy(() => import('./pages/CreateProposal'))
+const ProposalEditor     = lazy(() => import('./pages/ProposalEditor'))
+const Pricing            = lazy(() => import('./pages/Pricing'))
+const ForgotPassword     = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword      = lazy(() => import('./pages/ResetPassword'))
+const Configuracoes      = lazy(() => import('./pages/Configuracoes'))
+const Settings           = lazy(() => import('./pages/Settings'))
+const Register           = lazy(() => import('./pages/Register'))
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -79,6 +81,11 @@ function App() {
 
   return (
     <Router>
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-primary-50">
+          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
       <Routes>
         <Route
           path="/login"
@@ -108,11 +115,13 @@ function App() {
           <Route path="create-proposal" element={<CreateProposal />} />
           <Route path="proposal/:id/edit" element={<ProposalEditor />} />
           <Route path="pricing" element={<Pricing />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
+          <Route path="configuracoes" element={<Navigate to="/settings" />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+      </Suspense>
     </Router>
   )
 }

@@ -32,8 +32,8 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-lg border border-primary-100 
-           transition-all duration-300 hover:shadow-xl;
+    @apply bg-white rounded-xl shadow-sm border border-primary-100
+           transition-all duration-200;
   }
 
   .input-field {

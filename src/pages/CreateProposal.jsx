@@ -151,6 +151,7 @@ const CreateProposal = () => {
                 exit={{ opacity: 0, scale: 0.7 }}
                 transition={{ duration: 0.25 }}
                 className="text-4xl"
+                aria-hidden="true"
               >
                 {step.icon}
               </motion.span>
@@ -254,6 +255,9 @@ const CreateProposal = () => {
                 <div className="flex flex-col items-center flex-1">
                   <button
                     onClick={() => index < currentStep && setCurrentStep(index)}
+                    aria-label={index < currentStep ? `Ir para etapa ${index + 1}: ${step.title}` : undefined}
+                    aria-current={index === currentStep ? 'step' : undefined}
+                    disabled={index >= currentStep}
                     className={`
                       w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300
                       ${index < currentStep
@@ -323,29 +327,31 @@ const CreateProposal = () => {
             {currentStep === 1 && (
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-primary-700 mb-1.5">Tema da Proposição</label>
+                  <label htmlFor="theme" className="block text-sm font-medium text-primary-700 mb-1.5">Tema da Proposição</label>
                   <input
+                    id="theme"
                     type="text"
                     value={formData.theme}
                     onChange={e => update('theme', e.target.value)}
-                    className={`input-field ${triedNext && !formData.theme.trim() ? 'border-red-400' : ''}`}
+                    className={`input-field ${triedNext && !formData.theme.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Coleta Seletiva de Lixo Reciclável"
                     autoFocus
                   />
                   {triedNext && !formData.theme.trim() && (
-                    <p className="text-xs text-red-500 mt-1">Campo obrigatório.</p>
+                    <p className="text-xs text-rosso-500 mt-1">Campo obrigatório.</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-primary-700 mb-1.5">Objetivo Principal</label>
+                  <label htmlFor="objective" className="block text-sm font-medium text-primary-700 mb-1.5">Objetivo Principal</label>
                   <textarea
+                    id="objective"
                     value={formData.objective}
                     onChange={e => update('objective', e.target.value)}
-                    className={`input-field min-h-[80px] resize-none ${triedNext && !formData.objective.trim() ? 'border-red-400' : ''}`}
+                    className={`input-field min-h-[80px] resize-none ${triedNext && !formData.objective.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Descreva o objetivo principal desta proposição..."
                   />
                   {triedNext && !formData.objective.trim() && (
-                    <p className="text-xs text-red-500 mt-1">Campo obrigatório.</p>
+                    <p className="text-xs text-rosso-500 mt-1">Campo obrigatório.</p>
                   )}
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
@@ -427,12 +433,13 @@ const CreateProposal = () => {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-primary-700">Justificativa da Proposição</label>
-                    <span className={`text-xs font-medium ${justLen >= 50 ? 'text-green-600' : 'text-primary-400'}`}>
+                    <label htmlFor="justification" className="block text-sm font-medium text-primary-700">Justificativa da Proposição</label>
+                    <span className={`text-xs font-medium ${justLen >= 50 ? 'text-primary-600' : 'text-primary-400'}`}>
                       {justLen} / mín. 50
                     </span>
                   </div>
                   <textarea
+                    id="justification"
                     value={formData.justification}
                     onChange={e => update('justification', e.target.value)}
                     className="input-field min-h-[120px] resize-none"
@@ -441,7 +448,7 @@ const CreateProposal = () => {
                   />
                   <div className="mt-1.5 w-full bg-primary-100 rounded-full h-1">
                     <div
-                      className={`h-1 rounded-full transition-all duration-300 ${justLen >= 50 ? 'bg-green-500' : 'bg-oro-500'}`}
+                      className={`h-1 rounded-full transition-all duration-300 ${justLen >= 50 ? 'bg-primary-500' : 'bg-oro-500'}`}
                       style={{ width: `${Math.min((justLen / 50) * 100, 100)}%` }}
                     />
                   </div>

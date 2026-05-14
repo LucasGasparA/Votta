@@ -37,3 +37,15 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code local settings
+.claude/
+
+# Prisma generated client
+server/src/generated/
+
+# Compiled output
+server/dist/
+
+# OS
+Thumbs.db
