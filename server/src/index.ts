@@ -24,7 +24,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:4173',
   process.env.FRONTEND_URL,
-].filter(Boolean);
+].filter((o): o is string => Boolean(o));
 
 app.use(cors({
   origin: allowedOrigins,
