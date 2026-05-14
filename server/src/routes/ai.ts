@@ -45,12 +45,20 @@ router.post('/chat', async (req: Request, res: Response) => {
   }
 
   try {
-    const systemInstruction = `Você é um Assistente Jurídico especializado em técnica legislativa municipal (cidade de Nova Veneza - SC).
-Avalie minutas legislativas, sugira melhorias estruturais, verifique viabilidade constitucional e sugira citações.
-Sempre justifique citando fundamentações (ex: LOM Art. 145, CF Art. 30).
-Se identificar vícios de competência, alerte sobre inconstitucionalidade.
-Se não encontrar base normativa clara para um ponto, diga explicitamente que não encontrei referência normativa suficiente e recomende consultar a Procuradoria Municipal antes de prosseguir.
-Seja conciso e objetivo.
+    const systemInstruction = `Você é um Assistente Jurídico especializado em técnica legislativa municipal brasileira.
+Seu papel é auxiliar na elaboração de minutas legislativas com base na Lei Orgânica Municipal,
+Regimento Interno e na Constituição Federal (especialmente Art. 30).
+
+REGRAS OBRIGATÓRIAS — nunca viole estas regras:
+
+1. Responda SOMENTE sobre temas jurídicos e legislativos municipais. Se a pergunta for sobre outro assunto, diga: "Só posso ajudar com questões relacionadas à elaboração de proposições legislativas municipais."
+2. Nunca use linguagem ofensiva, informal em excesso, irônica ou inadequada para um contexto jurídico-institucional.
+3. Nunca invente leis, artigos ou normas. Se não tiver base normativa clara, diga: "Não encontrei referência normativa suficiente para este ponto. Recomendo consultar a Procuradoria Municipal antes de prosseguir."
+4. Nunca emita opiniões políticas, partidárias ou eleitorais.
+5. Nunca sugira ações que violem a Constituição Federal, a LOM ou o Regimento Interno.
+6. Se detectar pedido de conteúdo ofensivo, discriminatório ou ilegal, responda: "Não é possível auxiliar com este tipo de conteúdo."
+7. Sempre cite a base normativa das suas sugestões (ex: "conforme Art. 30, I, CF/88").
+8. Seja conciso, formal e objetivo.
 
 Contexto da proposta: ${promptContext || 'Sem contexto fornecido.'}`;
 
@@ -135,6 +143,25 @@ router.post('/generate', async (req: Request, res: Response) => {
     return;
   }
 
+  const BLOCKED_TERMS = [
+    'xingar', 'palavrão', 'ofensa', 'discrimin', 'racis', 'preconceito',
+    'ilegal', 'corrupção', 'propina', 'suborno',
+  ];
+
+  const inputText = [
+    proposal.theme ?? '',
+    proposal.objective ?? '',
+    proposal.justification ?? '',
+  ].join(' ').toLowerCase();
+
+  const hasBlocked = BLOCKED_TERMS.some(term => inputText.includes(term));
+  if (hasBlocked) {
+    res.status(400).json({
+      error: 'O conteúdo informado contém termos não permitidos para geração de proposições legislativas.',
+    });
+    return;
+  }
+
   // Modo demonstração — Vertex AI não configurado
   if (!vertexAI) {
     const content = buildDemoContent(proposal);
@@ -150,7 +177,13 @@ router.post('/generate', async (req: Request, res: Response) => {
 Gere uma minuta legislativa completa e tecnicamente correta para a Câmara Municipal de ${muni}.
 Use linguagem jurídica formal, respeite as normas da ABNT NBR 6544 e da Lei Complementar nº 95/1998.
 Baseie-se na Lei Orgânica Municipal e na competência municipal conforme CF/88 Art. 30.
-Retorne SOMENTE o JSON solicitado, sem nenhum texto antes ou depois, sem blocos de código markdown.`;
+Retorne SOMENTE o JSON solicitado, sem nenhum texto antes ou depois, sem blocos de código markdown.
+
+RESTRIÇÕES ABSOLUTAS:
+1. Gere SOMENTE conteúdo jurídico-legislativo formal e compatível com o ordenamento jurídico brasileiro.
+2. Não inclua linguagem ofensiva, discriminatória, político-partidária ou inconstitucional.
+3. Não invente normas. Se não houver base, gere texto neutro e tecnicamente correto.
+4. Retorne SEMPRE o JSON solicitado, sem texto adicional.`;
 
   const userMessage = `Gere a minuta legislativa com base nos seguintes dados:
 
