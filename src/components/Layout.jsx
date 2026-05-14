@@ -64,25 +64,25 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
       <>
         {/* ── Cabeçalho: logo + botão recolher ── */}
         <div
-          className={`border-b border-white/10 flex items-center flex-shrink-0 ${
+          className={`border-b border-primary-100 flex items-center flex-shrink-0 ${
             isCollapsed ? 'p-3 justify-center' : 'p-4 gap-3'
           }`}
         >
-          <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center flex-shrink-0">
             <Scale className="text-white" size={20} />
           </div>
 
           {!isCollapsed && (
             <>
               <div className="flex-1 min-w-0">
-                <h1 className="text-base font-display font-bold text-white leading-tight">Votta</h1>
+                <h1 className="text-base font-display font-bold text-primary-800 leading-tight">Votta</h1>
               </div>
 
               {mobile && (
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Fechar menu"
-                  className="p-1.5 rounded-lg text-white/40 hover:bg-white/10 hover:text-white transition-colors"
+                  className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -93,7 +93,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   onClick={() => setCollapsed(c => !c)}
                   aria-label="Recolher menu"
                   title="Recolher menu"
-                  className="p-1.5 rounded-lg text-white/40 hover:bg-white/10 hover:text-white transition-colors flex-shrink-0"
+                  className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors flex-shrink-0"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -106,7 +106,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
               onClick={() => setCollapsed(false)}
               aria-label="Expandir menu"
               title="Expandir menu"
-              className="p-1.5 rounded-lg text-white/40 hover:bg-white/10 hover:text-white transition-colors"
+              className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <ChevronRight size={18} />
             </button>
@@ -121,21 +121,21 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                 to="/select-municipality"
                 onClick={() => setSidebarOpen(false)}
                 title={`${selectedMunicipality.nome} — ${selectedMunicipality.uf}`}
-                className="p-2 bg-white/[0.07] rounded-xl border border-white/10 flex justify-center hover:bg-white/[0.12] transition-colors"
+                className="p-2 bg-primary-50 rounded-xl border border-primary-200 flex justify-center hover:bg-primary-100 transition-colors"
               >
-                <MapPin size={15} className="text-white/60" />
+                <MapPin size={15} className="text-primary-500" />
               </Link>
             </div>
           ) : (
-            <div className="px-3 pt-3">
+            <div className="px-4 pt-3">
               <Link
                 to="/select-municipality"
                 onClick={() => setSidebarOpen(false)}
-                className="block p-3 bg-white/[0.07] rounded-xl border border-white/10 hover:bg-white/[0.12] transition-colors"
+                className="block p-3 bg-primary-50 rounded-xl border border-primary-200 hover:bg-primary-100 transition-colors"
               >
-                <p className="text-[10px] text-white/40 font-medium uppercase tracking-wide mb-0.5">Município ativo</p>
-                <p className="text-sm font-semibold text-white leading-tight">{selectedMunicipality.nome}</p>
-                <p className="text-xs text-white/50">{selectedMunicipality.uf}</p>
+                <p className="text-xs text-primary-400 font-medium mb-0.5">Município ativo</p>
+                <p className="text-sm font-semibold text-primary-800 leading-tight">{selectedMunicipality.nome}</p>
+                <p className="text-xs text-primary-400">{selectedMunicipality.uf}</p>
               </Link>
             </div>
           )
@@ -156,22 +156,22 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   relative flex items-center rounded-xl transition-all duration-200 text-sm font-medium
                   ${isCollapsed
                     ? `justify-center p-3 ${isActive
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/60 hover:bg-white/[0.07] hover:text-white'
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'
                       }`
                     : `gap-3 px-3 py-2.5 ${isActive
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/60 hover:bg-white/[0.07] hover:text-white'
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'
                       }`
                   }
                 `}
               >
-                <Icon size={17} />
+                <Icon size={17} className={isActive ? 'text-primary-600' : ''} />
                 {!isCollapsed && (
                   <>
                     <span>{item.label}</span>
                     {item.path === '/pricing' && (
-                      <span className="ml-auto text-[10px] font-bold bg-oro-500/20 text-oro-400 px-1.5 py-0.5 rounded-full">
+                      <span className="ml-auto text-[10px] font-bold bg-oro-100 text-oro-700 px-1.5 py-0.5 rounded-full">
                         PRO
                       </span>
                     )}
@@ -186,9 +186,9 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         </nav>
 
         {/* ── Rodapé: avatar ── */}
-        <div className={`border-t border-white/10 relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
+        <div className={`border-t border-primary-100 relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
 
-          {/* Dropdown — mobile e desktop no sidebar */}
+          {/* Dropdown — apenas no mobile */}
           {mobile && (
             <AnimatePresence>
               {showUserMenu && (
@@ -223,7 +223,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           {mobile ? (
             <button
               onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-white/[0.07]"
+              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-50"
               aria-label="Menu do usuário"
             >
               <div
@@ -233,14 +233,14 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                 {getInitials(user?.name)}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-semibold text-white truncate leading-tight">{user?.name || '—'}</p>
-                <p className="text-[10px] text-white/40 truncate leading-tight mt-0.5">
+                <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{user?.name || '—'}</p>
+                <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
                   {selectedMunicipality?.nome || user?.email || ''}
                 </p>
               </div>
               <ChevronDown
                 size={14}
-                className={`text-white/40 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
+                className={`text-primary-400 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
               />
             </button>
           ) : (
@@ -254,8 +254,8 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-white truncate leading-tight">{user?.name || '—'}</p>
-                  <p className="text-[10px] text-white/40 truncate leading-tight mt-0.5">
+                  <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{user?.name || '—'}</p>
+                  <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
                     {selectedMunicipality?.nome || user?.email || ''}
                   </p>
                 </div>
@@ -272,7 +272,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
 
       {/* Sidebar desktop */}
       <aside
-        className={`hidden lg:flex bg-primary-900 flex-col flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
+        className={`hidden lg:flex bg-white border-r border-primary-100 flex-col shadow-sm flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
       >
         <SidebarContent />
       </aside>
@@ -294,7 +294,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-primary-900 flex flex-col shadow-xl print:hidden"
+              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-white border-r border-primary-100 flex flex-col shadow-xl print:hidden"
             >
               <SidebarContent mobile={true} />
             </motion.aside>
@@ -315,7 +315,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-primary-900 rounded-md flex items-center justify-center">
+            <div className="w-7 h-7 bg-gradient-to-br from-primary-600 to-primary-800 rounded-md flex items-center justify-center">
               <Scale className="text-white" size={14} />
             </div>
             <span className="font-display font-bold text-primary-800 text-sm">Votta</span>
