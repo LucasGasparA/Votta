@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
 import { sendPasswordResetEmail } from '../utils/mailer.js';
+import { logAudit } from '../utils/audit.js';
 
 const router = Router();
 
@@ -100,6 +101,7 @@ router.post('/login', loginLimiter, async (req: Request, res: Response) => {
 
     console.log('✅ Login:', email);
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
+    void logAudit({ userId: user.id, action: 'LOGIN', ip: req.ip });
   } catch (error) {
     console.error('❌ Erro ao logar:', error);
     res.status(500).json({ error: 'Erro no servidor' });

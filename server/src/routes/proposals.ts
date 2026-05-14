@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
+import { logAudit } from '../utils/audit.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -119,6 +120,7 @@ router.post('/', async (req: Request, res: Response) => {
       },
     });
     res.json(proposal);
+    void logAudit({ userId, action: 'PROPOSAL_CREATED', entityType: 'PROPOSAL', entityId: proposal.id, detail: { title: proposal.title, municipalityId: proposal.municipalityId }, ip: req.ip });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro ao criar proposição' });
@@ -173,6 +175,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     });
 
     res.json(proposal);
+    void logAudit({ userId, action: 'PROPOSAL_UPDATED', entityType: 'PROPOSAL', entityId: proposal.id, detail: { title: proposal.title }, ip: req.ip });
   } catch {
     res.status(500).json({ error: 'Erro ao atualizar proposição' });
   }
@@ -189,6 +192,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
     await prisma.proposal.delete({ where: { id: existing.id } });
     res.json({ ok: true });
+    void logAudit({ userId, action: 'PROPOSAL_DELETED', entityType: 'PROPOSAL', entityId: existing.id, detail: { title: existing.title }, ip: req.ip });
   } catch {
     res.status(500).json({ error: 'Erro ao excluir proposição' });
   }

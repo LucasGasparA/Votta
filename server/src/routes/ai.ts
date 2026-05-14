@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
 import { prisma } from '../utils/db.js';
+import { logAudit } from '../utils/audit.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -239,6 +240,7 @@ Retorne exatamente neste formato JSON, sem nenhum texto adicional:
     await prisma.proposalVersion.create({ data: { proposalId, content: JSON.stringify(content), versionNumber: 1 } });
 
     res.json({ content });
+    void logAudit({ userId: (req as AuthRequest).user.userId, action: 'PROPOSAL_GENERATED', entityType: 'PROPOSAL', entityId: proposalId, ip: req.ip });
   } catch (error: any) {
     console.error('Erro geração Vertex AI:', error);
     if (error?.message === 'TIMEOUT') {

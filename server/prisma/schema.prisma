@@ -18,6 +18,7 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   proposals         Proposal[]
+  auditLogs         AuditLog[]
 }
 
 model Municipality {
@@ -57,4 +58,16 @@ model ProposalVersion {
   content       String
   versionNumber Int
   createdAt     DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  entityType String?
+  entityId   String?
+  detail     String?
+  ip         String?
+  createdAt  DateTime @default(now())
 }
