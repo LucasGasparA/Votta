@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, PlusCircle, Settings, LogOut, MapPin, Scale, Menu, X, Zap, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { Home, PlusCircle, Settings, LogOut, MapPin, Scale, Menu, X, Zap, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 function getInitials(name) {
@@ -26,6 +26,7 @@ const PAGE_TITLES = {
   '/settings':            'Configurações',
   '/configuracoes':       'Configurações',
   '/pricing':             'Planos',
+  '/audit':               'Trilha de Auditoria',
 }
 
 const Layout = ({ selectedMunicipality, onLogout, user }) => {
@@ -54,6 +55,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
     { path: '/dashboard',           icon: Home,       label: 'Dashboard' },
     { path: '/create-proposal',     icon: PlusCircle, label: 'Nova Proposição' },
     { path: '/select-municipality', icon: MapPin,      label: 'Município' },
+    { path: '/audit',               icon: Shield,      label: 'Auditoria' },
     { path: '/pricing',             icon: Zap,         label: 'Planos' },
   ]
 

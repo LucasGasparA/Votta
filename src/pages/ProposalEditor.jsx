@@ -4,13 +4,14 @@ import {
   Save, Download, AlertTriangle, CheckCircle,
   FileText, Scale, Send, ArrowLeft,
   BookOpen, List, Calendar, Minus, AlignLeft,
-  Clock, RotateCcw, X, ClipboardCheck, Bold, Italic, ListOrdered,
+  History, X, ClipboardCheck, Bold, Italic, ListOrdered,
   ChevronDown, ChevronUp, ExternalLink,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 import { exportToPDF } from '../utils/exportPdf.js'
+import { exportToDocx } from '../utils/exportDocx.js'
 
 const SECTIONS = [
   { id: 'ementa',    label: 'Ementa',    icon: AlignLeft,  hint: 'A ementa resume de forma clara e objetiva o conteúdo da proposição.' },
@@ -213,10 +214,10 @@ const ProposalEditor = () => {
   const [thinkingMsg, setThinkingMsg]           = useState(THINKING_MESSAGES[0])
   const [uncertaintyBanner, setUncertaintyBanner] = useState(null)
 
-  const [showVersionsModal, setShowVersionsModal] = useState(false)
-  const [versions, setVersions]                   = useState([])
-  const [versionsLoading, setVersionsLoading]     = useState(false)
-  const [selectedVersion, setSelectedVersion]     = useState(null)
+  const [showVersionsModal, setShowVersionsModal]   = useState(false)
+  const [versions, setVersions]                     = useState([])
+  const [versionsLoading, setVersionsLoading]       = useState(false)
+  const [confirmingVersionId, setConfirmingVersionId] = useState(null)
 
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportReviewed, setExportReviewed]   = useState(false)
@@ -406,7 +407,7 @@ const ProposalEditor = () => {
 
   const openVersionsModal = () => {
     setShowVersionsModal(true)
-    setSelectedVersion(null)
+    setConfirmingVersionId(null)
     loadVersions()
   }
 
@@ -489,15 +490,26 @@ const ProposalEditor = () => {
 
   const pendingAlerts  = useMemo(() => validations.filter(v => v.type === 'warning' || v.type === 'error'), [validations])
   const usedCitations  = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
+  const exportFormat   = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('legisla:settings') || '{}').exportFormat || 'PDF' }
+    catch { return 'PDF' }
+  }, [])
 
   const handleExportClick = () => { setExportReviewed(false); setShowExportModal(true) }
   const confirmExport = () => {
     setShowExportModal(false)
     setIsExporting(true)
+    const isDocx = exportFormat === 'DOCX'
     toast.promise(
-      exportToPDF(proposalTitle, pendingDocRef.current, selectedMunicipality)
-        .finally(() => setIsExporting(false)),
-      { loading: 'Gerando PDF...', success: 'PDF exportado!', error: 'Erro ao gerar PDF' }
+      (isDocx
+        ? exportToDocx(proposalTitle, pendingDocRef.current, selectedMunicipality)
+        : exportToPDF(proposalTitle, pendingDocRef.current, selectedMunicipality)
+      ).finally(() => setIsExporting(false)),
+      {
+        loading: isDocx ? 'Gerando DOCX...' : 'Gerando PDF...',
+        success: isDocx ? 'DOCX exportado!'  : 'PDF exportado!',
+        error:   isDocx ? 'Erro ao gerar DOCX' : 'Erro ao gerar PDF',
+      }
     )
   }
 
@@ -617,8 +629,12 @@ const ProposalEditor = () => {
               )
             })()}
             <span className="text-xs text-primary-400 hidden lg:block">Ctrl+S</span>
-            <button onClick={openVersionsModal} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 border border-primary-200 rounded-lg transition-all">
-              <Clock size={14} />
+            <button
+              onClick={openVersionsModal}
+              aria-label="Ver histórico de versões"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-primary-200 text-primary-600 rounded-xl hover:bg-primary-50 active:scale-[0.97] transition-all"
+            >
+              <History size={15} />
               <span className="hidden md:inline">Versões</span>
             </button>
             <button
@@ -635,7 +651,7 @@ const ProposalEditor = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download size={14} />
-              <span className="hidden md:inline">{isExporting ? 'Gerando...' : 'Exportar PDF'}</span>
+              <span className="hidden md:inline">{isExporting ? 'Gerando...' : (exportFormat === 'DOCX' ? 'Exportar DOCX' : 'Exportar PDF')}</span>
             </button>
           </div>
         </div>
@@ -1096,85 +1112,87 @@ const ProposalEditor = () => {
         {showVersionsModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
             onClick={e => e.target === e.currentTarget && setShowVersionsModal(false)}
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col"
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 flex flex-col max-h-[80vh]"
             >
-              <div className="flex items-center justify-between p-6 border-b border-primary-100">
-                <div className="flex items-center gap-3">
-                  <Clock size={20} className="text-primary-500" />
-                  <h2 className="text-lg font-display font-bold text-primary-800">Histórico de Versões</h2>
-                </div>
-                <button onClick={() => setShowVersionsModal(false)} className="text-primary-400 hover:text-primary-600 p-1.5 rounded-lg hover:bg-primary-50">
-                  <X size={20} />
+              <div className="flex items-center justify-between p-5 border-b border-primary-100 flex-shrink-0">
+                <h2 className="text-base font-display font-bold text-primary-800">Histórico de versões</h2>
+                <button
+                  onClick={() => setShowVersionsModal(false)}
+                  aria-label="Fechar histórico de versões"
+                  className="text-primary-400 hover:text-primary-600 p-1.5 rounded-lg hover:bg-primary-50 transition-colors"
+                >
+                  <X size={18} />
                 </button>
               </div>
-              <div className="flex flex-1 overflow-hidden">
-                <div className="w-52 border-r border-primary-100 overflow-y-auto flex-shrink-0 p-2 space-y-1">
-                  {versionsLoading ? (
-                    <div className="flex items-center justify-center p-8 text-primary-400">
-                      <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  ) : versions.length === 0 ? (
-                    <p className="text-xs text-primary-400 text-center p-6">Nenhuma versão salva ainda.</p>
-                  ) : versions.map(v => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVersion(v)}
-                      className={`w-full text-left px-3 py-3 rounded-xl text-xs transition-all ${selectedVersion?.id === v.id ? 'bg-primary-600 text-white' : 'hover:bg-primary-50 text-primary-700'}`}
-                    >
-                      <p className="font-bold mb-0.5">Versão {v.versionNumber}</p>
-                      <p className={selectedVersion?.id === v.id ? 'text-primary-200' : 'text-primary-400'}>{formatVersionDate(v.createdAt)}</p>
-                    </button>
-                  ))}
-                </div>
-                <div className="flex-1 overflow-y-auto p-6">
-                  {!selectedVersion ? (
-                    <div className="flex flex-col items-center justify-center h-full text-primary-400">
-                      <Clock size={32} className="mb-3 opacity-40" />
-                      <p className="text-sm">Selecione uma versão para visualizar</p>
-                    </div>
-                  ) : (() => {
-                    let parsed = null
-                    try { parsed = JSON.parse(selectedVersion.content) } catch { /* noop */ }
-                    return (
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="font-bold text-primary-800">Versão {selectedVersion.versionNumber}</h3>
-                          <button onClick={() => restoreVersion(selectedVersion)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all">
-                            <RotateCcw size={14} /> Restaurar
-                          </button>
+              <div className="overflow-y-auto flex-1 p-4">
+                {versionsLoading ? (
+                  <div className="space-y-3">
+                    {[0, 1, 2].map(i => (
+                      <div key={i} className="animate-pulse flex items-center justify-between p-3 rounded-xl bg-primary-50">
+                        <div className="space-y-2 flex-1">
+                          <div className="h-3 bg-primary-200 rounded w-24" />
+                          <div className="h-2.5 bg-primary-100 rounded w-36" />
                         </div>
-                        {parsed ? (
-                          <div className="space-y-4 text-sm text-primary-700">
-                            {parsed.ementa && <div>
-                              <p className="text-xs font-bold text-primary-400 uppercase tracking-wide mb-1">Ementa</p>
-                              <p className="font-serif leading-relaxed bg-primary-50 rounded-lg p-3">{parsed.ementa}</p>
-                            </div>}
-                            {parsed.preambulo && <div>
-                              <p className="text-xs font-bold text-primary-400 uppercase tracking-wide mb-1">Preâmbulo</p>
-                              <p className="font-serif leading-relaxed bg-primary-50 rounded-lg p-3">{parsed.preambulo}</p>
-                            </div>}
-                            {parsed.artigos?.length > 0 && <div>
-                              <p className="text-xs font-bold text-primary-400 uppercase tracking-wide mb-1">Artigos ({parsed.artigos.length})</p>
-                              <div className="space-y-2">
-                                {parsed.artigos.map((a, i) => (
-                                  <div key={i} className="bg-primary-50 rounded-lg p-3 font-serif">
-                                    <span className="font-bold mr-2">{a.numero}</span>{a.texto}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>}
-                          </div>
-                        ) : <p className="text-xs text-primary-400">Não foi possível exibir o conteúdo desta versão.</p>}
+                        <div className="h-7 w-20 bg-primary-100 rounded-lg" />
                       </div>
-                    )
-                  })()}
-                </div>
+                    ))}
+                  </div>
+                ) : versions.length === 0 ? (
+                  <p className="text-sm text-primary-400 text-center py-10">Nenhuma versão salva ainda.</p>
+                ) : (() => {
+                  const maxV = Math.max(...versions.map(v => v.versionNumber))
+                  return (
+                    <div className="space-y-2">
+                      {versions.map(v => (
+                        <div key={v.id} className="border border-primary-100 rounded-xl p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-sm text-primary-800">Versão {v.versionNumber}</span>
+                                {v.versionNumber === maxV && (
+                                  <span className="text-xs font-semibold bg-oro-100 text-oro-700 px-2 py-0.5 rounded-full">Atual</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-primary-400 mt-0.5">{formatVersionDate(v.createdAt)}</p>
+                            </div>
+                            {v.versionNumber !== maxV && confirmingVersionId !== v.id && (
+                              <button
+                                onClick={() => setConfirmingVersionId(v.id)}
+                                className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                              >
+                                Restaurar
+                              </button>
+                            )}
+                          </div>
+                          {confirmingVersionId === v.id && (
+                            <div className="mt-3 pt-3 border-t border-primary-100">
+                              <p className="text-xs text-primary-600 mb-2">Isso substituirá o conteúdo atual.</p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setConfirmingVersionId(null)}
+                                  className="flex-1 text-xs py-1.5 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 transition-all"
+                                >
+                                  Cancelar
+                                </button>
+                                <button
+                                  onClick={() => { restoreVersion(v); setConfirmingVersionId(null) }}
+                                  className="flex-1 text-xs py-1.5 rounded-lg bg-primary-600 text-white hover:bg-primary-700 active:scale-[0.97] transition-all font-semibold"
+                                >
+                                  Confirmar restauração
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
               </div>
             </motion.div>
           </motion.div>
@@ -1256,7 +1274,7 @@ const ProposalEditor = () => {
                 <button onClick={confirmExport} disabled={!exportReviewed}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed
                     ${exportReviewed ? 'bg-primary-800 hover:bg-primary-900 text-white' : 'bg-primary-100 text-primary-300'}`}>
-                  <Download size={15} /> Gerar PDF
+                  <Download size={15} /> {exportFormat === 'DOCX' ? 'Gerar DOCX' : 'Gerar PDF'}
                 </button>
               </div>
             </motion.div>

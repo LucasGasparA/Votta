@@ -14,6 +14,7 @@ const ResetPassword      = lazy(() => import('./pages/ResetPassword'))
 const Configuracoes      = lazy(() => import('./pages/Configuracoes'))
 const Settings           = lazy(() => import('./pages/Settings'))
 const Register           = lazy(() => import('./pages/Register'))
+const AuditLog           = lazy(() => import('./pages/AuditLog'))
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -117,6 +118,7 @@ function App() {
           <Route path="pricing" element={<Pricing />} />
           <Route path="configuracoes" element={<Navigate to="/settings" />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="audit" element={<AuditLog />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />

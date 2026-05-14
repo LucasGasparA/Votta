@@ -1,0 +1,125 @@
+import { useState, useEffect, useCallback } from 'react'
+import { Shield, LogIn, FilePlus, FileEdit, Trash2, Zap, Download, Activity } from 'lucide-react'
+import { api } from '../utils/api.js'
+
+const ACTION_ICONS = {
+  LOGIN:              LogIn,
+  PROPOSAL_CREATED:   FilePlus,
+  PROPOSAL_UPDATED:   FileEdit,
+  PROPOSAL_DELETED:   Trash2,
+  PROPOSAL_GENERATED: Zap,
+  PROPOSAL_EXPORTED:  Download,
+}
+
+const ACTION_LABELS = {
+  LOGIN:              'Acesso ao sistema',
+  PROPOSAL_CREATED:   'Proposição criada',
+  PROPOSAL_UPDATED:   'Proposição atualizada',
+  PROPOSAL_DELETED:   'Proposição excluída',
+  PROPOSAL_GENERATED: 'Minuta gerada pela IA',
+  PROPOSAL_EXPORTED:  'Documento exportado',
+}
+
+function actionLabel(action) {
+  return ACTION_LABELS[action] ?? action.toLowerCase().replace(/_/g, ' ')
+}
+
+function parseDetail(raw) {
+  if (!raw) return null
+  try { return typeof raw === 'string' ? JSON.parse(raw) : raw } catch { return null }
+}
+
+function secondaryText(log) {
+  const detail = parseDetail(log.detail)
+  if (detail?.title) return detail.title
+  if (log.entityId)  return `ID: ${log.entityId.slice(0, 8)}…`
+  return null
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  return (
+    d.toLocaleDateString('pt-BR') +
+    ' às ' +
+    d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  )
+}
+
+const AuditLog = () => {
+  const [logs, setLogs]       = useState([])
+  const [status, setStatus]   = useState('loading') // loading | success | empty | error
+
+  const fetchLogs = useCallback(async () => {
+    setStatus('loading')
+    try {
+      const data = await api.get('/audit')
+      const list = data.logs ?? []
+      setLogs(list)
+      setStatus(list.length === 0 ? 'empty' : 'success')
+    } catch {
+      setStatus('error')
+    }
+  }, [])
+
+  useEffect(() => { fetchLogs() }, [fetchLogs])
+
+  return (
+    <div className="max-w-2xl mx-auto px-6 py-8">
+      <h1 className="text-xl font-display font-bold text-primary-800 mb-1">Trilha de Auditoria</h1>
+      <p className="text-sm text-primary-400 mb-6">Registro de todas as ações realizadas na sua conta</p>
+
+      {status === 'loading' && (
+        <div className="space-y-3">
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="animate-pulse h-14 rounded-xl bg-primary-100" />
+          ))}
+        </div>
+      )}
+
+      {status === 'empty' && (
+        <div className="flex flex-col items-center justify-center py-20 text-primary-400">
+          <Shield size={40} className="mb-4 opacity-40" />
+          <p className="text-sm">Nenhuma ação registrada ainda</p>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div className="flex flex-col items-center justify-center py-20 text-primary-400">
+          <p className="text-sm mb-4">Não foi possível carregar o histórico.</p>
+          <button
+            onClick={fetchLogs}
+            className="px-4 py-2 text-sm rounded-xl border border-primary-200 text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {status === 'success' && (
+        <div className="space-y-2">
+          {logs.map(log => {
+            const Icon = ACTION_ICONS[log.action] ?? Activity
+            const sub  = secondaryText(log)
+            return (
+              <div
+                key={log.id}
+                className="bg-white rounded-xl border border-primary-100 px-5 py-4 flex items-center gap-4"
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+                  <Icon size={16} className="text-primary-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-primary-800">{actionLabel(log.action)}</p>
+                  {sub && <p className="text-xs text-primary-400 truncate mt-0.5">{sub}</p>}
+                </div>
+                <p className="text-xs text-primary-400 ml-auto flex-shrink-0">{formatDate(log.createdAt)}</p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default AuditLog
