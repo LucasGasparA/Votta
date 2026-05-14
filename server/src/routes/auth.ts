@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import rateLimit from 'express-rate-limit';
+//import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
@@ -11,13 +11,13 @@ import { logAudit } from '../utils/audit.js';
 
 const router = Router();
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+//const loginLimiter = rateLimit({
+//  windowMs: 15 * 60 * 1000,
+  //max: 10,
+  //message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
+  //standardHeaders: true,
+  //legacyHeaders: false,
+//});
 
 const registerSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -42,7 +42,7 @@ function signToken(userId: string, role: string) {
   return jwt.sign({ userId, role }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 }
 
-router.post('/register', loginLimiter, async (req: Request, res: Response) => {
+router.post('/register', async (req: Request, res: Response) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
@@ -74,7 +74,7 @@ router.post('/register', loginLimiter, async (req: Request, res: Response) => {
   }
 });
 
-router.post('/login', loginLimiter, async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
@@ -130,13 +130,13 @@ router.post('/logout', (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-const forgotPasswordLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: 'Muitas tentativas. Aguarde 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+//const forgotPasswordLimiter = rateLimit({
+//  windowMs: 15 * 60 * 1000,
+//  max: 5,
+//  message: { error: 'Muitas tentativas. Aguarde 15 minutos.' },
+//  standardHeaders: true,
+//  legacyHeaders: false,
+//});
 
 const forgotSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -148,7 +148,7 @@ const resetSchema = z.object({
 });
 
 // POST /auth/forgot-password
-router.post('/forgot-password', forgotPasswordLimiter, async (req: Request, res: Response) => {
+router.post('/forgot-password', async (req: Request, res: Response) => {
   const parsed = forgotSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
