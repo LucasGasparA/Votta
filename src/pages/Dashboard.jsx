@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
-import { FileText, Clock, CheckCircle, AlertTriangle, TrendingUp, PlusCircle, X } from 'lucide-react'
+import { Link, useOutletContext, useNavigate } from 'react-router-dom'
+import { FileText, Clock, CheckCircle, AlertTriangle, TrendingUp, PlusCircle, X, MapPin, Download, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
 import StatCard from '../components/StatCard'
 import ProposalList from '../components/ProposalList'
@@ -84,6 +84,7 @@ const Dashboard = () => {
     }
   }
 
+  const navigate     = useNavigate()
   const pendingCount = Number(stats[2]?.value ?? 0)
   const firstName    = user?.name?.split(' ')[0] ?? ''
   const listaExibida = somentePendentes
@@ -133,19 +134,47 @@ const Dashboard = () => {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="card p-12 text-center"
+          className="bg-white rounded-2xl border border-primary-100 shadow-sm p-8 mt-2"
         >
-          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FileText className="text-primary-400" size={36} />
-          </div>
-          <h2 className="text-2xl font-display font-bold text-primary-800 mb-2">Comece sua primeira proposição</h2>
-          <p className="text-primary-500 mb-8 max-w-md mx-auto">
-            Use o wizard guiado para criar propostas legislativas com conformidade normativa e assistência jurídica inteligente.
+          <p className="text-base font-semibold text-primary-800 mb-1">
+            Comece sua primeira proposição
           </p>
-          <Link to="/create-proposal" className="inline-flex items-center gap-2 btn-primary">
-            <PlusCircle size={20} />
-            Nova Proposição
-          </Link>
+          <p className="text-sm text-primary-400 mb-8 max-w-sm">
+            Siga os passos abaixo para criar sua primeira minuta legislativa com conformidade normativa.
+          </p>
+
+          <div className="flex items-start gap-3 mb-8">
+            {[
+              { icone: MapPin,   titulo: 'Selecione o município',  desc: 'Define o perfil normativo da câmara' },
+              { icone: FileText, titulo: 'Crie a proposição',      desc: 'Wizard guiado em 5 etapas' },
+              { icone: Download, titulo: 'Exporte o documento',    desc: 'PDF ou DOCX com conformidade validada' },
+            ].map((passo, i, arr) => (
+              <div key={i} className="flex items-start gap-3 flex-1">
+                <div className="flex flex-col items-center flex-1 text-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0">
+                    <passo.icone size={18} className="text-primary-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-primary-800">{passo.titulo}</p>
+                  <p className="text-xs text-primary-400">{passo.desc}</p>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="mt-5 text-primary-200 text-lg flex-shrink-0">→</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              onClick={() => navigate('/create-proposal')}
+              className="flex items-center gap-2 px-6 py-3 bg-rosso-500 text-white
+                rounded-xl font-semibold hover:bg-rosso-600 active:scale-[0.97]
+                transition-all duration-200 shadow-sm"
+            >
+              <Plus size={16} />
+              Nova Proposição
+            </button>
+          </div>
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

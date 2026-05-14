@@ -69,22 +69,24 @@ export default function Configuracoes() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-6 py-8">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-display font-bold text-primary-800 mb-1">Configurações</h1>
+        <h1 className="text-xl font-display font-bold text-primary-800 mb-1">Configurações</h1>
         <p className="text-primary-500 text-sm">Gerencie sua conta e credenciais de acesso</p>
       </motion.div>
+
+      <div className="space-y-4">
 
       {/* ── Seção Perfil ── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="bg-white rounded-xl border border-primary-100 shadow-sm mb-6"
+        className="bg-white rounded-xl border border-primary-100 shadow-sm"
       >
         <div className="flex items-center gap-3 p-6 border-b border-primary-100">
           <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -157,6 +159,7 @@ export default function Configuracoes() {
         transition={{ delay: 0.1 }}
         className="bg-white rounded-xl border border-primary-100 shadow-sm"
       >
+
         <div className="flex items-center gap-3 p-6 border-b border-primary-100">
           <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
             <Lock size={18} className="text-primary-600" />
@@ -257,6 +260,8 @@ export default function Configuracoes() {
           </div>
         </form>
       </motion.div>
+
+      </div>
     </div>
   )
 }

@@ -24,14 +24,16 @@ const PAGE_TITLES = {
   '/create-proposal':     'Nova Proposição',
   '/select-municipality': 'Selecionar Município',
   '/settings':            'Configurações',
+  '/configuracoes':       'Configurações',
   '/pricing':             'Planos',
 }
 
 const Layout = ({ selectedMunicipality, onLogout, user }) => {
   const location = useLocation()
-  const [sidebarOpen,  setSidebarOpen]  = useState(false)
-  const [collapsed,    setCollapsed]    = useState(false)
-  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [sidebarOpen,       setSidebarOpen]       = useState(false)
+  const [collapsed,         setCollapsed]         = useState(false)
+  const [showUserMenu,      setShowUserMenu]      = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     if (!showUserMenu) return
@@ -56,6 +58,12 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
   ]
 
   const avatarColor = nameToColor(user?.name)
+
+  const handleLogoutRequest = () => {
+    setShowUserMenu(false)
+    setSidebarOpen(false)
+    setShowLogoutConfirm(true)
+  }
 
   const SidebarContent = ({ mobile = false }) => {
     const isCollapsed = collapsed && !mobile
@@ -114,31 +122,40 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         </div>
 
         {/* ── Município ativo ── */}
-        {selectedMunicipality && (
-          isCollapsed ? (
-            <div className="px-2 pt-3">
-              <Link
-                to="/select-municipality"
-                onClick={() => setSidebarOpen(false)}
-                title={`${selectedMunicipality.nome} — ${selectedMunicipality.uf}`}
-                className="p-2 bg-primary-50 rounded-xl border border-primary-200 flex justify-center hover:bg-primary-100 transition-colors"
-              >
-                <MapPin size={15} className="text-primary-500" />
-              </Link>
-            </div>
-          ) : (
-            <div className="px-4 pt-3">
-              <Link
-                to="/select-municipality"
-                onClick={() => setSidebarOpen(false)}
-                className="block p-3 bg-primary-50 rounded-xl border border-primary-200 hover:bg-primary-100 transition-colors"
-              >
-                <p className="text-xs text-primary-400 font-medium mb-0.5">Município ativo</p>
-                <p className="text-sm font-semibold text-primary-800 leading-tight">{selectedMunicipality.nome}</p>
-                <p className="text-xs text-primary-400">{selectedMunicipality.uf}</p>
-              </Link>
-            </div>
-          )
+        {isCollapsed ? (
+          <div className="px-2 pt-3">
+            <Link
+              to="/select-municipality"
+              onClick={() => setSidebarOpen(false)}
+              title={selectedMunicipality
+                ? `${selectedMunicipality.nome} — ${selectedMunicipality.uf}`
+                : 'Selecionar município'}
+              className="p-2 bg-primary-50 rounded-xl border border-primary-200 flex justify-center hover:bg-primary-100 transition-colors"
+            >
+              <MapPin size={15} className={selectedMunicipality ? 'text-primary-600' : 'text-primary-400'} />
+            </Link>
+          </div>
+        ) : (
+          <div className="px-4 pt-3">
+            <Link
+              to="/select-municipality"
+              onClick={() => setSidebarOpen(false)}
+              className="block p-3 bg-primary-50 rounded-xl border border-primary-200 hover:bg-primary-100 transition-colors"
+            >
+              <p className="text-[11px] text-primary-500 font-medium mb-0.5">Município ativo</p>
+              {selectedMunicipality ? (
+                <>
+                  <p className="text-sm font-semibold text-primary-800 leading-tight">
+                    <span className="text-emerald-500 mr-1">●</span>
+                    {selectedMunicipality.nome}
+                  </p>
+                  <p className="text-xs text-primary-400">{selectedMunicipality.uf}</p>
+                </>
+              ) : (
+                <p className="text-sm text-primary-400 italic">Nenhum município selecionado</p>
+              )}
+            </Link>
+          </div>
         )}
 
         {/* ── Navegação ── */}
@@ -197,20 +214,20 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute bottom-full left-0 min-w-[180px] mb-1 bg-white rounded-xl shadow-lg border border-primary-100 overflow-hidden z-50"
+                  className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-xl shadow-lg border border-primary-100 py-1 z-50"
                 >
                   <Link
                     to="/settings"
                     onClick={() => { setShowUserMenu(false); setSidebarOpen(false) }}
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-primary-600 hover:bg-primary-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 cursor-pointer transition-colors w-full text-left"
                   >
                     <Settings size={15} />
                     Configurações
                   </Link>
-                  <div className="border-t border-primary-100" />
+                  <div className="border-t border-primary-100 my-1" />
                   <button
-                    onClick={() => { setShowUserMenu(false); onLogout() }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-rosso-500 hover:bg-rosso-50 transition-colors"
+                    onClick={handleLogoutRequest}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
                   >
                     <LogOut size={15} />
                     Sair
@@ -223,8 +240,9 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           {mobile ? (
             <button
               onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-50"
+              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-100 hover:ring-1 hover:ring-primary-200"
               aria-label="Menu do usuário"
+              title="Configurações e sair"
             >
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
@@ -240,7 +258,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
               </div>
               <ChevronDown
                 size={14}
-                className={`text-primary-400 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
+                className={`text-primary-500 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
               />
             </button>
           ) : (
@@ -352,7 +370,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                 </div>
                 <ChevronDown
                   size={14}
-                  className={`text-primary-400 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
+                  className={`text-primary-500 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
                 />
               </button>
 
@@ -363,24 +381,24 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-primary-100 overflow-hidden z-50"
+                    className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-primary-100 py-1 overflow-hidden z-50"
                   >
-                    <div className="px-3 py-2.5 border-b border-primary-100">
+                    <div className="px-4 py-2.5 border-b border-primary-100">
                       <p className="text-sm font-semibold text-primary-800 leading-tight truncate">{user.name}</p>
                       <p className="text-xs text-primary-400 mt-0.5 truncate">{user.email}</p>
                     </div>
                     <Link
                       to="/settings"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-primary-600 hover:bg-primary-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors"
                     >
                       <Settings size={15} />
                       Configurações
                     </Link>
-                    <div className="border-t border-primary-100" />
+                    <div className="border-t border-primary-100 my-1" />
                     <button
-                      onClick={() => { setShowUserMenu(false); onLogout() }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-rosso-500 hover:bg-rosso-50 transition-colors"
+                      onClick={handleLogoutRequest}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
                     >
                       <LogOut size={15} />
                       Sair
@@ -396,6 +414,51 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
           <Outlet context={{ selectedMunicipality, user }} />
         </main>
       </div>
+
+      {/* Modal de confirmação de logout */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 16 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            >
+              <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogOut size={22} className="text-primary-600" />
+              </div>
+              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+                Sair do sistema?
+              </h2>
+              <p className="text-sm text-primary-500 text-center mb-6 leading-relaxed">
+                Você será redirecionado para a tela de login.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200
+                    text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => { setShowLogoutConfirm(false); onLogout() }}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
+                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                >
+                  Sair
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
