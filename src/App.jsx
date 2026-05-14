@@ -42,10 +42,14 @@ function App() {
   }, [])
 
   const handleLogin = () => {
-    api.get('/auth/me').then(({ user }) => {
-      setIsAuthenticated(true)
-      setUser(user)
-    })
+    api.get('/auth/me')
+      .then(({ user }) => {
+        setIsAuthenticated(true)
+        setUser(user)
+      })
+      .catch(() => {
+        setIsAuthenticated(false)
+      })
   }
 
   const handleSelectMunicipality = (municipio) => {

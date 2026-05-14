@@ -30,10 +30,12 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Senha obrigatória'),
 });
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+  secure: isProd,
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',
 };
@@ -126,7 +128,7 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
 });
 
 router.post('/logout', (_req: Request, res: Response) => {
-  res.clearCookie('token', { path: '/' });
+  res.clearCookie('token', { path: '/', sameSite: COOKIE_OPTIONS.sameSite, secure: COOKIE_OPTIONS.secure });
   res.json({ ok: true });
 });
 
