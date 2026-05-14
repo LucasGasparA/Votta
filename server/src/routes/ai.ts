@@ -19,13 +19,20 @@ function zodError(error: z.ZodError): string {
   return issues[0]?.message ?? 'Dados inválidos';
 }
 
-const PROJECT_ID = process.env.GCP_PROJECT_ID;
-const LOCATION   = process.env.GCP_LOCATION || 'us-central1';
-const MODEL      = process.env.GCP_MODEL    || 'gemini-1.5-pro';
+const PROJECT_ID           = process.env.GCP_PROJECT_ID;
+const LOCATION             = process.env.GCP_LOCATION || 'us-central1';
+const MODEL                = process.env.GCP_MODEL    || 'gemini-1.5-pro';
+const GCP_CREDENTIALS_JSON = process.env.GCP_CREDENTIALS_JSON;
 const LLM_TIMEOUT_MS = 30_000;
 
 const vertexAI = PROJECT_ID
-  ? new VertexAI({ project: PROJECT_ID, location: LOCATION })
+  ? new VertexAI({
+      project: PROJECT_ID,
+      location: LOCATION,
+      googleAuthOptions: GCP_CREDENTIALS_JSON
+        ? { credentials: JSON.parse(GCP_CREDENTIALS_JSON) }
+        : undefined,
+    })
   : null;
 
 router.post('/chat', async (req: Request, res: Response) => {
