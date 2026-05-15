@@ -42,10 +42,14 @@ lerna-debug.log*
 .claude/
 
 # Prisma generated client
-server/src/generated/
+Back/src/generated/
 
 # Compiled output
-server/dist/
+Back/dist/
+Front/dist/
+
+# Vite cache
+.vite/
 
 # OS
 Thumbs.db
