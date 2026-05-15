@@ -68,7 +68,7 @@ router.post('/register', async (req: Request, res: Response) => {
     const token = signToken(user.id, user.role);
     res.cookie('token', token, COOKIE_OPTIONS);
 
-    console.log('✅ Usuário registrado:', email);
+    console.log('✅ Usuário registrado com sucesso');
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
     console.error('❌ Erro ao registrar:', error);
@@ -101,7 +101,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const token = signToken(user.id, user.role);
     res.cookie('token', token, COOKIE_OPTIONS);
 
-    console.log('✅ Login:', email);
+    console.log('✅ Login realizado');
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
     void logAudit({ userId: user.id, action: 'LOGIN', ip: req.ip });
   } catch (error) {

@@ -5,26 +5,26 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
 
-export default function Login({ onLogin }) {
-  const [email,        setEmail]       = useState('')
-  const [password,     setPassword]    = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading,      setLoading]     = useState(false)
-  const [error,        setError]       = useState('')
+export default function Login({ aoEntrar }) {
+  const [email,        setEmail]        = useState('')
+  const [senha,        setSenha]        = useState('')
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [carregando,   setCarregando]   = useState(false)
+  const [erro,         setErro]         = useState('')
 
-  const handleSubmit = async (e) => {
+  const aoEnviar = async (e) => {
     e.preventDefault()
-    setError('')
-    setLoading(true)
+    setErro('')
+    setCarregando(true)
     try {
-      await api.post('/auth/login', { email, password })
-      onLogin()
+      await api.post('/auth/login', { email, password: senha })
+      aoEntrar()
     } catch (err) {
       const msg = err.message || 'E-mail ou senha incorretos'
-      setError(msg)
+      setErro(msg)
       toast.error(msg)
     } finally {
-      setLoading(false)
+      setCarregando(false)
     }
   }
 
@@ -47,7 +47,7 @@ export default function Login({ onLogin }) {
 
           <h1 className="text-xl font-semibold text-center text-primary-900 mb-6">Entrar</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={aoEnviar} className="space-y-3">
             <div>
               <label htmlFor="email" className="sr-only">E-mail</label>
               <input
@@ -62,13 +62,13 @@ export default function Login({ onLogin }) {
             </div>
 
             <div>
-              <label htmlFor="password" className="sr-only">Senha</label>
+              <label htmlFor="senha" className="sr-only">Senha</label>
               <div className="relative">
                 <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  id="senha"
+                  type={mostrarSenha ? 'text' : 'password'}
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
                   placeholder="Senha"
                   minLength={6}
                   required
@@ -77,14 +77,14 @@ export default function Login({ onLogin }) {
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(v => !v)}
-                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setMostrarSenha(v => !v)}
+                    aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
                     className="text-primary-400 hover:text-primary-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                   <Link
-                    to="/forgot-password"
+                    to="/esqueci-senha"
                     className="text-xs font-semibold uppercase tracking-wider text-rosso-500 hover:text-rosso-600 transition-colors"
                   >
                     Esqueceu?
@@ -93,18 +93,18 @@ export default function Login({ onLogin }) {
               </div>
             </div>
 
-            {error && (
+            {erro && (
               <p role="alert" className="text-sm text-rosso-500 text-center">
-                {error}
+                {erro}
               </p>
             )}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={carregando}
               className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-rosso-500 hover:bg-rosso-600 text-white"
             >
-              {loading ? (
+              {carregando ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
               ) : 'Entrar'}
             </button>
@@ -112,7 +112,7 @@ export default function Login({ onLogin }) {
 
           <p className="text-center text-sm mt-5 text-primary-400">
             Não tem conta?{' '}
-            <Link to="/register" className="font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
+            <Link to="/cadastro" className="font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
               Criar conta grátis
             </Link>
           </p>

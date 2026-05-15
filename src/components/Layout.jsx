@@ -20,16 +20,15 @@ function nameToColor(name) {
 }
 
 const PAGE_TITLES = {
-  '/dashboard':           'Dashboard',
-  '/create-proposal':     'Nova Proposição',
-  '/select-municipality': 'Selecionar Município',
-  '/settings':            'Configurações',
-  '/configuracoes':       'Configurações',
-  '/pricing':             'Planos',
-  '/audit':               'Trilha de Auditoria',
+  '/painel':                'Painel',
+  '/criar-minuta':          'Nova Proposição',
+  '/selecionar-municipio':  'Selecionar Município',
+  '/configuracoes':         'Configurações',
+  '/planos':                'Planos',
+  '/auditoria':             'Trilha de Auditoria',
 }
 
-const Layout = ({ selectedMunicipality, onLogout, user }) => {
+const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
   const location = useLocation()
   const [sidebarOpen,       setSidebarOpen]       = useState(false)
   const [collapsed,         setCollapsed]         = useState(false)
@@ -47,21 +46,21 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
     setShowUserMenu(false)
   }, [location.pathname])
 
-  const pageTitle = location.pathname.startsWith('/proposal/')
+  const pageTitle = location.pathname.startsWith('/minuta/')
     ? 'Editor de Proposição'
     : PAGE_TITLES[location.pathname] ?? ''
 
   const navItems = [
-    { path: '/dashboard',           icon: Home,       label: 'Dashboard' },
-    { path: '/create-proposal',     icon: PlusCircle, label: 'Nova Proposição' },
-    { path: '/select-municipality', icon: MapPin,      label: 'Município' },
-    { path: '/audit',               icon: Shield,      label: 'Auditoria' },
-    { path: '/pricing',             icon: Zap,         label: 'Planos' },
+    { path: '/painel',               icon: Home,       label: 'Painel' },
+    { path: '/criar-minuta',         icon: PlusCircle, label: 'Nova Proposição' },
+    { path: '/selecionar-municipio', icon: MapPin,      label: 'Município' },
+    { path: '/auditoria',            icon: Shield,      label: 'Auditoria' },
+    { path: '/planos',               icon: Zap,         label: 'Planos' },
   ]
 
-  const avatarColor = nameToColor(user?.name)
+  const corAvatar = nameToColor(usuario?.name)
 
-  const handleLogoutRequest = () => {
+  const aoSolicitarLogout = () => {
     setShowUserMenu(false)
     setSidebarOpen(false)
     setShowLogoutConfirm(true)
@@ -127,31 +126,31 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         {isCollapsed ? (
           <div className="px-2 pt-3">
             <Link
-              to="/select-municipality"
+              to="/selecionar-municipio"
               onClick={() => setSidebarOpen(false)}
-              title={selectedMunicipality
-                ? `${selectedMunicipality.nome} — ${selectedMunicipality.uf}`
+              title={municipioSelecionado
+                ? `${municipioSelecionado.nome} — ${municipioSelecionado.uf}`
                 : 'Selecionar município'}
               className="p-2 bg-primary-50 rounded-xl border border-primary-200 flex justify-center hover:bg-primary-100 transition-colors"
             >
-              <MapPin size={15} className={selectedMunicipality ? 'text-primary-600' : 'text-primary-400'} />
+              <MapPin size={15} className={municipioSelecionado ? 'text-primary-600' : 'text-primary-400'} />
             </Link>
           </div>
         ) : (
           <div className="px-4 pt-3">
             <Link
-              to="/select-municipality"
+              to="/selecionar-municipio"
               onClick={() => setSidebarOpen(false)}
               className="block p-3 bg-primary-50 rounded-xl border border-primary-200 hover:bg-primary-100 transition-colors"
             >
               <p className="text-[11px] text-primary-500 font-medium mb-0.5">Município ativo</p>
-              {selectedMunicipality ? (
+              {municipioSelecionado ? (
                 <>
                   <p className="text-sm font-semibold text-primary-800 leading-tight">
                     <span className="text-emerald-500 mr-1">●</span>
-                    {selectedMunicipality.nome}
+                    {municipioSelecionado.nome}
                   </p>
-                  <p className="text-xs text-primary-400">{selectedMunicipality.uf}</p>
+                  <p className="text-xs text-primary-400">{municipioSelecionado.uf}</p>
                 </>
               ) : (
                 <p className="text-sm text-primary-400 italic">Nenhum município selecionado</p>
@@ -189,14 +188,14 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                 {!isCollapsed && (
                   <>
                     <span>{item.label}</span>
-                    {item.path === '/pricing' && (
+                    {item.path === '/planos' && (
                       <span className="ml-auto text-[10px] font-bold bg-oro-100 text-oro-700 px-1.5 py-0.5 rounded-full">
                         PRO
                       </span>
                     )}
                   </>
                 )}
-                {isCollapsed && item.path === '/pricing' && (
+                {isCollapsed && item.path === '/planos' && (
                   <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-oro-400 rounded-full" />
                 )}
               </Link>
@@ -219,7 +218,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-xl shadow-lg border border-primary-100 py-1 z-50"
                 >
                   <Link
-                    to="/settings"
+                    to="/configuracoes"
                     onClick={() => { setShowUserMenu(false); setSidebarOpen(false) }}
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 cursor-pointer transition-colors w-full text-left"
                   >
@@ -228,7 +227,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   </Link>
                   <div className="border-t border-primary-100 my-1" />
                   <button
-                    onClick={handleLogoutRequest}
+                    onClick={aoSolicitarLogout}
                     className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
                   >
                     <LogOut size={15} />
@@ -248,14 +247,14 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             >
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                style={{ background: avatarColor }}
+                style={{ background: corAvatar }}
               >
-                {getInitials(user?.name)}
+                {getInitials(usuario?.name)}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{user?.name || '—'}</p>
+                <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{usuario?.name || '—'}</p>
                 <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
-                  {selectedMunicipality?.nome || user?.email || ''}
+                  {municipioSelecionado?.nome || usuario?.email || ''}
                 </p>
               </div>
               <ChevronDown
@@ -267,16 +266,16 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             <div className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-2.5 px-2 py-2'}`}>
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                style={{ background: avatarColor }}
-                title={user?.name}
+                style={{ background: corAvatar }}
+                title={usuario?.name}
               >
-                {getInitials(user?.name)}
+                {getInitials(usuario?.name)}
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{user?.name || '—'}</p>
+                  <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{usuario?.name || '—'}</p>
                   <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
-                    {selectedMunicipality?.nome || user?.email || ''}
+                    {municipioSelecionado?.nome || usuario?.email || ''}
                   </p>
                 </div>
               )}
@@ -340,21 +339,21 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
             </div>
             <span className="font-display font-bold text-primary-800 text-sm">Votta</span>
           </div>
-          {user && (
+          {usuario && (
             <button
               onClick={() => setSidebarOpen(true)}
               aria-label="Abrir menu do usuário"
               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-              style={{ background: avatarColor }}
-              title={user.name}
+              style={{ background: corAvatar }}
+              title={usuario.name}
             >
-              {getInitials(user.name)}
+              {getInitials(usuario.name)}
             </button>
           )}
         </div>
 
         {/* Desktop top bar */}
-        {user && (
+        {usuario && (
           <div className="hidden lg:flex items-center justify-between px-6 py-2.5 bg-white border-b border-primary-100 flex-shrink-0 print:hidden">
             <p className="text-sm font-semibold text-primary-700">{pageTitle}</p>
 
@@ -366,9 +365,9 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                  style={{ background: avatarColor }}
+                  style={{ background: corAvatar }}
                 >
-                  {getInitials(user.name)}
+                  {getInitials(usuario.name)}
                 </div>
                 <ChevronDown
                   size={14}
@@ -386,11 +385,11 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                     className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-primary-100 py-1 overflow-hidden z-50"
                   >
                     <div className="px-4 py-2.5 border-b border-primary-100">
-                      <p className="text-sm font-semibold text-primary-800 leading-tight truncate">{user.name}</p>
-                      <p className="text-xs text-primary-400 mt-0.5 truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-primary-800 leading-tight truncate">{usuario.name}</p>
+                      <p className="text-xs text-primary-400 mt-0.5 truncate">{usuario.email}</p>
                     </div>
                     <Link
-                      to="/settings"
+                      to="/configuracoes"
                       onClick={() => setShowUserMenu(false)}
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors"
                     >
@@ -399,7 +398,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                     </Link>
                     <div className="border-t border-primary-100 my-1" />
                     <button
-                      onClick={handleLogoutRequest}
+                      onClick={aoSolicitarLogout}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
                     >
                       <LogOut size={15} />
@@ -413,7 +412,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
         )}
 
         <main className="flex-1 overflow-y-auto print:overflow-visible">
-          <Outlet context={{ selectedMunicipality, user }} />
+          <Outlet context={{ municipioSelecionado, usuario }} />
         </main>
       </div>
 
@@ -450,7 +449,7 @@ const Layout = ({ selectedMunicipality, onLogout, user }) => {
                   Cancelar
                 </button>
                 <button
-                  onClick={() => { setShowLogoutConfirm(false); onLogout() }}
+                  onClick={() => { setShowLogoutConfirm(false); aoSair() }}
                   className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
                     hover:bg-rosso-600 active:scale-[0.97] transition-all"
                 >

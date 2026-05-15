@@ -1,267 +1,228 @@
-import { useState, useEffect } from 'react'
-import { User, Lock, CheckCircle, Eye, EyeOff } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { Download, Bell, Sun, Check } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../utils/api.js'
+import Alternador from '../components/Alternador.jsx'
 
-export default function Configuracoes() {
-  // ── Perfil ──────────────────────────────────────────────────────
-  const [name,          setName]          = useState('')
-  const [email,         setEmail]         = useState('')
-  const [savingProfile, setSavingProfile] = useState(false)
+const DEFAULT_SETTINGS = {
+  exportFormat:          'PDF',
+  includePageNumbers:    true,
+  includeGenerationDate: true,
+  validationAlerts:      true,
+  unsavedReminder:       true,
+  emailNotifications:    false,
+  theme:                 'light',
+}
 
-  // ── Senha ────────────────────────────────────────────────────────
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword,     setNewPassword]     = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showCurrent,     setShowCurrent]     = useState(false)
-  const [showNew,         setShowNew]         = useState(false)
-  const [savingPassword,  setSavingPassword]  = useState(false)
+const Configuracoes = () => {
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('legisla:settings')
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS
+    } catch {
+      return DEFAULT_SETTINGS
+    }
+  })
+  const [indicadorSalvo, setIndicadorSalvo] = useState(false)
+  const isFirstRender = useRef(true)
+
+  const atualizar = (key, value) => setSettings(p => ({ ...p, [key]: value }))
 
   useEffect(() => {
-    api.get('/auth/me')
-      .then(({ user }) => {
-        setName(user.name || '')
-        setEmail(user.email || '')
-      })
-      .catch(() => toast.error('Não foi possível carregar os dados do perfil.'))
-  }, [])
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault()
-    if (!name.trim()) {
-      toast.error('O nome não pode ficar em branco.')
+    if (isFirstRender.current) {
+      isFirstRender.current = false
       return
     }
-    setSavingProfile(true)
-    try {
-      await api.put('/auth/me', { name: name.trim() })
-      toast.success('Nome atualizado com sucesso!')
-    } catch (err) {
-      toast.error(err.message)
-    } finally {
-      setSavingProfile(false)
-    }
-  }
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault()
-    if (newPassword !== confirmPassword) {
-      toast.error('A nova senha e a confirmação não coincidem.')
-      return
-    }
-    if (newPassword.length < 6) {
-      toast.error('A nova senha deve ter pelo menos 6 caracteres.')
-      return
-    }
-    setSavingPassword(true)
-    try {
-      await api.put('/auth/password', { currentPassword, newPassword })
-      toast.success('Senha alterada com sucesso!')
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
-    } catch (err) {
-      toast.error(err.message)
-    } finally {
-      setSavingPassword(false)
-    }
-  }
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem('legisla:settings', JSON.stringify(settings))
+        setIndicadorSalvo(true)
+        setTimeout(() => setIndicadorSalvo(false), 2000)
+      } catch {
+        toast.error('Não foi possível salvar as preferências.')
+      }
+    }, 600)
+    return () => clearTimeout(t)
+  }, [settings])
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-xl font-display font-bold text-primary-800 mb-1">Configurações</h1>
-        <p className="text-primary-500 text-sm">Gerencie sua conta e credenciais de acesso</p>
-      </motion.div>
+    <div className="p-8 max-w-2xl mx-auto">
+
+      {/* Cabeçalho */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-display font-bold text-primary-800">Configurações</h1>
+          <p className="text-sm text-primary-400 mt-1">Personalize como o sistema funciona para você.</p>
+        </div>
+        <AnimatePresence>
+          {indicadorSalvo && (
+            <motion.span
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-1.5 text-xs font-semibold text-primary-500"
+            >
+              <Check size={13} className="text-primary-500" />
+              Salvo
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div className="space-y-4">
 
-      {/* ── Seção Perfil ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="bg-white rounded-xl border border-primary-100 shadow-sm"
-      >
-        <div className="flex items-center gap-3 p-6 border-b border-primary-100">
-          <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
-            <User size={18} className="text-primary-600" />
+        {/* ── Card Exportação ── */}
+        <div className="card">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+              <Download size={16} className="text-primary-600" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-primary-800">Exportação</h2>
+              <p className="text-xs text-primary-400 mt-0.5">Configurações padrão para exportação de documentos</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-base font-display font-bold text-primary-800">Perfil</h2>
-            <p className="text-xs text-primary-400">Seu nome de exibição no sistema</p>
+          <div className="divide-y divide-primary-50">
+            <div className="flex items-center justify-between px-5 py-4">
+              <label htmlFor="exportFormat" className="text-sm text-primary-700 font-medium">
+                Formato padrão
+              </label>
+              <select
+                id="exportFormat"
+                value={settings.exportFormat}
+                onChange={e => atualizar('exportFormat', e.target.value)}
+                className="text-sm border border-primary-200 rounded-lg px-3 py-1.5 text-primary-700 focus:border-primary-400 focus:outline-none bg-white transition-colors"
+              >
+                <option value="PDF">PDF</option>
+                <option value="DOCX">DOCX</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-between px-5 py-4">
+              <span className="text-sm text-primary-700 font-medium">
+                Incluir rodapé com número de página
+              </span>
+              <Alternador checked={settings.includePageNumbers} onChange={v => atualizar('includePageNumbers', v)} />
+            </div>
+            <div className="flex items-center justify-between px-5 py-4">
+              <span className="text-sm text-primary-700 font-medium">
+                Incluir data de geração no documento
+              </span>
+              <Alternador checked={settings.includeGenerationDate} onChange={v => atualizar('includeGenerationDate', v)} />
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="name" className="block text-sm font-medium text-primary-700">
-              Nome completo <span className="text-rosso-500">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-primary-200
-                focus:border-primary-500 focus:ring-2 focus:ring-primary-100
-                outline-none transition-all duration-200 text-sm"
-              placeholder="Seu nome completo"
-            />
+        {/* ── Card Notificações ── */}
+        <div className="card">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
+            <div className="w-8 h-8 rounded-lg bg-oro-50 flex items-center justify-center flex-shrink-0">
+              <Bell size={16} className="text-oro-600" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-primary-800">Notificações</h2>
+              <p className="text-xs text-primary-400 mt-0.5">Gerencie os avisos e alertas do sistema</p>
+            </div>
           </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="email" className="block text-sm font-medium text-primary-700">
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              readOnly
-              className="w-full px-4 py-3 rounded-xl border-2 border-primary-100
-                bg-primary-50 text-primary-400 text-sm cursor-not-allowed outline-none"
-            />
-            <p className="text-xs text-primary-400">
-              O e-mail não pode ser alterado. Entre em contato com o suporte se necessário.
-            </p>
-          </div>
-
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={savingProfile}
-              className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white
-                text-sm font-semibold rounded-xl hover:bg-primary-700
-                active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-200"
-            >
-              {savingProfile ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <CheckCircle size={16} />
-              )}
-              {savingProfile ? 'Salvando...' : 'Salvar nome'}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-
-      {/* ── Seção Segurança ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-xl border border-primary-100 shadow-sm"
-      >
-
-        <div className="flex items-center gap-3 p-6 border-b border-primary-100">
-          <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
-            <Lock size={18} className="text-primary-600" />
-          </div>
-          <div>
-            <h2 className="text-base font-display font-bold text-primary-800">Segurança</h2>
-            <p className="text-xs text-primary-400">Altere sua senha de acesso</p>
+          <div className="divide-y divide-primary-50">
+            <div className="flex items-center justify-between px-5 py-4 gap-6">
+              <div>
+                <p className="text-sm text-primary-700 font-medium">Alertas de validação automática</p>
+                <p className="text-xs text-primary-400 mt-0.5">Avisos de conformidade ao editar a minuta</p>
+              </div>
+              <Alternador checked={settings.validationAlerts} onChange={v => atualizar('validationAlerts', v)} />
+            </div>
+            <div className="flex items-center justify-between px-5 py-4 gap-6">
+              <div>
+                <p className="text-sm text-primary-700 font-medium">Lembrete de rascunho não salvo</p>
+                <p className="text-xs text-primary-400 mt-0.5">Aviso ao sair com alterações pendentes</p>
+              </div>
+              <Alternador checked={settings.unsavedReminder} onChange={v => atualizar('unsavedReminder', v)} />
+            </div>
+            <div className="flex items-center justify-between px-5 py-4 gap-6">
+              <div>
+                <p className="text-sm text-primary-700 font-medium">Notificações por e-mail</p>
+                <p className="text-xs text-primary-400 mt-0.5">Resumo semanal de proposições</p>
+              </div>
+              <Alternador checked={settings.emailNotifications} onChange={v => atualizar('emailNotifications', v)} />
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleChangePassword} className="p-6 space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-primary-700">
-              Senha atual <span className="text-rosso-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                id="currentPassword"
-                type={showCurrent ? 'text' : 'password'}
-                value={currentPassword}
-                onChange={e => setCurrentPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-11 rounded-xl border-2 border-primary-200
-                  focus:border-primary-500 focus:ring-2 focus:ring-primary-100
-                  outline-none transition-all duration-200 text-sm"
-                placeholder="Digite sua senha atual"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrent(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-400
-                  hover:text-primary-600 transition-colors"
-                aria-label={showCurrent ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+        {/* ── Card Aparência ── */}
+        <div className="card">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+              <Sun size={16} className="text-primary-400" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-primary-800">Aparência</h2>
+              <p className="text-xs text-primary-400 mt-0.5">Escolha o tema visual da interface</p>
             </div>
           </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="newPassword" className="block text-sm font-medium text-primary-700">
-              Nova senha <span className="text-rosso-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                id="newPassword"
-                type={showNew ? 'text' : 'password'}
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-11 rounded-xl border-2 border-primary-200
-                  focus:border-primary-500 focus:ring-2 focus:ring-primary-100
-                  outline-none transition-all duration-200 text-sm"
-                placeholder="Mínimo 6 caracteres"
-              />
+          <div className="px-5 py-5">
+            <div className="grid grid-cols-2 gap-3">
               <button
-                type="button"
-                onClick={() => setShowNew(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-400
-                  hover:text-primary-600 transition-colors"
-                aria-label={showNew ? 'Ocultar senha' : 'Mostrar senha'}
+                onClick={() => atualizar('theme', 'light')}
+                aria-label="Tema claro"
+                aria-pressed={settings.theme === 'light'}
+                className={`relative rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98]
+                  ${settings.theme === 'light'
+                    ? 'border-primary-500 bg-primary-50'
+                    : 'border-primary-100 hover:border-primary-200 bg-white'
+                  }`}
               >
-                {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-primary-100">
+                  <div className="w-7 bg-primary-900 flex-shrink-0" />
+                  <div className="flex-1 bg-slate-100" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-primary-700">Claro</span>
+                  {settings.theme === 'light' && (
+                    <span className="w-4 h-4 rounded-full bg-primary-500 flex items-center justify-center">
+                      <Check size={10} className="text-white" />
+                    </span>
+                  )}
+                </div>
               </button>
+
+              <div className="relative rounded-xl border-2 border-primary-100 p-3 opacity-50 cursor-not-allowed bg-white">
+                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-primary-100">
+                  <div className="w-7 bg-slate-800 flex-shrink-0" />
+                  <div className="flex-1 bg-slate-700" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-primary-700">Escuro</span>
+                  <span className="text-[10px] font-bold bg-oro-100 text-oro-700 px-1.5 py-0.5 rounded-full">
+                    Em breve
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary-700">
-              Confirmar nova senha <span className="text-rosso-500">*</span>
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-primary-200
-                focus:border-primary-500 focus:ring-2 focus:ring-primary-100
-                outline-none transition-all duration-200 text-sm"
-              placeholder="Repita a nova senha"
-            />
-          </div>
+      </div>
 
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={savingPassword || !currentPassword || !newPassword || !confirmPassword}
-              className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white
-                text-sm font-semibold rounded-xl hover:bg-primary-700
-                active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-200"
-            >
-              {savingPassword ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Lock size={16} />
-              )}
-              {savingPassword ? 'Salvando...' : 'Alterar senha'}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-
+      {/* Botão salvar */}
+      <div className="mt-6">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            try {
+              localStorage.setItem('legisla:settings', JSON.stringify(settings))
+              setIndicadorSalvo(true)
+              setTimeout(() => setIndicadorSalvo(false), 2000)
+            } catch {
+              toast.error('Não foi possível salvar as preferências.')
+            }
+          }}
+          className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+        >
+          Salvar preferências
+        </motion.button>
       </div>
     </div>
   )
 }
+
+export default Configuracoes

@@ -3,24 +3,23 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/Layout'
 import { api } from './utils/api.js'
 
-const Login              = lazy(() => import('./pages/Login'))
-const Dashboard          = lazy(() => import('./pages/Dashboard'))
-const SelectMunicipality = lazy(() => import('./pages/SelectMunicipality'))
-const CreateProposal     = lazy(() => import('./pages/CreateProposal'))
-const ProposalEditor     = lazy(() => import('./pages/ProposalEditor'))
-const Pricing            = lazy(() => import('./pages/Pricing'))
-const ForgotPassword     = lazy(() => import('./pages/ForgotPassword'))
-const ResetPassword      = lazy(() => import('./pages/ResetPassword'))
-const Configuracoes      = lazy(() => import('./pages/Configuracoes'))
-const Settings           = lazy(() => import('./pages/Settings'))
-const Register           = lazy(() => import('./pages/Register'))
-const AuditLog           = lazy(() => import('./pages/AuditLog'))
+const Login               = lazy(() => import('./pages/Login'))
+const Painel              = lazy(() => import('./pages/Painel'))
+const SelecionarMunicipio = lazy(() => import('./pages/SelecionarMunicipio'))
+const CriarMinuta         = lazy(() => import('./pages/CriarMinuta'))
+const EditorMinuta        = lazy(() => import('./pages/EditorMinuta'))
+const Planos              = lazy(() => import('./pages/Planos'))
+const EsqueciSenha        = lazy(() => import('./pages/EsqueciSenha'))
+const RedefinirSenha      = lazy(() => import('./pages/RedefinirSenha'))
+const Configuracoes       = lazy(() => import('./pages/Configuracoes'))
+const Cadastro            = lazy(() => import('./pages/Cadastro'))
+const LogAuditoria        = lazy(() => import('./pages/LogAuditoria'))
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser]                       = useState(null)
-  const [loading, setLoading]                 = useState(true)
-  const [selectedMunicipality, setSelectedMunicipality] = useState(() => {
+  const [estaAutenticado, definirAutenticado]          = useState(false)
+  const [usuario, setUsuario]                          = useState(null)
+  const [carregando, setCarregando]                    = useState(true)
+  const [municipioSelecionado, setMunicipioSelecionado] = useState(() => {
     try {
       const saved = localStorage.getItem('legisla:municipality')
       return saved ? JSON.parse(saved) : null
@@ -32,28 +31,28 @@ function App() {
   useEffect(() => {
     api.get('/auth/me')
       .then(({ user }) => {
-        setIsAuthenticated(true)
-        setUser(user)
+        definirAutenticado(true)
+        setUsuario(user)
       })
       .catch(() => {
-        setIsAuthenticated(false)
+        definirAutenticado(false)
       })
-      .finally(() => setLoading(false))
+      .finally(() => setCarregando(false))
   }, [])
 
-  const handleLogin = () => {
+  const aoEntrar = () => {
     api.get('/auth/me')
       .then(({ user }) => {
-        setIsAuthenticated(true)
-        setUser(user)
+        definirAutenticado(true)
+        setUsuario(user)
       })
       .catch(() => {
-        setIsAuthenticated(false)
+        definirAutenticado(false)
       })
   }
 
-  const handleSelectMunicipality = (municipio) => {
-    setSelectedMunicipality(municipio)
+  const aoSelecionarMunicipio = (municipio) => {
+    setMunicipioSelecionado(municipio)
     try {
       if (municipio) {
         localStorage.setItem('legisla:municipality', JSON.stringify(municipio))
@@ -65,15 +64,15 @@ function App() {
     }
   }
 
-  const handleLogout = async () => {
+  const aoSair = async () => {
     try { await api.post('/auth/logout', {}) } catch { /* ignora */ }
-    setIsAuthenticated(false)
-    setUser(null)
-    setSelectedMunicipality(null)
+    definirAutenticado(false)
+    setUsuario(null)
+    setMunicipioSelecionado(null)
     try { localStorage.removeItem('legisla:municipality') } catch { /* ignora */ }
   }
 
-  if (loading) {
+  if (carregando) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-primary-50">
         <div className="flex items-center gap-3 text-primary-600">
@@ -94,35 +93,34 @@ function App() {
       <Routes>
         <Route
           path="/login"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />}
+          element={estaAutenticado ? <Navigate to="/painel" /> : <Login aoEntrar={aoEntrar} />}
         />
         <Route
-          path="/register"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />}
+          path="/cadastro"
+          element={estaAutenticado ? <Navigate to="/painel" /> : <Cadastro />}
         />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password"  element={<ResetPassword />} />
+        <Route path="/esqueci-senha"   element={<EsqueciSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
         <Route
           path="/"
           element={
-            isAuthenticated
-              ? <Layout selectedMunicipality={selectedMunicipality} onLogout={handleLogout} user={user} />
+            estaAutenticado
+              ? <Layout municipioSelecionado={municipioSelecionado} aoSair={aoSair} usuario={usuario} />
               : <Navigate to="/login" />
           }
         >
-          <Route index element={<Navigate to="/dashboard" />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Navigate to="/painel" />} />
+          <Route path="painel" element={<Painel />} />
           <Route
-            path="select-municipality"
-            element={<SelectMunicipality onSelect={handleSelectMunicipality} current={selectedMunicipality} />}
+            path="selecionar-municipio"
+            element={<SelecionarMunicipio aoSelecionar={aoSelecionarMunicipio} current={municipioSelecionado} />}
           />
-          <Route path="create-proposal" element={<CreateProposal />} />
-          <Route path="proposal/:id/edit" element={<ProposalEditor />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="configuracoes" element={<Navigate to="/settings" />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="audit" element={<AuditLog />} />
+          <Route path="criar-minuta"           element={<CriarMinuta />} />
+          <Route path="minuta/:id/editar"      element={<EditorMinuta />} />
+          <Route path="planos"                 element={<Planos />} />
+          <Route path="configuracoes"          element={<Configuracoes />} />
+          <Route path="auditoria"              element={<LogAuditoria />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />
