@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from './db.js';
-import { AuthRequest } from './authMiddleware.js';
+import { prisma } from '../prisma/client.js';
+import { AuthRequest } from './auth.js';
 
 function effectivePlan(plan: string, planExpiresAt: Date | null): string {
   if (planExpiresAt && planExpiresAt < new Date()) return 'BASIC';

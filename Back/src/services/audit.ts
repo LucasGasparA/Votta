@@ -1,4 +1,4 @@
-import { prisma } from './db.js'
+import { prisma } from '../prisma/client.js'
 
 export async function logAudit(params: {
   userId: string
