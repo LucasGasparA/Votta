@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-//import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
@@ -10,14 +9,6 @@ import { sendPasswordResetEmail, sendWelcomeEmail } from '../utils/mailer.js';
 import { logAudit } from '../utils/audit.js';
 
 const router = Router();
-
-//const loginLimiter = rateLimit({
-//  windowMs: 15 * 60 * 1000,
-  //max: 10,
-  //message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
-  //standardHeaders: true,
-  //legacyHeaders: false,
-//});
 
 const registerSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -67,8 +58,6 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const token = signToken(user.id, user.role);
     res.cookie('token', token, COOKIE_OPTIONS);
-
-    console.log('✅ Usuário registrado com sucesso');
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
     void sendWelcomeEmail(user.email, user.name).catch(() => {});
   } catch (error) {
@@ -101,8 +90,6 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const token = signToken(user.id, user.role);
     res.cookie('token', token, COOKIE_OPTIONS);
-
-    console.log('✅ Login realizado');
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
     void logAudit({ userId: user.id, action: 'LOGIN', ip: req.ip });
   } catch (error) {
@@ -177,9 +164,8 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     });
 
     await sendPasswordResetEmail(email, rawToken);
-    console.log('✅ E-mail de recuperação enviado');
-  } catch (error) {
-    console.error('❌ Erro ao enviar e-mail de recuperação:', error);
+  } catch {
+    // silencioso — não expõe se o e-mail existe
   }
 });
 
@@ -217,10 +203,8 @@ router.post('/reset-password', async (req: Request, res: Response) => {
       },
     });
 
-    console.log('✅ Senha redefinida para usuário:', user.id);
     res.json({ ok: true });
-  } catch (error) {
-    console.error('❌ Erro ao redefinir senha:', error);
+  } catch {
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
