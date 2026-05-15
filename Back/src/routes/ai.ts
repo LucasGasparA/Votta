@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { requirePlan } from '../middleware/plan.js';
-import { prisma } from '../lib/db.js';
+import { prisma } from '../prisma/client.js';
 import { logAudit } from '../services/audit.js';
 
 const router = Router();

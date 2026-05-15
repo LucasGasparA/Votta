@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../services/api.js'
+import { api } from '../api/client.js'
 import { exportToPDF } from '../services/exportarPdf.js'
 import { exportToDocx } from '../services/exportarDocx.js'
 

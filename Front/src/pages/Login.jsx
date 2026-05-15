@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../services/api.js'
-import LogoVotta from '../components/LogoVotta'
+import { api } from '../api/client.js'
+import LogoVotta from '../components/layout/LogoVotta'
 
 export default function Login({ aoEntrar }) {
   const [email,        setEmail]        = useState('')

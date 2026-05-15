@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { z } from 'zod';
-import { prisma } from '../lib/db.js';
+import { prisma } from '../prisma/client.js';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/mailer.js';
 import { logAudit } from '../services/audit.js';

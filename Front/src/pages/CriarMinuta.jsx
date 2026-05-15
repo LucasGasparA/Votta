@@ -3,7 +3,7 @@ import { FileText, ArrowRight, ArrowLeft, Check, Scale, AlertCircle, X, Info } f
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, Link, useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { api } from '../services/api.js'
+import { api } from '../api/client.js'
 
 const LOADING_STEPS = [
   { icon: '📋', text: 'Registrando sua proposição...' },
