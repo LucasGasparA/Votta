@@ -10,8 +10,8 @@ import auditRoutes from './routes/audit.js';
 
 dotenv.config();
 
-if (!process.env.JWT_SECRET) {
-  console.error('❌ JWT_SECRET não definido no .env — servidor abortado por segurança.');
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  console.error('❌ JWT_SECRET não definido ou fraco (mínimo 32 caracteres) — servidor abortado por segurança.');
   process.exit(1);
 }
 
@@ -34,10 +34,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use((req, _res, next) => {
-  console.log(`📍 ${req.method} ${req.path}`);
-  next();
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, _res, next) => {
+    console.log(`📍 ${req.method} ${req.path}`);
+    next();
+  });
+}
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
@@ -58,5 +60,5 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 app.listen(port, () => {
-  console.log(`\n🚀 Server rodando em http://localhost:${port}\n`);
+  console.log(`🚀 Servidor na porta ${port}`);
 });

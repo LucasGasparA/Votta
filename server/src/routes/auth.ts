@@ -176,7 +176,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     });
 
     await sendPasswordResetEmail(email, rawToken);
-    console.log('✅ E-mail de recuperação enviado para:', email);
+    console.log('✅ E-mail de recuperação enviado');
   } catch (error) {
     console.error('❌ Erro ao enviar e-mail de recuperação:', error);
   }
@@ -216,7 +216,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
       },
     });
 
-    console.log('✅ Senha redefinida para:', user.email);
+    console.log('✅ Senha redefinida para usuário:', user.id);
     res.json({ ok: true });
   } catch (error) {
     console.error('❌ Erro ao redefinir senha:', error);

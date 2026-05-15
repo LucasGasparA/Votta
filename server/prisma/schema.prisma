@@ -19,6 +19,8 @@ model User {
   updatedAt         DateTime  @updatedAt
   proposals         Proposal[]
   auditLogs         AuditLog[]
+
+  @@index([resetToken])
 }
 
 model Municipality {
@@ -49,6 +51,10 @@ model Proposal {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   versions           ProposalVersion[]
+
+  @@index([userId])
+  @@index([municipalityId])
+  @@index([status])
 }
 
 model ProposalVersion {
@@ -70,4 +76,7 @@ model AuditLog {
   detail     String?
   ip         String?
   createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }

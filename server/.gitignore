@@ -4,3 +4,5 @@ credentials/
 .env
 
 /src/generated/prisma
+prisma/*.db
+prisma/*.db-journal
