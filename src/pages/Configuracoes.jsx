@@ -3,6 +3,7 @@ import { Download, Bell, Sun, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Alternador from '../components/Alternador.jsx'
+import { api } from '../utils/api.js'
 
 const DEFAULT_SETTINGS = {
   exportFormat:          'PDF',
@@ -24,18 +25,33 @@ const Configuracoes = () => {
     }
   })
   const [indicadorSalvo, setIndicadorSalvo] = useState(false)
+  const [carregando, setCarregando] = useState(true)
   const isFirstRender = useRef(true)
+
+  useEffect(() => {
+    api.get('/settings')
+      .then(data => {
+        const merged = { ...DEFAULT_SETTINGS, ...data }
+        setSettings(merged)
+        try { localStorage.setItem('legisla:settings', JSON.stringify(merged)) } catch { /* ignora */ }
+      })
+      .catch(() => {
+        // mantém o que veio do localStorage
+      })
+      .finally(() => {
+        setCarregando(false)
+        isFirstRender.current = false
+      })
+  }, [])
 
   const atualizar = (key, value) => setSettings(p => ({ ...p, [key]: value }))
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    const t = setTimeout(() => {
+    if (isFirstRender.current || carregando) return
+    const t = setTimeout(async () => {
       try {
-        localStorage.setItem('legisla:settings', JSON.stringify(settings))
+        await api.put('/settings', settings)
+        try { localStorage.setItem('legisla:settings', JSON.stringify(settings)) } catch { /* ignora */ }
         setIndicadorSalvo(true)
         setTimeout(() => setIndicadorSalvo(false), 2000)
       } catch {
@@ -43,7 +59,40 @@ const Configuracoes = () => {
       }
     }, 600)
     return () => clearTimeout(t)
-  }, [settings])
+  }, [settings, carregando])
+
+  const salvarAgora = async () => {
+    try {
+      await api.put('/settings', settings)
+      try { localStorage.setItem('legisla:settings', JSON.stringify(settings)) } catch { /* ignora */ }
+      setIndicadorSalvo(true)
+      setTimeout(() => setIndicadorSalvo(false), 2000)
+    } catch {
+      toast.error('Não foi possível salvar as preferências.')
+    }
+  }
+
+  if (carregando) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto">
+        <div className="mb-8">
+          <div className="h-6 bg-primary-100 rounded w-40 animate-pulse mb-2" />
+          <div className="h-4 bg-primary-100 rounded w-64 animate-pulse" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="card p-6 animate-pulse">
+              <div className="h-4 bg-primary-100 rounded w-32 mb-4" />
+              <div className="space-y-3">
+                <div className="h-10 bg-primary-100 rounded" />
+                <div className="h-10 bg-primary-100 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
@@ -207,15 +256,7 @@ const Configuracoes = () => {
       <div className="mt-6">
         <motion.button
           whileTap={{ scale: 0.97 }}
-          onClick={() => {
-            try {
-              localStorage.setItem('legisla:settings', JSON.stringify(settings))
-              setIndicadorSalvo(true)
-              setTimeout(() => setIndicadorSalvo(false), 2000)
-            } catch {
-              toast.error('Não foi possível salvar as preferências.')
-            }
-          }}
+          onClick={salvarAgora}
           className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
         >
           Salvar preferências

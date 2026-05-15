@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
+import { requirePlan } from '../utils/planMiddleware.js';
 import { prisma } from '../utils/db.js';
 import { logAudit } from '../utils/audit.js';
 
@@ -35,7 +36,7 @@ const vertexAI = PROJECT_ID
     })
   : null;
 
-router.post('/chat', async (req: Request, res: Response) => {
+router.post('/chat', requirePlan('PRO'), async (req: Request, res: Response) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: zodError(parsed.error) });

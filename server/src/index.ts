@@ -7,6 +7,7 @@ import proposalRoutes from './routes/proposals.js';
 import aiRoutes from './routes/ai.js';
 import authRoutes from './routes/auth.js';
 import auditRoutes from './routes/audit.js';
+import settingsRoutes from './routes/settings.js';
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/proposals', proposalRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada' });

@@ -12,13 +12,16 @@ model User {
   email     String   @unique
   password  String
   name      String
-  role              String    @default("USER")
-  resetToken        String?
-  resetTokenExpiry  DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  proposals         Proposal[]
-  auditLogs         AuditLog[]
+  role             String    @default("USER")
+  plan             String    @default("BASIC")
+  planExpiresAt    DateTime?
+  settings         String    @default("{}")
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  proposals        Proposal[]
+  auditLogs        AuditLog[]
 
   @@index([resetToken])
 }

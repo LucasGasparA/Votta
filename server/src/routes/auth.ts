@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { prisma } from '../utils/db.js';
 import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
-import { sendPasswordResetEmail } from '../utils/mailer.js';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../utils/mailer.js';
 import { logAudit } from '../utils/audit.js';
 
 const router = Router();
@@ -70,6 +70,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     console.log('✅ Usuário registrado com sucesso');
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
+    void sendWelcomeEmail(user.email, user.name).catch(() => {});
   } catch (error) {
     console.error('❌ Erro ao registrar:', error);
     res.status(500).json({ error: 'Erro no servidor' });
