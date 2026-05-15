@@ -26,13 +26,21 @@ const MODEL                = process.env.GCP_MODEL    || 'gemini-1.5-pro';
 const GCP_CREDENTIALS_JSON = process.env.GCP_CREDENTIALS_JSON;
 const LLM_TIMEOUT_MS = 30_000;
 
+function parseCredentials() {
+  if (!GCP_CREDENTIALS_JSON) return undefined;
+  try {
+    return JSON.parse(GCP_CREDENTIALS_JSON);
+  } catch {
+    console.error('GCP_CREDENTIALS_JSON inválido — verifique o valor no Railway');
+    return undefined;
+  }
+}
+
 const vertexAI = PROJECT_ID
   ? new VertexAI({
       project: PROJECT_ID,
       location: LOCATION,
-      googleAuthOptions: GCP_CREDENTIALS_JSON
-        ? { credentials: JSON.parse(GCP_CREDENTIALS_JSON) }
-        : undefined,
+      googleAuthOptions: { credentials: parseCredentials() },
     })
   : null;
 
