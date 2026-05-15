@@ -35,10 +35,10 @@ const ListaMinutas = ({ proposals, onDelete }) => {
     >
       <div className="card p-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-display font-bold text-primary-800">Proposições Recentes</h2>
+          <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">Proposições Recentes</h2>
           <Link
             to="/criar-minuta"
-            className="flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-800 font-semibold transition-colors"
+            className="flex items-center gap-1.5 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold transition-colors"
           >
             <PlusCircle size={15} />
             Nova
@@ -48,8 +48,8 @@ const ListaMinutas = ({ proposals, onDelete }) => {
         {proposals.length === 0 ? (
           <div className="text-center py-10">
             <EmptyStateSVG />
-            <p className="text-primary-700 font-semibold mb-1.5">Nenhuma proposição ainda</p>
-            <p className="text-sm text-primary-400 mb-5">Crie sua primeira proposição legislativa em minutos com o wizard guiado.</p>
+            <p className="text-primary-700 dark:text-slate-300 font-semibold mb-1.5">Nenhuma proposição ainda</p>
+            <p className="text-sm text-primary-400 dark:text-slate-500 mb-5">Crie sua primeira proposição legislativa em minutos com o wizard guiado.</p>
             <Link
               to="/criar-minuta"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm rounded-xl hover:bg-primary-700 active:scale-[0.97] transition-all font-semibold shadow-md shadow-primary-200"
@@ -66,8 +66,8 @@ const ListaMinutas = ({ proposals, onDelete }) => {
               return (
                 <div
                   key={proposal.id}
-                  className={`relative border-l-4 ${cfg.border} bg-white rounded-xl
-                    hover:bg-primary-50/50 transition-colors duration-150 group`}
+                  className={`relative border-l-4 ${cfg.border} bg-white dark:bg-[#1c1f38] rounded-xl
+                    hover:bg-primary-50/50 dark:hover:bg-[#232745] transition-colors duration-150 group`}
                 >
                   <Link
                     to={`/minuta/${proposal.id}/editar`}
@@ -75,10 +75,10 @@ const ListaMinutas = ({ proposals, onDelete }) => {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0 pr-3">
-                        <h3 className="font-semibold text-primary-900 text-[15px] mb-0.5 truncate group-hover:text-primary-600 transition-colors">
+                        <h3 className="font-semibold text-primary-900 dark:text-slate-100 text-[15px] mb-0.5 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                           {proposal.title}
                         </h3>
-                        <p className="text-xs text-primary-400 truncate">{proposal.type}</p>
+                        <p className="text-xs text-primary-400 dark:text-slate-500 truncate">{proposal.type}</p>
                       </div>
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${cfg.color}`}>
                         <StatusIcon size={11} strokeWidth={2.5} />
@@ -86,13 +86,13 @@ const ListaMinutas = ({ proposals, onDelete }) => {
                       </span>
                     </div>
 
-                    <div className="w-full bg-primary-100 rounded-full h-1.5 mb-1.5">
+                    <div className="w-full bg-primary-100 dark:bg-[#2d3158] rounded-full h-1.5 mb-1.5">
                       <div
                         className={`${cfg.bar} h-1.5 rounded-full transition-all duration-700`}
                         style={{ width: `${proposal.progress}%` }}
                       />
                     </div>
-                    <p className="text-xs text-primary-400">Atualizado {proposal.lastUpdate}</p>
+                    <p className="text-xs text-primary-400 dark:text-slate-500">Atualizado {proposal.lastUpdate}</p>
                   </Link>
 
                   <button
@@ -129,18 +129,18 @@ const ListaMinutas = ({ proposals, onDelete }) => {
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
             >
-              <div className="w-12 h-12 bg-rosso-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-rosso-50 dark:bg-rosso-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Trash2 size={22} className="text-rosso-500" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
                 Excluir proposição?
               </h2>
-              <p className="text-sm text-primary-500 text-center mb-1 leading-relaxed">
+              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-1 leading-relaxed">
                 Você está prestes a excluir:
               </p>
-              <p className="text-sm font-semibold text-primary-800 text-center mb-6 px-2 truncate">
+              <p className="text-sm font-semibold text-primary-800 dark:text-slate-200 text-center mb-6 px-2 truncate">
                 "{alvoExclusao.title}"
               </p>
               <p className="text-xs text-rosso-500 text-center mb-6">
@@ -149,8 +149,8 @@ const ListaMinutas = ({ proposals, onDelete }) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setAlvoExclusao(null)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200
-                    text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
                 >
                   Cancelar
                 </button>

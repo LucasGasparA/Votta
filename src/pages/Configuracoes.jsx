@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { Download, Bell, Sun, Check } from 'lucide-react'
+import { Download, Bell, Sun, Moon, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Alternador from '../components/Alternador.jsx'
 import { api } from '../utils/api.js'
+import { useTema } from '../context/TemaContext'
 
 const DEFAULT_SETTINGS = {
   exportFormat:          'PDF',
@@ -16,6 +17,7 @@ const DEFAULT_SETTINGS = {
 }
 
 const Configuracoes = () => {
+  const { definirTema } = useTema()
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem('legisla:settings')
@@ -44,7 +46,10 @@ const Configuracoes = () => {
       })
   }, [])
 
-  const atualizar = (key, value) => setSettings(p => ({ ...p, [key]: value }))
+  const atualizar = (key, value) => {
+    setSettings(p => ({ ...p, [key]: value }))
+    if (key === 'theme') definirTema(value)
+  }
 
   useEffect(() => {
     if (isFirstRender.current || carregando) return
@@ -100,8 +105,8 @@ const Configuracoes = () => {
       {/* Cabeçalho */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-display font-bold text-primary-800">Configurações</h1>
-          <p className="text-sm text-primary-400 mt-1">Personalize como o sistema funciona para você.</p>
+          <h1 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">Configurações</h1>
+          <p className="text-sm text-primary-400 dark:text-slate-500 mt-1">Personalize como o sistema funciona para você.</p>
         </div>
         <AnimatePresence>
           {indicadorSalvo && (
@@ -122,38 +127,38 @@ const Configuracoes = () => {
 
         {/* ── Card Exportação ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
               <Download size={16} className="text-primary-600" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-primary-800">Exportação</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Configurações padrão para exportação de documentos</p>
+              <h2 className="text-sm font-semibold text-primary-800 dark:text-slate-100">Exportação</h2>
+              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Configurações padrão para exportação de documentos</p>
             </div>
           </div>
-          <div className="divide-y divide-primary-50">
+          <div className="divide-y divide-primary-50 dark:divide-[#2d3158]">
             <div className="flex items-center justify-between px-5 py-4">
-              <label htmlFor="exportFormat" className="text-sm text-primary-700 font-medium">
+              <label htmlFor="exportFormat" className="text-sm text-primary-700 dark:text-slate-300 font-medium">
                 Formato padrão
               </label>
               <select
                 id="exportFormat"
                 value={settings.exportFormat}
                 onChange={e => atualizar('exportFormat', e.target.value)}
-                className="text-sm border border-primary-200 rounded-lg px-3 py-1.5 text-primary-700 focus:border-primary-400 focus:outline-none bg-white transition-colors"
+                className="text-sm border border-primary-200 dark:border-[#3d4270] rounded-lg px-3 py-1.5 text-primary-700 dark:text-slate-200 focus:border-primary-400 focus:outline-none bg-white dark:bg-[#232745] transition-colors"
               >
                 <option value="PDF">PDF</option>
                 <option value="DOCX">DOCX</option>
               </select>
             </div>
             <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm text-primary-700 font-medium">
+              <span className="text-sm text-primary-700 dark:text-slate-300 font-medium">
                 Incluir rodapé com número de página
               </span>
               <Alternador checked={settings.includePageNumbers} onChange={v => atualizar('includePageNumbers', v)} />
             </div>
             <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm text-primary-700 font-medium">
+              <span className="text-sm text-primary-700 dark:text-slate-300 font-medium">
                 Incluir data de geração no documento
               </span>
               <Alternador checked={settings.includeGenerationDate} onChange={v => atualizar('includeGenerationDate', v)} />
@@ -163,34 +168,34 @@ const Configuracoes = () => {
 
         {/* ── Card Notificações ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
-            <div className="w-8 h-8 rounded-lg bg-oro-50 flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
+            <div className="w-8 h-8 rounded-lg bg-oro-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
               <Bell size={16} className="text-oro-600" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-primary-800">Notificações</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Gerencie os avisos e alertas do sistema</p>
+              <h2 className="text-sm font-semibold text-primary-800 dark:text-slate-100">Notificações</h2>
+              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Gerencie os avisos e alertas do sistema</p>
             </div>
           </div>
-          <div className="divide-y divide-primary-50">
+          <div className="divide-y divide-primary-50 dark:divide-[#2d3158]">
             <div className="flex items-center justify-between px-5 py-4 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Alertas de validação automática</p>
-                <p className="text-xs text-primary-400 mt-0.5">Avisos de conformidade ao editar a minuta</p>
+                <p className="text-sm text-primary-700 dark:text-slate-300 font-medium">Alertas de validação automática</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Avisos de conformidade ao editar a minuta</p>
               </div>
               <Alternador checked={settings.validationAlerts} onChange={v => atualizar('validationAlerts', v)} />
             </div>
             <div className="flex items-center justify-between px-5 py-4 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Lembrete de rascunho não salvo</p>
-                <p className="text-xs text-primary-400 mt-0.5">Aviso ao sair com alterações pendentes</p>
+                <p className="text-sm text-primary-700 dark:text-slate-300 font-medium">Lembrete de rascunho não salvo</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Aviso ao sair com alterações pendentes</p>
               </div>
               <Alternador checked={settings.unsavedReminder} onChange={v => atualizar('unsavedReminder', v)} />
             </div>
             <div className="flex items-center justify-between px-5 py-4 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Notificações por e-mail</p>
-                <p className="text-xs text-primary-400 mt-0.5">Resumo semanal de proposições</p>
+                <p className="text-sm text-primary-700 dark:text-slate-300 font-medium">Notificações por e-mail</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Resumo semanal de proposições</p>
               </div>
               <Alternador checked={settings.emailNotifications} onChange={v => atualizar('emailNotifications', v)} />
             </div>
@@ -199,13 +204,13 @@ const Configuracoes = () => {
 
         {/* ── Card Aparência ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
-              <Sun size={16} className="text-primary-400" />
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
+              {settings.theme === 'dark' ? <Moon size={16} className="text-primary-400" /> : <Sun size={16} className="text-primary-400" />}
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-primary-800">Aparência</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Escolha o tema visual da interface</p>
+              <h2 className="text-sm font-semibold text-primary-800 dark:text-slate-100">Aparência</h2>
+              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Escolha o tema visual da interface</p>
             </div>
           </div>
           <div className="px-5 py-5">
@@ -216,16 +221,16 @@ const Configuracoes = () => {
                 aria-pressed={settings.theme === 'light'}
                 className={`relative rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98]
                   ${settings.theme === 'light'
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-primary-100 hover:border-primary-200 bg-white'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                    : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-200 bg-white dark:bg-[#1c1f38]'
                   }`}
               >
                 <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-primary-100">
-                  <div className="w-7 bg-primary-900 flex-shrink-0" />
+                  <div className="w-7 bg-primary-800 flex-shrink-0" />
                   <div className="flex-1 bg-slate-100" />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary-700">Claro</span>
+                  <span className="text-xs font-semibold text-primary-700 dark:text-slate-300">Claro</span>
                   {settings.theme === 'light' && (
                     <span className="w-4 h-4 rounded-full bg-primary-500 flex items-center justify-center">
                       <Check size={10} className="text-white" />
@@ -234,18 +239,29 @@ const Configuracoes = () => {
                 </div>
               </button>
 
-              <div className="relative rounded-xl border-2 border-primary-100 p-3 opacity-50 cursor-not-allowed bg-white">
-                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-primary-100">
-                  <div className="w-7 bg-slate-800 flex-shrink-0" />
-                  <div className="flex-1 bg-slate-700" />
+              <button
+                onClick={() => atualizar('theme', 'dark')}
+                aria-label="Tema escuro"
+                aria-pressed={settings.theme === 'dark'}
+                className={`relative rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98]
+                  ${settings.theme === 'dark'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                    : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-200 bg-white dark:bg-[#1c1f38]'
+                  }`}
+              >
+                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-[#2d3158]">
+                  <div className="w-7 bg-[#191c33] flex-shrink-0" />
+                  <div className="flex-1 bg-[#141624]" />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary-700">Escuro</span>
-                  <span className="text-[10px] font-bold bg-oro-100 text-oro-700 px-1.5 py-0.5 rounded-full">
-                    Em breve
-                  </span>
+                  <span className="text-xs font-semibold text-primary-700 dark:text-slate-300">Escuro</span>
+                  {settings.theme === 'dark' && (
+                    <span className="w-4 h-4 rounded-full bg-primary-500 flex items-center justify-center">
+                      <Check size={10} className="text-white" />
+                    </span>
+                  )}
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </div>

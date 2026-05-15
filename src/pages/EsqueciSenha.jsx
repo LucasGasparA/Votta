@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Scale, ArrowLeft, Mail } from 'lucide-react'
+import { ArrowLeft, Mail } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
+import LogoVotta from '../components/LogoVotta'
 
 export default function EsqueciSenha() {
   const [email,     setEmail]     = useState('')
@@ -23,30 +24,17 @@ export default function EsqueciSenha() {
     }
   }
 
-  const inputStyle = {
-    border: '1.5px solid #e8e8e8',
-    background: '#fafafa',
-    color: '#111',
-    outline: 'none',
-    fontFamily: 'inherit',
-  }
+  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-[#e8e8e8] bg-[#fafafa] text-[#111] dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-[#b83b3d] focus:bg-white focus:shadow-[0_0_0_3px_rgba(184,59,61,0.08)] dark:focus:bg-[#232745]'
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 pb-16">
+    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col items-center justify-center px-6 pb-16">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-7">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-               style={{ background: '#b83b3d' }}>
-            <Scale size={16} color="#fff" />
-          </div>
-          <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
-        </div>
+        <LogoVotta className="justify-center mb-7" />
 
         {enviado ? (
           /* Estado pós-envio */
@@ -56,14 +44,13 @@ export default function EsqueciSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-                 style={{ background: '#fef2f2' }}>
-              <Mail size={24} style={{ color: '#b83b3d' }} />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[#fef2f2] dark:bg-[#232745]">
+              <Mail size={24} className="text-rosso-500" />
             </div>
-            <h1 className="text-xl font-semibold mb-2" style={{ color: '#111' }}>
+            <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">
               Verifique seu e-mail
             </h1>
-            <p className="text-sm leading-relaxed mb-6" style={{ color: '#666' }}>
+            <p className="text-sm leading-relaxed mb-6 text-primary-700 dark:text-slate-300">
               Se <strong>{email}</strong> estiver cadastrado, você receberá
               um link de recuperação em instantes.
               <br /><br />
@@ -71,8 +58,7 @@ export default function EsqueciSenha() {
             </p>
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 text-sm font-medium"
-              style={{ color: '#b83b3d' }}
+              className="flex items-center justify-center gap-2 text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors"
             >
               <ArrowLeft size={14} />
               Voltar ao login
@@ -81,10 +67,10 @@ export default function EsqueciSenha() {
         ) : (
           /* Formulário */
           <>
-            <h1 className="text-xl font-semibold text-center mb-2" style={{ color: '#111' }}>
+            <h1 className="text-xl font-semibold text-center mb-2 text-primary-900 dark:text-slate-100">
               Esqueceu sua senha?
             </h1>
-            <p className="text-sm text-center mb-6" style={{ color: '#888' }}>
+            <p className="text-sm text-center mb-6 text-primary-400 dark:text-slate-500">
               Digite seu e-mail e enviaremos um link para criar uma nova senha.
             </p>
 
@@ -95,18 +81,7 @@ export default function EsqueciSenha() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="E-mail"
                 required
-                className="w-full px-4 py-3.5 rounded-xl text-sm transition-all"
-                style={inputStyle}
-                onFocus={e => {
-                  e.target.style.borderColor = '#b83b3d'
-                  e.target.style.background  = '#fff'
-                  e.target.style.boxShadow   = '0 0 0 3px rgba(184,59,61,0.08)'
-                }}
-                onBlur={e => {
-                  e.target.style.borderColor = '#e8e8e8'
-                  e.target.style.background  = '#fafafa'
-                  e.target.style.boxShadow   = 'none'
-                }}
+                className={inputBase}
               />
 
               <button
@@ -125,8 +100,7 @@ export default function EsqueciSenha() {
             <div className="text-center mt-5">
               <Link
                 to="/login"
-                className="flex items-center justify-center gap-2 text-sm font-medium"
-                style={{ color: '#b83b3d' }}
+                className="flex items-center justify-center gap-2 text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors"
               >
                 <ArrowLeft size={14} />
                 Voltar ao login

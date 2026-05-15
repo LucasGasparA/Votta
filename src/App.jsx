@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/Layout'
 import { api } from './utils/api.js'
+import { TemaProvider } from './context/TemaContext'
 
 const Login               = lazy(() => import('./pages/Login'))
 const Painel              = lazy(() => import('./pages/Painel'))
@@ -74,7 +75,7 @@ function App() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary-50">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
         <div className="flex items-center gap-3 text-primary-600">
           <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
           <span className="text-sm font-medium">Carregando...</span>
@@ -84,9 +85,10 @@ function App() {
   }
 
   return (
+    <TemaProvider>
     <Router>
       <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-primary-50">
+        <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
           <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }>
@@ -127,6 +129,7 @@ function App() {
       </Routes>
       </Suspense>
     </Router>
+    </TemaProvider>
   )
 }
 

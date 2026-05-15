@@ -87,14 +87,14 @@ const FAQS = [
 function PrecoDisplay({ price }) {
   if (price === null) {
     return (
-      <span className="text-4xl font-display font-bold text-primary-900">
+      <span className="text-4xl font-display font-bold text-primary-900 dark:text-slate-100">
         Sob consulta
       </span>
     )
   }
   if (price === 0) {
     return (
-      <span className="text-5xl font-display font-bold text-primary-900">
+      <span className="text-5xl font-display font-bold text-primary-900 dark:text-slate-100">
         Grátis
       </span>
     )
@@ -106,11 +106,11 @@ function PrecoDisplay({ price }) {
   const [inteiro, centavos] = formatted.split(',')
   return (
     <div className="flex items-baseline gap-0.5">
-      <span className="text-lg font-semibold text-primary-400 mr-0.5">R$</span>
-      <span className="text-5xl font-display font-bold text-primary-900 tracking-tight leading-none">
+      <span className="text-lg font-semibold text-primary-400 dark:text-slate-500 mr-0.5">R$</span>
+      <span className="text-5xl font-display font-bold text-primary-900 dark:text-slate-100 tracking-tight leading-none">
         {inteiro}
       </span>
-      <span className="text-xl font-semibold text-primary-400">,{centavos}</span>
+      <span className="text-xl font-semibold text-primary-400 dark:text-slate-500">,{centavos}</span>
     </div>
   )
 }
@@ -122,7 +122,7 @@ export default function Planos() {
   const [faqAberto, setFaqAberto]         = useState(null)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#141624]">
 
       {/* ── CABEÇALHO ───────────────────────────────────────────────────── */}
       <section className="pt-16 pb-10 px-6 text-center">
@@ -131,21 +131,21 @@ export default function Planos() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary-900 mb-3 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary-900 dark:text-slate-100 mb-3 leading-tight">
             Planos simples,<br className="hidden md:block" /> sem surpresas.
           </h1>
-          <p className="text-primary-400 text-base mb-8 max-w-md mx-auto">
+          <p className="text-primary-400 dark:text-slate-500 text-base mb-8 max-w-md mx-auto">
             Comece grátis. Faça upgrade quando precisar.
           </p>
 
           {/* Toggle mensal / anual */}
-          <div className="inline-flex items-center gap-1 bg-primary-100 rounded-full p-1">
+          <div className="inline-flex items-center gap-1 bg-primary-100 dark:bg-[#232745] rounded-full p-1">
             <button
               onClick={() => setCicloCobranca('monthly')}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                 cicloCobranca === 'monthly'
-                  ? 'bg-white text-primary-800 shadow-sm'
-                  : 'text-primary-500 hover:text-primary-700'
+                  ? 'bg-white dark:bg-[#1c1f38] text-primary-800 dark:text-slate-100 shadow-sm'
+                  : 'text-primary-500 dark:text-slate-400 hover:text-primary-700 dark:hover:text-slate-200'
               }`}
             >
               Mensal
@@ -154,8 +154,8 @@ export default function Planos() {
               onClick={() => setCicloCobranca('annual')}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                 cicloCobranca === 'annual'
-                  ? 'bg-white text-primary-800 shadow-sm'
-                  : 'text-primary-500 hover:text-primary-700'
+                  ? 'bg-white dark:bg-[#1c1f38] text-primary-800 dark:text-slate-100 shadow-sm'
+                  : 'text-primary-500 dark:text-slate-400 hover:text-primary-700 dark:hover:text-slate-200'
               }`}
             >
               Anual
@@ -184,13 +184,13 @@ export default function Planos() {
                 transition={{ delay: i * 0.08, duration: 0.4 }}
                 className={`rounded-2xl p-8 flex flex-col ${
                   plan.recommended
-                    ? 'bg-primary-50 border border-primary-200'
-                    : 'bg-white border border-primary-100'
+                    ? 'bg-primary-50 dark:bg-[#232745] border border-primary-200 dark:border-[#3d4270]'
+                    : 'bg-white dark:bg-[#1c1f38] border border-primary-100 dark:border-[#2d3158]'
                 }`}
               >
                 {/* Nome do plano */}
                 <p className={`text-xs font-bold uppercase tracking-widest mb-5 ${
-                  plan.recommended ? 'text-primary-600' : 'text-primary-400'
+                  plan.recommended ? 'text-primary-600' : 'text-primary-400 dark:text-slate-500'
                 }`}>
                   {plan.name}
                 </p>
@@ -214,24 +214,24 @@ export default function Planos() {
                 <div className="mb-6 min-h-[36px]">
                   {price !== null && price > 0 && (
                     <div>
-                      <p className="text-sm text-primary-400">por mês</p>
+                      <p className="text-sm text-primary-400 dark:text-slate-500">por mês</p>
                       {cicloCobranca === 'annual' && (
-                        <p className="text-xs text-primary-400 mt-0.5">
+                        <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">
                           cobrado anualmente · economia de R$ {economiaAnual}/ano
                         </p>
                       )}
                     </div>
                   )}
                   {price === 0 && (
-                    <p className="text-sm text-primary-400">para sempre</p>
+                    <p className="text-sm text-primary-400 dark:text-slate-500">para sempre</p>
                   )}
                   {price === null && (
-                    <p className="text-sm text-primary-400">sob proposta</p>
+                    <p className="text-sm text-primary-400 dark:text-slate-500">sob proposta</p>
                   )}
                 </div>
 
                 {/* Descrição */}
-                <p className="text-sm text-primary-500 mb-6 leading-relaxed">
+                <p className="text-sm text-primary-500 dark:text-slate-400 mb-6 leading-relaxed">
                   {plan.description}
                 </p>
 
@@ -242,7 +242,7 @@ export default function Planos() {
                     className={`w-full py-3 rounded-xl text-sm font-semibold text-center transition-all active:scale-[0.97] mb-8 block ${
                       plan.recommended
                         ? 'text-white hover:opacity-90'
-                        : 'border border-primary-200 text-primary-700 hover:border-primary-400 hover:bg-white'
+                        : 'border border-primary-200 dark:border-[#3d4270] text-primary-700 dark:text-slate-200 hover:border-primary-400 hover:bg-white dark:hover:bg-[#2d3158]'
                     }`}
                     style={plan.recommended ? { background: '#dc2626' } : {}}
                   >
@@ -251,7 +251,7 @@ export default function Planos() {
                 ) : (
                   <a
                     href={plan.ctaHref}
-                    className="w-full py-3 rounded-xl text-sm font-semibold text-center border border-primary-200 text-primary-700 hover:border-primary-400 hover:bg-primary-50 transition-all active:scale-[0.97] mb-8 block"
+                    className="w-full py-3 rounded-xl text-sm font-semibold text-center border border-primary-200 dark:border-[#3d4270] text-primary-700 dark:text-slate-200 hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-[#2d3158] transition-all active:scale-[0.97] mb-8 block"
                   >
                     {plan.cta}
                   </a>
@@ -266,7 +266,7 @@ export default function Planos() {
                         className="text-green-500 flex-shrink-0 mt-0.5"
                         strokeWidth={2.5}
                       />
-                      <span className="text-sm text-primary-700 leading-snug">
+                      <span className="text-sm text-primary-700 dark:text-slate-300 leading-snug">
                         {feature}
                       </span>
                     </li>
@@ -285,12 +285,12 @@ export default function Planos() {
         viewport={{ once: true }}
         className="px-6 py-6 max-w-3xl mx-auto"
       >
-        <div className="bg-primary-50 rounded-2xl px-8 py-5 text-center">
-          <p className="text-sm text-primary-600 leading-relaxed">
+        <div className="bg-primary-50 dark:bg-[#1c1f38] rounded-2xl px-8 py-5 text-center">
+          <p className="text-sm text-primary-600 dark:text-slate-300 leading-relaxed">
             Câmaras municipais pagam em média{' '}
-            <strong className="text-primary-800">R$ 3.400/mês</strong> em sistemas legados.
+            <strong className="text-primary-800 dark:text-slate-100">R$ 3.400/mês</strong> em sistemas legados.
             Com o Votta, você começa por{' '}
-            <strong className="text-primary-800">R$ 150</strong>.
+            <strong className="text-primary-800 dark:text-slate-100">R$ 150</strong>.
           </p>
         </div>
       </motion.section>
@@ -301,7 +301,7 @@ export default function Planos() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-2xl font-display font-bold text-primary-900 mb-8 text-center"
+          className="text-2xl font-display font-bold text-primary-900 dark:text-slate-100 mb-8 text-center"
         >
           Perguntas frequentes
         </motion.h2>
@@ -314,20 +314,20 @@ export default function Planos() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.04 }}
-              className="border border-primary-100 rounded-xl overflow-hidden"
+              className="border border-primary-100 dark:border-[#2d3158] rounded-xl overflow-hidden"
             >
               <button
                 onClick={() => setFaqAberto(faqAberto === i ? null : i)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-primary-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-primary-50 dark:hover:bg-[#232745] transition-colors"
                 aria-expanded={faqAberto === i}
               >
-                <span className="font-medium text-primary-800 text-sm pr-4">
+                <span className="font-medium text-primary-800 dark:text-slate-200 text-sm pr-4">
                   {faq.q}
                 </span>
                 <motion.span
                   animate={{ rotate: faqAberto === i ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
-                  className="flex-shrink-0 text-primary-300"
+                  className="flex-shrink-0 text-primary-300 dark:text-slate-600"
                 >
                   <ChevronDown size={16} />
                 </motion.span>
@@ -341,7 +341,7 @@ export default function Planos() {
                     transition={{ duration: 0.22 }}
                     className="overflow-hidden"
                   >
-                    <p className="px-5 pb-4 pt-1 text-sm text-primary-500 leading-relaxed border-t border-primary-50">
+                    <p className="px-5 pb-4 pt-1 text-sm text-primary-500 dark:text-slate-400 leading-relaxed border-t border-primary-50 dark:border-[#2d3158]">
                       {faq.a}
                     </p>
                   </motion.div>
@@ -353,18 +353,18 @@ export default function Planos() {
       </section>
 
       {/* ── TRUST BADGES ────────────────────────────────────────────────── */}
-      <section className="border-t border-primary-100 py-8 px-6">
-        <div className="max-w-2xl mx-auto flex flex-wrap items-center justify-center gap-8 text-xs text-primary-400">
+      <section className="border-t border-primary-100 dark:border-[#2d3158] py-8 px-6">
+        <div className="max-w-2xl mx-auto flex flex-wrap items-center justify-center gap-8 text-xs text-primary-400 dark:text-slate-500">
           <div className="flex items-center gap-1.5">
-            <Lock size={13} className="text-primary-300" />
+            <Lock size={13} className="text-primary-300 dark:text-slate-600" />
             Dados protegidos pela LGPD
           </div>
           <div className="flex items-center gap-1.5">
-            <CreditCard size={13} className="text-primary-300" />
+            <CreditCard size={13} className="text-primary-300 dark:text-slate-600" />
             Sem cartão no plano básico
           </div>
           <div className="flex items-center gap-1.5">
-            <Shield size={13} className="text-primary-300" />
+            <Shield size={13} className="text-primary-300 dark:text-slate-600" />
             Cancele quando quiser
           </div>
         </div>

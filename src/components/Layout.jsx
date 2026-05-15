@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, PlusCircle, Settings, LogOut, MapPin, Scale, Menu, X, Zap, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Zap, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import LogoVotta from './LogoVotta'
 
 function getInitials(name) {
   if (!name) return '?'
@@ -73,25 +74,20 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
       <>
         {/* ── Cabeçalho: logo + botão recolher ── */}
         <div
-          className={`border-b border-primary-100 flex items-center flex-shrink-0 ${
+          className={`border-b border-primary-100 dark:border-[#2d3158] flex items-center flex-shrink-0 ${
             isCollapsed ? 'p-3 justify-center' : 'p-4 gap-3'
           }`}
         >
-          <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Scale className="text-white" size={20} />
-          </div>
+          <LogoVotta alturaIcone={28} semTexto={isCollapsed} classeTexto="text-base font-bold" className={isCollapsed ? '' : 'flex-1 min-w-0'} />
 
           {!isCollapsed && (
             <>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-base font-display font-bold text-primary-800 leading-tight">Votta</h1>
-              </div>
 
               {mobile && (
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Fechar menu"
-                  className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-600 dark:hover:text-slate-300 transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -141,19 +137,19 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             <Link
               to="/selecionar-municipio"
               onClick={() => setSidebarOpen(false)}
-              className="block p-3 bg-primary-50 rounded-xl border border-primary-200 hover:bg-primary-100 transition-colors"
+              className="block p-3 bg-primary-50 dark:bg-[#232745] rounded-xl border border-primary-200 dark:border-[#3d4270] hover:bg-primary-100 dark:hover:bg-[#2d3158] transition-colors"
             >
-              <p className="text-[11px] text-primary-500 font-medium mb-0.5">Município ativo</p>
+              <p className="text-[11px] text-primary-500 dark:text-slate-500 font-medium mb-0.5">Município ativo</p>
               {municipioSelecionado ? (
                 <>
-                  <p className="text-sm font-semibold text-primary-800 leading-tight">
+                  <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 leading-tight">
                     <span className="text-emerald-500 mr-1">●</span>
                     {municipioSelecionado.nome}
                   </p>
-                  <p className="text-xs text-primary-400">{municipioSelecionado.uf}</p>
+                  <p className="text-xs text-primary-400 dark:text-slate-500">{municipioSelecionado.uf}</p>
                 </>
               ) : (
-                <p className="text-sm text-primary-400 italic">Nenhum município selecionado</p>
+                <p className="text-sm text-primary-400 dark:text-slate-500 italic">Nenhum município selecionado</p>
               )}
             </Link>
           </div>
@@ -174,12 +170,12 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                   relative flex items-center rounded-xl transition-all duration-200 text-sm font-medium
                   ${isCollapsed
                     ? `justify-center p-3 ${isActive
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'
+                        ? 'bg-primary-50 dark:bg-[#232745] text-primary-700 dark:text-slate-200'
+                        : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'
                       }`
                     : `gap-3 px-3 py-2.5 ${isActive
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'
+                        ? 'bg-primary-50 dark:bg-[#232745] text-primary-700 dark:text-slate-200'
+                        : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'
                       }`
                   }
                 `}
@@ -204,7 +200,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
         </nav>
 
         {/* ── Rodapé: avatar ── */}
-        <div className={`border-t border-primary-100 relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
+        <div className={`border-t border-primary-100 dark:border-[#2d3158] relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
 
           {/* Dropdown — apenas no mobile */}
           {mobile && (
@@ -215,20 +211,20 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-xl shadow-lg border border-primary-100 py-1 z-50"
+                  className="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-[#1c1f38] rounded-xl shadow-lg border border-primary-100 dark:border-[#2d3158] py-1 z-50"
                 >
                   <Link
                     to="/configuracoes"
                     onClick={() => { setShowUserMenu(false); setSidebarOpen(false) }}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 cursor-pointer transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] cursor-pointer transition-colors w-full text-left"
                   >
                     <Settings size={15} />
                     Configurações
                   </Link>
-                  <div className="border-t border-primary-100 my-1" />
+                  <div className="border-t border-primary-100 dark:border-[#2d3158] my-1" />
                   <button
                     onClick={aoSolicitarLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
                   >
                     <LogOut size={15} />
                     Sair
@@ -241,7 +237,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           {mobile ? (
             <button
               onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-100 hover:ring-1 hover:ring-primary-200"
+              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-100 dark:hover:bg-[#232745] hover:ring-1 hover:ring-primary-200 dark:hover:ring-[#3d4270]"
               aria-label="Menu do usuário"
               title="Configurações e sair"
             >
@@ -252,14 +248,14 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                 {getInitials(usuario?.name)}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{usuario?.name || '—'}</p>
-                <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
+                <p className="text-xs font-semibold text-primary-800 dark:text-slate-100 truncate leading-tight">{usuario?.name || '—'}</p>
+                <p className="text-[10px] text-primary-400 dark:text-slate-500 truncate leading-tight mt-0.5">
                   {municipioSelecionado?.nome || usuario?.email || ''}
                 </p>
               </div>
               <ChevronDown
                 size={14}
-                className={`text-primary-500 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
+                className={`text-primary-500 dark:text-slate-500 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
               />
             </button>
           ) : (
@@ -273,8 +269,8 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-primary-800 truncate leading-tight">{usuario?.name || '—'}</p>
-                  <p className="text-[10px] text-primary-400 truncate leading-tight mt-0.5">
+                  <p className="text-xs font-semibold text-primary-800 dark:text-slate-100 truncate leading-tight">{usuario?.name || '—'}</p>
+                  <p className="text-[10px] text-primary-400 dark:text-slate-500 truncate leading-tight mt-0.5">
                     {municipioSelecionado?.nome || usuario?.email || ''}
                   </p>
                 </div>
@@ -287,11 +283,11 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-primary-50 print:block print:bg-white">
+    <div className="h-screen flex overflow-hidden bg-primary-50 dark:bg-[#141624] print:block print:bg-white">
 
       {/* Sidebar desktop */}
       <aside
-        className={`hidden lg:flex bg-white border-r border-primary-100 flex-col shadow-sm flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
+        className={`hidden lg:flex bg-white dark:bg-[#191c33] border-r border-primary-100 dark:border-[#2d3158] flex-col shadow-sm flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
       >
         <SidebarContent />
       </aside>
@@ -313,7 +309,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-white border-r border-primary-100 flex flex-col shadow-xl print:hidden"
+              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-white dark:bg-[#191c33] border-r border-primary-100 dark:border-[#2d3158] flex flex-col shadow-xl print:hidden"
             >
               <SidebarContent mobile={true} />
             </motion.aside>
@@ -325,20 +321,15 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-primary-100 shadow-sm flex-shrink-0 print:hidden">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#191c33] border-b border-primary-100 dark:border-[#2d3158] shadow-sm flex-shrink-0 print:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menu"
-            className="p-2 rounded-lg text-primary-500 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+            className="p-2 rounded-lg text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 transition-colors"
           >
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-primary-600 to-primary-800 rounded-md flex items-center justify-center">
-              <Scale className="text-white" size={14} />
-            </div>
-            <span className="font-display font-bold text-primary-800 text-sm">Votta</span>
-          </div>
+          <LogoVotta alturaIcone={22} classeTexto="text-sm font-bold" />
           {usuario && (
             <button
               onClick={() => setSidebarOpen(true)}
@@ -354,13 +345,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
 
         {/* Desktop top bar */}
         {usuario && (
-          <div className="hidden lg:flex items-center justify-between px-6 py-2.5 bg-white border-b border-primary-100 flex-shrink-0 print:hidden">
-            <p className="text-sm font-semibold text-primary-700">{pageTitle}</p>
+          <div className="hidden lg:flex items-center justify-between px-6 py-2.5 bg-white dark:bg-[#191c33] border-b border-primary-100 dark:border-[#2d3158] flex-shrink-0 print:hidden">
+            <p className="text-sm font-semibold text-primary-700 dark:text-slate-300">{pageTitle}</p>
 
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-                className="flex items-center gap-2 hover:bg-primary-50 rounded-xl px-2 py-1.5 transition-all"
+                className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-[#232745] rounded-xl px-2 py-1.5 transition-all"
                 aria-label="Menu do usuário"
               >
                 <div
@@ -382,24 +373,24 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-primary-100 py-1 overflow-hidden z-50"
+                    className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-[#1c1f38] rounded-xl shadow-lg border border-primary-100 dark:border-[#2d3158] py-1 overflow-hidden z-50"
                   >
-                    <div className="px-4 py-2.5 border-b border-primary-100">
-                      <p className="text-sm font-semibold text-primary-800 leading-tight truncate">{usuario.name}</p>
-                      <p className="text-xs text-primary-400 mt-0.5 truncate">{usuario.email}</p>
+                    <div className="px-4 py-2.5 border-b border-primary-100 dark:border-[#2d3158]">
+                      <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 leading-tight truncate">{usuario.name}</p>
+                      <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5 truncate">{usuario.email}</p>
                     </div>
                     <Link
                       to="/configuracoes"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] transition-colors"
                     >
                       <Settings size={15} />
                       Configurações
                     </Link>
-                    <div className="border-t border-primary-100 my-1" />
+                    <div className="border-t border-primary-100 dark:border-[#2d3158] my-1" />
                     <button
                       onClick={aoSolicitarLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
                     >
                       <LogOut size={15} />
                       Sair
@@ -429,22 +420,22 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
             >
-              <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-primary-50 dark:bg-[#232745] rounded-full flex items-center justify-center mx-auto mb-4">
                 <LogOut size={22} className="text-primary-600" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
                 Sair do sistema?
               </h2>
-              <p className="text-sm text-primary-500 text-center mb-6 leading-relaxed">
+              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">
                 Você será redirecionado para a tela de login.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200
-                    text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
                 >
                   Cancelar
                 </button>

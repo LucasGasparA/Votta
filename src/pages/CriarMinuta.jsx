@@ -206,19 +206,19 @@ const CriarMinuta = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-primary-50 via-white to-oro-50 p-4 md:p-6">
+    <div className="bg-gradient-to-br from-primary-50 via-white to-oro-50 dark:from-[#141624] dark:via-[#141624] dark:to-[#141624] p-4 md:p-6">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-5">
           <div>
-            <h1 className="text-2xl font-display font-bold text-primary-800 mb-0.5 flex items-center gap-3">
+            <h1 className="text-2xl font-display font-bold text-primary-800 dark:text-slate-100 mb-0.5 flex items-center gap-3">
               <FileText className="text-primary-600" size={26} />
               Nova Proposição
             </h1>
-            <p className="text-primary-500 text-sm">Wizard guiado com assistência jurídica inteligente</p>
+            <p className="text-primary-500 dark:text-slate-400 text-sm">Wizard guiado com assistência jurídica inteligente</p>
           </div>
-          <Link to="/painel" className="flex items-center gap-1.5 text-sm text-primary-400 hover:text-primary-600 transition-colors mt-1">
+          <Link to="/painel" className="flex items-center gap-1.5 text-sm text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 transition-colors mt-1">
             <X size={16} />
             Cancelar
           </Link>
@@ -232,16 +232,16 @@ const CriarMinuta = () => {
         >
           {/* Indicador textual */}
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-primary-700">
+            <p className="text-sm font-semibold text-primary-700 dark:text-slate-200">
               Etapa {etapaAtual + 1} de {steps.length} — {steps[etapaAtual].title}
             </p>
-            <p className="text-xs text-primary-400 font-medium">
+            <p className="text-xs text-primary-400 dark:text-slate-500 font-medium">
               {etapaAtual === steps.length - 1 ? '100' : Math.round(percentualProgresso)}% concluído
             </p>
           </div>
 
           {/* Barra linear */}
-          <div className="w-full bg-primary-100 rounded-full h-1.5 mb-4">
+          <div className="w-full bg-primary-100 dark:bg-[#232745] rounded-full h-1.5 mb-4">
             <div
               className="bg-primary-600 h-1.5 rounded-full transition-all duration-500"
               style={{ width: `${etapaAtual === steps.length - 1 ? 100 : percentualProgresso}%` }}
@@ -263,19 +263,19 @@ const CriarMinuta = () => {
                       ${index < etapaAtual
                         ? 'bg-primary-600 text-white cursor-pointer hover:bg-primary-700'
                         : index === etapaAtual
-                          ? 'bg-primary-500 text-white ring-4 ring-primary-100'
-                          : 'bg-primary-100 text-primary-400 cursor-default'
+                          ? 'bg-primary-500 text-white ring-4 ring-primary-100 dark:ring-[#2d3158]'
+                          : 'bg-primary-100 dark:bg-[#232745] text-primary-400 dark:text-slate-500 cursor-default'
                       }
                     `}
                   >
                     {index < etapaAtual ? <Check size={16} /> : index + 1}
                   </button>
-                  <p className={`text-xs mt-1.5 text-center hidden lg:block font-medium ${index <= etapaAtual ? 'text-primary-700' : 'text-primary-300'}`}>
+                  <p className={`text-xs mt-1.5 text-center hidden lg:block font-medium ${index <= etapaAtual ? 'text-primary-700 dark:text-slate-300' : 'text-primary-300 dark:text-slate-600'}`}>
                     {step.title}
                   </p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`h-0.5 flex-1 mx-1 transition-all duration-500 ${index < etapaAtual ? 'bg-primary-600' : 'bg-primary-100'}`} />
+                  <div className={`h-0.5 flex-1 mx-1 transition-all duration-500 ${index < etapaAtual ? 'bg-primary-600' : 'bg-primary-100 dark:bg-[#232745]'}`} />
                 )}
               </div>
             ))}
@@ -292,8 +292,8 @@ const CriarMinuta = () => {
             transition={{ duration: 0.25 }}
             className="card p-5 mb-4"
           >
-            <h2 className="text-xl font-display font-bold text-primary-800 mb-0.5">{steps[etapaAtual].title}</h2>
-            <p className="text-primary-400 text-sm mb-4">{steps[etapaAtual].description}</p>
+            <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100 mb-0.5">{steps[etapaAtual].title}</h2>
+            <p className="text-primary-400 dark:text-slate-500 text-sm mb-4">{steps[etapaAtual].description}</p>
 
             {/* Passo 0 */}
             {etapaAtual === 0 && (
@@ -305,13 +305,13 @@ const CriarMinuta = () => {
                     onClick={() => { atualizar('type', type.value); setTentouProximo(false) }}
                     className={`text-left p-5 border-2 rounded-xl transition-all duration-200
                       ${dadosFormulario.type === type.value
-                        ? 'border-primary-500 bg-primary-50 shadow-md'
-                        : 'border-primary-100 hover:border-primary-300 hover:shadow-sm'
+                        ? 'border-primary-500 bg-primary-50 dark:bg-[#232745] shadow-md'
+                        : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270] hover:shadow-sm'
                       }`}
                   >
                     <div className="text-3xl mb-2">{type.icon}</div>
-                    <h3 className="font-display font-bold text-primary-800 text-sm mb-1">{type.label}</h3>
-                    <p className="text-xs text-primary-500 leading-relaxed">{type.description}</p>
+                    <h3 className="font-display font-bold text-primary-800 dark:text-slate-100 text-sm mb-1">{type.label}</h3>
+                    <p className="text-xs text-primary-500 dark:text-slate-400 leading-relaxed">{type.description}</p>
                     {dadosFormulario.type === type.value && (
                       <div className="mt-2 flex items-center gap-1 text-primary-600">
                         <Check size={14} />
@@ -327,7 +327,7 @@ const CriarMinuta = () => {
             {etapaAtual === 1 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="theme" className="block text-sm font-medium text-primary-700 mb-1.5">Tema da Proposição</label>
+                  <label htmlFor="theme" className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Tema da Proposição</label>
                   <input
                     id="theme"
                     type="text"
@@ -342,7 +342,7 @@ const CriarMinuta = () => {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="objective" className="block text-sm font-medium text-primary-700 mb-1.5">Objetivo Principal</label>
+                  <label htmlFor="objective" className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Objetivo Principal</label>
                   <textarea
                     id="objective"
                     value={dadosFormulario.objective}
@@ -354,9 +354,9 @@ const CriarMinuta = () => {
                     <p className="text-xs text-rosso-500 mt-1">Campo obrigatório.</p>
                   )}
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270]">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
+                  <p className="text-sm text-primary-600 dark:text-slate-300">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
                 </div>
               </div>
             )}
@@ -364,7 +364,7 @@ const CriarMinuta = () => {
             {/* Passo 2 */}
             {etapaAtual === 2 && (
               <div className="space-y-4">
-                <label className="block text-sm font-medium text-primary-700 mb-2">A matéria é de competência municipal?</label>
+                <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-2">A matéria é de competência municipal?</label>
                 <div className="grid grid-cols-1 gap-2">
                   {['Sim, exclusiva', 'Sim, concorrente', 'Não tenho certeza'].map(option => (
                     <button
@@ -373,11 +373,11 @@ const CriarMinuta = () => {
                       onClick={() => atualizar('competence', option)}
                       className={`flex items-center justify-between text-left p-4 border-2 rounded-xl transition-all duration-200
                         ${dadosFormulario.competence === option
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-primary-100 hover:border-primary-300'
+                          ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                          : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
                         }`}
                     >
-                      <span className="font-medium text-primary-800 text-sm">{option}</span>
+                      <span className="font-medium text-primary-800 dark:text-slate-200 text-sm">{option}</span>
                       {dadosFormulario.competence === option && <Check size={16} className="text-primary-600" />}
                     </button>
                   ))}
@@ -394,7 +394,7 @@ const CriarMinuta = () => {
             {/* Passo 3 */}
             {etapaAtual === 3 && (
               <div className="space-y-4">
-                <label className="block text-sm font-medium text-primary-700 mb-2">Esta proposição tem impacto orçamentário?</label>
+                <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-2">Esta proposição tem impacto orçamentário?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
                     <button
@@ -403,18 +403,18 @@ const CriarMinuta = () => {
                       onClick={() => atualizar('hasFinancialImpact', value)}
                       className={`text-left p-5 border-2 rounded-xl transition-all duration-200
                         ${dadosFormulario.hasFinancialImpact === value
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-primary-100 hover:border-primary-300'
+                          ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                          : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
                         }`}
                     >
-                      <h3 className="font-display font-bold text-primary-800 mb-1">{label}</h3>
-                      <p className="text-xs text-primary-500">{desc}</p>
+                      <h3 className="font-display font-bold text-primary-800 dark:text-slate-100 mb-1">{label}</h3>
+                      <p className="text-xs text-primary-500 dark:text-slate-400">{desc}</p>
                     </button>
                   ))}
                 </div>
                 {dadosFormulario.hasFinancialImpact && (
                   <div>
-                    <label className="block text-sm font-medium text-primary-700 mb-1.5">Estimativa de Impacto (R$)</label>
+                    <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Estimativa de Impacto (R$)</label>
                     <input
                       type="text"
                       value={dadosFormulario.estimatedImpact}
@@ -422,7 +422,7 @@ const CriarMinuta = () => {
                       className="input-field"
                       placeholder="Ex: 150.000,00"
                     />
-                    <p className="text-xs text-primary-400 mt-1">Necessário anexar estimativa de impacto orçamentário-financeiro</p>
+                    <p className="text-xs text-primary-400 dark:text-slate-500 mt-1">Necessário anexar estimativa de impacto orçamentário-financeiro</p>
                   </div>
                 )}
               </div>
@@ -433,8 +433,8 @@ const CriarMinuta = () => {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="justification" className="block text-sm font-medium text-primary-700">Justificativa da Proposição</label>
-                    <span className={`text-xs font-medium ${tamanhoJustificativa >= 50 ? 'text-primary-600' : 'text-primary-400'}`}>
+                    <label htmlFor="justification" className="block text-sm font-medium text-primary-700 dark:text-slate-300">Justificativa da Proposição</label>
+                    <span className={`text-xs font-medium ${tamanhoJustificativa >= 50 ? 'text-primary-600' : 'text-primary-400 dark:text-slate-500'}`}>
                       {tamanhoJustificativa} / mín. 50
                     </span>
                   </div>
@@ -446,16 +446,16 @@ const CriarMinuta = () => {
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />
-                  <div className="mt-1.5 w-full bg-primary-100 rounded-full h-1">
+                  <div className="mt-1.5 w-full bg-primary-100 dark:bg-[#232745] rounded-full h-1">
                     <div
                       className={`h-1 rounded-full transition-all duration-300 ${tamanhoJustificativa >= 50 ? 'bg-primary-500' : 'bg-oro-500'}`}
                       style={{ width: `${Math.min((tamanhoJustificativa / 50) * 100, 100)}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270]">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
+                  <p className="text-sm text-primary-600 dark:text-slate-300">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
                 </div>
               </div>
             )}
@@ -468,7 +468,7 @@ const CriarMinuta = () => {
             onClick={etapaAnterior}
             disabled={etapaAtual === 0}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all
-              ${etapaAtual === 0 ? 'text-primary-300 cursor-not-allowed' : 'text-primary-600 hover:bg-primary-100'}`}
+              ${etapaAtual === 0 ? 'text-primary-300 dark:text-slate-600 cursor-not-allowed' : 'text-primary-600 dark:text-slate-300 hover:bg-primary-100 dark:hover:bg-[#232745]'}`}
           >
             <ArrowLeft size={18} />
             Anterior
@@ -492,7 +492,7 @@ const CriarMinuta = () => {
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all
                 ${podeAvancar()
                   ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md'
-                  : 'bg-primary-100 text-primary-400 hover:bg-primary-200'
+                  : 'bg-primary-100 dark:bg-[#232745] text-primary-400 dark:text-slate-500 hover:bg-primary-200 dark:hover:bg-[#2d3158]'
                 }`}
             >
               Próximo
@@ -505,7 +505,7 @@ const CriarMinuta = () => {
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all
                 ${podeAvancar() && !enviando
                   ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-lg'
-                  : 'bg-primary-100 text-primary-300 cursor-not-allowed'
+                  : 'bg-primary-100 dark:bg-[#232745] text-primary-300 dark:text-slate-600 cursor-not-allowed'
                 }`}
             >
               <Check size={18} />

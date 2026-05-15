@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Scale, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
+import LogoVotta from '../components/LogoVotta'
 
 export default function ResetPassword() {
   const [searchParams]                  = useSearchParams()
@@ -72,14 +73,7 @@ export default function ResetPassword() {
         transition={{ duration: 0.45, ease: 'easeOut' }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-7">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-               style={{ background: '#b83b3d' }}>
-            <Scale size={16} color="#fff" />
-          </div>
-          <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
-        </div>
+        <LogoVotta className="justify-center mb-7" />
 
         {done ? (
           /* Sucesso */

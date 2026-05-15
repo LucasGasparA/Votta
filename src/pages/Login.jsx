@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Scale, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
+import LogoVotta from '../components/LogoVotta'
 
 export default function Login({ aoEntrar }) {
   const [email,        setEmail]        = useState('')
@@ -29,7 +30,7 @@ export default function Login({ aoEntrar }) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -37,15 +38,9 @@ export default function Login({ aoEntrar }) {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="w-full max-w-sm"
         >
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-2.5 mb-7">
-            <div className="w-8 h-8 rounded-lg bg-rosso-600 flex items-center justify-center">
-              <Scale size={16} className="text-white" />
-            </div>
-            <span className="text-lg font-semibold text-primary-900">Votta</span>
-          </div>
+          <LogoVotta className="justify-center mb-7" />
 
-          <h1 className="text-xl font-semibold text-center text-primary-900 mb-6">Entrar</h1>
+          <h1 className="text-xl font-semibold text-center text-primary-900 dark:text-slate-100 mb-6">Entrar</h1>
 
           <form onSubmit={aoEnviar} className="space-y-3">
             <div>
@@ -79,7 +74,7 @@ export default function Login({ aoEntrar }) {
                     type="button"
                     onClick={() => setMostrarSenha(v => !v)}
                     aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                    className="text-primary-400 hover:text-primary-600 transition-colors"
+                    className="text-primary-400 hover:text-primary-600 dark:text-slate-500 transition-colors"
                   >
                     {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -110,7 +105,7 @@ export default function Login({ aoEntrar }) {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5 text-primary-400">
+          <p className="text-center text-sm mt-5 text-primary-400 dark:text-slate-500">
             Não tem conta?{' '}
             <Link to="/cadastro" className="font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
               Criar conta grátis

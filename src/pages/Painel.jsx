@@ -96,7 +96,7 @@ const Painel = () => {
 
       {/* Cabeçalho */}
       <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
-        <h1 className="text-2xl font-display font-bold text-primary-900">
+        <h1 className="text-2xl font-display font-bold text-primary-900 dark:text-slate-100">
           {obterSaudacao()}{primeiroNome ? `, ${primeiroNome}` : ''}
         </h1>
         {!carregando && totalPendentes > 0 && (
@@ -118,10 +118,10 @@ const Painel = () => {
       >
         {carregando
           ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-primary-100 p-5 animate-pulse">
-                <div className="h-3 bg-primary-100 rounded w-1/2 mb-4" />
-                <div className="h-9 bg-primary-100 rounded w-1/3 mb-2" />
-                <div className="h-2.5 bg-primary-100 rounded w-2/3" />
+              <div key={i} className="bg-white dark:bg-[#1c1f38] rounded-xl border border-primary-100 dark:border-[#2d3158] p-5 animate-pulse">
+                <div className="h-3 bg-primary-100 dark:bg-[#2d3158] rounded w-1/2 mb-4" />
+                <div className="h-9 bg-primary-100 dark:bg-[#2d3158] rounded w-1/3 mb-2" />
+                <div className="h-2.5 bg-primary-100 dark:bg-[#2d3158] rounded w-2/3" />
               </div>
             ))
           : estatisticas.map((stat, index) => <CartaoEstatistica key={stat.label} stat={stat} index={index} />)
@@ -134,12 +134,12 @@ const Painel = () => {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl border border-primary-100 shadow-sm p-8 mt-2"
+          className="bg-white dark:bg-[#1c1f38] rounded-2xl border border-primary-100 dark:border-[#2d3158] shadow-sm p-8 mt-2"
         >
-          <p className="text-base font-semibold text-primary-800 mb-1">
+          <p className="text-base font-semibold text-primary-800 dark:text-slate-100 mb-1">
             Comece sua primeira proposição
           </p>
-          <p className="text-sm text-primary-400 mb-8 max-w-sm">
+          <p className="text-sm text-primary-400 dark:text-slate-500 mb-8 max-w-sm">
             Siga os passos abaixo para criar sua primeira minuta legislativa com conformidade normativa.
           </p>
 
@@ -151,11 +151,11 @@ const Painel = () => {
             ].map((passo, i, arr) => (
               <div key={i} className="flex items-start gap-3 flex-1">
                 <div className="flex flex-col items-center flex-1 text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
                     <passo.icone size={18} className="text-primary-600" />
                   </div>
-                  <p className="text-sm font-semibold text-primary-800">{passo.titulo}</p>
-                  <p className="text-xs text-primary-400">{passo.desc}</p>
+                  <p className="text-sm font-semibold text-primary-800 dark:text-slate-200">{passo.titulo}</p>
+                  <p className="text-xs text-primary-400 dark:text-slate-500">{passo.desc}</p>
                 </div>
                 {i < arr.length - 1 && (
                   <div className="mt-5 text-primary-200 text-lg flex-shrink-0">→</div>
@@ -183,8 +183,8 @@ const Painel = () => {
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="animate-pulse">
-                    <div className="h-4 bg-primary-100 rounded w-3/4 mb-2" />
-                    <div className="h-3 bg-primary-100 rounded w-1/2" />
+                    <div className="h-4 bg-primary-100 dark:bg-[#2d3158] rounded w-3/4 mb-2" />
+                    <div className="h-3 bg-primary-100 dark:bg-[#2d3158] rounded w-1/2" />
                   </div>
                 ))}
               </div>
@@ -198,7 +198,7 @@ const Painel = () => {
                   </span>
                   <button
                     onClick={() => setSomentePendentes(false)}
-                    className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-700 transition-colors"
+                    className="flex items-center gap-1 text-xs text-primary-500 dark:text-slate-400 hover:text-primary-700 dark:hover:text-slate-200 transition-colors"
                   >
                     <X size={12} /> Ver todas
                   </button>
@@ -215,7 +215,7 @@ const Painel = () => {
             className="space-y-3"
           >
             <div className="card p-4">
-              <h2 className="text-sm font-semibold text-primary-400 uppercase tracking-wide mb-3">Ações Rápidas</h2>
+              <h2 className="text-sm font-semibold text-primary-400 dark:text-slate-500 uppercase tracking-wide mb-3">Ações Rápidas</h2>
               <div className="space-y-2">
                 <Link
                   to="/criar-minuta"
@@ -230,12 +230,12 @@ const Painel = () => {
 
                 <button
                   onClick={() => setSomentePendentes(true)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-primary-100 hover:border-oro-300 hover:bg-oro-50/50 active:scale-[0.98] transition-all group"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-primary-100 dark:border-[#2d3158] hover:border-oro-300 hover:bg-oro-50/50 dark:hover:bg-[#232745] active:scale-[0.98] transition-all group"
                 >
                   <AlertTriangle className="text-oro-500 flex-shrink-0" size={16} />
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-primary-800 leading-tight">Revisar Pendências</p>
-                    <p className="text-xs text-primary-400 leading-tight mt-0.5">
+                    <p className="text-sm font-semibold text-primary-800 dark:text-slate-200 leading-tight">Revisar Pendências</p>
+                    <p className="text-xs text-primary-400 dark:text-slate-500 leading-tight mt-0.5">
                       {totalPendentes > 0 ? `${totalPendentes} aguardam revisão` : 'Nenhuma pendente'}
                     </p>
                   </div>

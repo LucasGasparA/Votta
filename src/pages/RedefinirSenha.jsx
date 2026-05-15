@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Scale, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
+import LogoVotta from '../components/LogoVotta'
 
 export default function RedefinirSenha() {
   const [searchParams]                       = useSearchParams()
@@ -17,13 +18,7 @@ export default function RedefinirSenha() {
   const [carregando,         setCarregando]         = useState(false)
   const [concluido,          setConcluido]          = useState(false)
 
-  const inputStyle = {
-    border: '1.5px solid #e8e8e8',
-    background: '#fafafa',
-    color: '#111',
-    outline: 'none',
-    fontFamily: 'inherit',
-  }
+  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-[#e8e8e8] bg-[#fafafa] text-[#111] dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-[#b83b3d] focus:bg-white focus:shadow-[0_0_0_3px_rgba(184,59,61,0.08)] dark:focus:bg-[#232745]'
 
   const aoEnviar = async (e) => {
     e.preventDefault()
@@ -51,12 +46,12 @@ export default function RedefinirSenha() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-sm text-center">
-          <p className="text-sm mb-4" style={{ color: '#888' }}>
+          <p className="text-sm mb-4 text-primary-400 dark:text-slate-500">
             Link de recuperação inválido ou expirado.
           </p>
-          <Link to="/esqueci-senha" className="text-sm font-medium" style={{ color: '#b83b3d' }}>
+          <Link to="/esqueci-senha" className="text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
             Solicitar novo link
           </Link>
         </div>
@@ -65,21 +60,14 @@ export default function RedefinirSenha() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 pb-16">
+    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col items-center justify-center px-6 pb-16">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-7">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-               style={{ background: '#b83b3d' }}>
-            <Scale size={16} color="#fff" />
-          </div>
-          <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
-        </div>
+        <LogoVotta className="justify-center mb-7" />
 
         {concluido ? (
           /* Sucesso */
@@ -89,14 +77,13 @@ export default function RedefinirSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-                 style={{ background: '#f0fdf4' }}>
-              <CheckCircle size={24} style={{ color: '#16a34a' }} />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[#f0fdf4] dark:bg-[#232745]">
+              <CheckCircle size={24} className="text-green-600" />
             </div>
-            <h1 className="text-xl font-semibold mb-2" style={{ color: '#111' }}>
+            <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">
               Senha redefinida!
             </h1>
-            <p className="text-sm leading-relaxed mb-6" style={{ color: '#666' }}>
+            <p className="text-sm leading-relaxed mb-6 text-primary-700 dark:text-slate-300">
               Sua senha foi atualizada com sucesso.
               Agora você pode entrar com a nova senha.
             </p>
@@ -111,10 +98,10 @@ export default function RedefinirSenha() {
         ) : (
           /* Formulário */
           <>
-            <h1 className="text-xl font-semibold text-center mb-2" style={{ color: '#111' }}>
+            <h1 className="text-xl font-semibold text-center mb-2 text-primary-900 dark:text-slate-100">
               Criar nova senha
             </h1>
-            <p className="text-sm text-center mb-6" style={{ color: '#888' }}>
+            <p className="text-sm text-center mb-6 text-primary-400 dark:text-slate-500">
               Escolha uma senha com pelo menos 6 caracteres.
             </p>
 
@@ -128,25 +115,13 @@ export default function RedefinirSenha() {
                   placeholder="Nova senha"
                   minLength={6}
                   required
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm transition-all"
-                  style={inputStyle}
-                  onFocus={e => {
-                    e.target.style.borderColor = '#b83b3d'
-                    e.target.style.background  = '#fff'
-                    e.target.style.boxShadow   = '0 0 0 3px rgba(184,59,61,0.08)'
-                  }}
-                  onBlur={e => {
-                    e.target.style.borderColor = '#e8e8e8'
-                    e.target.style.background  = '#fafafa'
-                    e.target.style.boxShadow   = 'none'
-                  }}
+                  className={`${inputBase} pr-12`}
                 />
                 <button
                   type="button"
                   onClick={() => setMostrarSenha(v => !v)}
                   aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                  style={{ color: '#aaa', lineHeight: 0 }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
                 >
                   {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -161,25 +136,13 @@ export default function RedefinirSenha() {
                   placeholder="Confirmar nova senha"
                   minLength={6}
                   required
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm transition-all"
-                  style={inputStyle}
-                  onFocus={e => {
-                    e.target.style.borderColor = '#b83b3d'
-                    e.target.style.background  = '#fff'
-                    e.target.style.boxShadow   = '0 0 0 3px rgba(184,59,61,0.08)'
-                  }}
-                  onBlur={e => {
-                    e.target.style.borderColor = '#e8e8e8'
-                    e.target.style.background  = '#fafafa'
-                    e.target.style.boxShadow   = 'none'
-                  }}
+                  className={`${inputBase} pr-12`}
                 />
                 <button
                   type="button"
                   onClick={() => setMostrarConfirmacao(v => !v)}
                   aria-label={mostrarConfirmacao ? 'Ocultar confirmação' : 'Mostrar confirmação'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                  style={{ color: '#aaa', lineHeight: 0 }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
                 >
                   {mostrarConfirmacao ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>

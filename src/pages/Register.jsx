@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Scale, ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../utils/api.js'
+import LogoVotta from '../components/LogoVotta'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -81,14 +82,7 @@ export default function Register() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="w-full max-w-sm"
         >
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-2.5 mb-7">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                 style={{ background: '#b83b3d' }}>
-              <Scale size={16} color="#fff" />
-            </div>
-            <span className="text-lg font-semibold" style={{ color: '#111' }}>Votta</span>
-          </div>
+          <LogoVotta className="justify-center mb-7" />
 
           <h1 className="text-xl font-semibold text-center mb-6" style={{ color: '#111' }}>
             Criar conta

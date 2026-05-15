@@ -515,8 +515,8 @@ const EditorMinuta = () => {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary-50">
-        <div className="flex items-center gap-3 text-primary-500">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
+        <div className="flex items-center gap-3 text-primary-500 dark:text-slate-400">
           <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
           Carregando editor...
         </div>
@@ -525,14 +525,14 @@ const EditorMinuta = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-primary-50 print:bg-white">
+    <div className="h-screen flex flex-col bg-primary-50 dark:bg-[#141624] print:bg-white">
       {/* Top Bar */}
-      <div className="bg-white border-b border-primary-200 px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
+      <div className="bg-white dark:bg-[#1c1f38] border-b border-primary-200 dark:border-[#2d3158] px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navegacaoSegura('/painel')}
-              className="text-primary-400 hover:text-primary-600 transition-colors flex-shrink-0"
+              className="text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 transition-colors flex-shrink-0"
               aria-label="Voltar ao painel"
             >
               <ArrowLeft size={20} />
@@ -547,8 +547,8 @@ const EditorMinuta = () => {
                     if (e.key === 'Enter') aoSalvarTitulo(e.target.value)
                     if (e.key === 'Escape') setEditandoTitulo(false)
                   }}
-                  className="text-base font-display font-bold text-primary-800 bg-primary-50
-                    border-b-2 border-primary-400 outline-none px-1 min-w-0 w-48 md:w-64"
+                  className="text-base font-display font-bold text-primary-800 dark:text-slate-100 bg-primary-50 dark:bg-[#232745]
+                    border-b-2 border-primary-400 dark:border-[#3d4270] outline-none px-1 min-w-0 w-48 md:w-64"
                   autoFocus
                 />
               ) : (
@@ -558,8 +558,8 @@ const EditorMinuta = () => {
                     setTimeout(() => titleInputRef.current?.select(), 50)
                   }}
                   title="Clique para renomear"
-                  className="text-base font-display font-bold text-primary-800 truncate
-                    hover:text-primary-600 hover:underline decoration-dashed underline-offset-2
+                  className="text-base font-display font-bold text-primary-800 dark:text-slate-100 truncate
+                    hover:text-primary-600 dark:hover:text-slate-300 hover:underline decoration-dashed underline-offset-2
                     transition-colors text-left max-w-[200px] md:max-w-xs"
                 >
                   {tituloProposicao}
@@ -588,7 +588,7 @@ const EditorMinuta = () => {
           </div>
 
           {/* Toolbar de formatação */}
-          <div className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-primary-50 rounded-lg border border-primary-100">
+          <div className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270]">
             {[
               { icon: Bold,        title: 'Negrito',   prefix: '**', suffix: '**' },
               { icon: Italic,      title: 'Itálico',   prefix: '_',  suffix: '_'  },
@@ -599,7 +599,7 @@ const EditorMinuta = () => {
                 title={title}
                 aria-label={title}
                 onClick={() => applyFormat(activeTextareaRef, prefix, suffix)}
-                className="p-1.5 rounded text-primary-500 hover:bg-white hover:text-primary-700 hover:shadow-sm transition-all"
+                className="p-1.5 rounded text-primary-500 dark:text-slate-400 hover:bg-white dark:hover:bg-[#1c1f38] hover:text-primary-700 dark:hover:text-slate-200 hover:shadow-sm transition-all"
               >
                 <Icon size={14} />
               </button>
@@ -628,11 +628,11 @@ const EditorMinuta = () => {
                 </div>
               )
             })()}
-            <span className="text-xs text-primary-400 hidden lg:block">Ctrl+S</span>
+            <span className="text-xs text-primary-400 dark:text-slate-500 hidden lg:block">Ctrl+S</span>
             <button
               onClick={abrirModalVersoes}
               aria-label="Ver histórico de versões"
-              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-primary-200 text-primary-600 rounded-xl hover:bg-primary-50 active:scale-[0.97] transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 rounded-xl hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
             >
               <History size={15} />
               <span className="hidden md:inline">Versões</span>
@@ -640,7 +640,7 @@ const EditorMinuta = () => {
             <button
               onClick={aoSalvar}
               disabled={salvando}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 border border-primary-200 rounded-lg transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] border border-primary-200 dark:border-[#3d4270] rounded-lg transition-all disabled:opacity-50"
             >
               <Save size={14} />
               <span>{salvando ? 'Salvando...' : 'Salvar'}</span>
@@ -687,7 +687,7 @@ const EditorMinuta = () => {
                   key={sId}
                   onClick={() => setSecaoAtiva(sId)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all active:scale-[0.97]
-                    ${secaoAtiva === sId ? 'bg-primary-600 text-white shadow-sm' : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700'}`}
+                    ${secaoAtiva === sId ? 'bg-primary-600 text-white shadow-sm' : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'}`}
                 >
                   <Icon size={15} />
                   {label}
@@ -705,7 +705,7 @@ const EditorMinuta = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
                 className={`p-3 rounded-lg border-l-4 flex items-center gap-2.5 ${
-                  v.type === 'success' ? 'bg-primary-50 border-primary-400' : v.type === 'warning' ? 'bg-amber-50 border-amber-400' : 'bg-rosso-50 border-rosso-500'
+                  v.type === 'success' ? 'bg-primary-50 dark:bg-[#1c1f38] border-primary-400' : v.type === 'warning' ? 'bg-amber-50 border-amber-400' : 'bg-rosso-50 border-rosso-500'
                 }`}
               >
                 {v.type === 'success'
@@ -725,7 +725,7 @@ const EditorMinuta = () => {
               return (
                 <div className="flex items-center gap-2 mb-5">
                   <Icon size={20} className="text-primary-400" />
-                  <h2 className="text-xl font-display font-bold text-primary-800">{section?.label}</h2>
+                  <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">{section?.label}</h2>
                 </div>
               )
             })()}
@@ -735,7 +735,7 @@ const EditorMinuta = () => {
                 <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
                   onChange={e => aoMudarCampo('ementa', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Resumo do objeto da lei..." />
-                <p className="text-xs text-primary-400 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
               </div>
             )}
 
@@ -744,33 +744,33 @@ const EditorMinuta = () => {
                 <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
                   onChange={e => aoMudarCampo('preambulo', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Texto introdutório..." />
-                <p className="text-xs text-primary-400 mt-2">Fórmula legislativa padrão conforme LOM.</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-2">Fórmula legislativa padrão conforme LOM.</p>
               </div>
             )}
 
             {secaoAtiva === 'artigos' && (
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-primary-500">{doc.artigos.length} artigo(s)</p>
+                  <p className="text-sm text-primary-500 dark:text-slate-400">{doc.artigos.length} artigo(s)</p>
                   <button onClick={adicionarArtigo}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 active:scale-[0.97] transition-all">
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-100 dark:bg-[#232745] text-primary-700 dark:text-slate-300 rounded-lg hover:bg-primary-200 dark:hover:bg-[#2d3158] active:scale-[0.97] transition-all">
                     + Adicionar Artigo
                   </button>
                 </div>
                 {doc.artigos.length === 0 ? (
-                  <div className="text-center py-10 text-primary-400">
+                  <div className="text-center py-10 text-primary-400 dark:text-slate-500">
                     <List size={32} className="mx-auto mb-3 opacity-40" />
                     <p className="text-sm">Nenhum artigo ainda. Clique em "+ Adicionar Artigo".</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {doc.artigos.map(artigo => (
-                      <div key={artigo.id} className="border border-primary-100 rounded-xl p-5">
+                      <div key={artigo.id} className="border border-primary-100 dark:border-[#2d3158] rounded-xl p-5">
                         <div className="flex items-start gap-4">
-                          <span className="px-2.5 py-1 bg-primary-100 text-primary-700 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
+                          <span className="px-2.5 py-1 bg-primary-100 dark:bg-[#232745] text-primary-700 dark:text-slate-300 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
                           <div className="flex-1">
                             <textarea defaultValue={artigo.texto} onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
-                              className="w-full px-3 py-2.5 border-2 border-primary-100 rounded-lg focus:border-primary-400 focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
+                              className="w-full px-3 py-2.5 border-2 border-primary-100 dark:border-[#2d3158] dark:bg-[#232745] dark:text-slate-100 rounded-lg focus:border-primary-400 dark:focus:border-[#3d4270] focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
                               placeholder="Texto do artigo..." />
                             {artigo.citacoes?.length > 0 && (
                               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -809,9 +809,9 @@ const EditorMinuta = () => {
           const suggestions = getDynamicSuggestions(tipoProposicao)
           if (!suggestions.length) return null
           return (
-            <aside className="hidden xl:flex flex-col w-64 border-l border-primary-200 bg-white overflow-y-auto flex-shrink-0 print:hidden">
-              <div className="p-4 border-b border-primary-100">
-                <p className="text-[10px] text-primary-400 uppercase tracking-wide font-semibold">
+            <aside className="hidden xl:flex flex-col w-64 border-l border-primary-200 dark:border-[#2d3158] bg-white dark:bg-[#1c1f38] overflow-y-auto flex-shrink-0 print:hidden">
+              <div className="p-4 border-b border-primary-100 dark:border-[#2d3158]">
+                <p className="text-[10px] text-primary-400 dark:text-slate-500 uppercase tracking-wide font-semibold">
                   Sugestões para esta proposição
                 </p>
               </div>
@@ -827,10 +827,10 @@ const EditorMinuta = () => {
                         : 'bg-rosso-50 border-rosso-400'
                     }`}
                   >
-                    <p className="text-primary-700 mb-2 leading-relaxed">{s.text}</p>
+                    <p className="text-primary-700 dark:text-slate-200 mb-2 leading-relaxed">{s.text}</p>
                     <button
                       onClick={() => aoAcionarSugestao(s)}
-                      className="flex items-center gap-1 text-primary-500 hover:text-primary-700 font-medium transition-colors"
+                      className="flex items-center gap-1 text-primary-500 dark:text-slate-400 hover:text-primary-700 dark:hover:text-slate-200 font-medium transition-colors"
                     >
                       <ExternalLink size={11} />
                       {s.action}
@@ -853,7 +853,7 @@ const EditorMinuta = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 w-[340px] bg-white rounded-2xl shadow-2xl border border-primary-100 flex flex-col overflow-hidden z-50 print:hidden"
+            className="fixed bottom-24 right-6 w-[340px] bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl border border-primary-100 dark:border-[#2d3158] flex flex-col overflow-hidden z-50 print:hidden"
             style={{ height: minimizado ? 'auto' : '440px' }}
           >
             {/* Header */}
@@ -915,12 +915,12 @@ const EditorMinuta = () => {
                     {historicoChat.length === 0 && !carregandoChat && (
                       <div className="flex flex-col h-full">
                         <div className="flex-1 flex flex-col items-center justify-center gap-3 pb-2">
-                          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center">
+                          <div className="w-12 h-12 bg-primary-100 dark:bg-[#232745] rounded-2xl flex items-center justify-center">
                             <Scale size={22} className="text-primary-500" />
                           </div>
                           <div className="text-center">
-                            <p className="text-sm font-semibold text-primary-700">Assistente Jurídico</p>
-                            <p className="text-xs text-primary-400 mt-0.5">Faça uma pergunta ou escolha uma sugestão</p>
+                            <p className="text-sm font-semibold text-primary-700 dark:text-slate-200">Assistente Jurídico</p>
+                            <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Faça uma pergunta ou escolha uma sugestão</p>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-1.5">
@@ -930,7 +930,7 @@ const EditorMinuta = () => {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.97 }}
                               onClick={() => aoSugerirRapido(s)}
-                              className="text-left px-2.5 py-2 bg-primary-50 hover:bg-primary-100 border border-primary-100 hover:border-primary-200 rounded-xl text-[11px] text-primary-700 leading-tight transition-all"
+                              className="text-left px-2.5 py-2 bg-primary-50 dark:bg-[#232745] hover:bg-primary-100 dark:hover:bg-[#2d3158] border border-primary-100 dark:border-[#3d4270] hover:border-primary-200 rounded-xl text-[11px] text-primary-700 dark:text-slate-300 leading-tight transition-all"
                             >
                               {s}
                             </motion.button>
@@ -946,7 +946,7 @@ const EditorMinuta = () => {
                           <div className="bg-primary-600 text-white rounded-2xl rounded-br-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed">
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                           </div>
-                          <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-primary-600">
+                          <div className="w-6 h-6 bg-primary-100 dark:bg-[#232745] rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-primary-600 dark:text-slate-300">
                             EU
                           </div>
                         </div>
@@ -970,7 +970,7 @@ const EditorMinuta = () => {
                           <div className={`rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed ${
                             msg.hasCit
                               ? 'bg-oro-50 border-l-4 border-oro-400 text-primary-800'
-                              : 'bg-white border border-primary-100 text-primary-800 shadow-sm'
+                              : 'bg-white dark:bg-[#232745] border border-primary-100 dark:border-[#3d4270] text-primary-800 dark:text-slate-200 shadow-sm'
                           }`}>
                             {msg.hasCit && (
                               <p className="font-semibold text-[10px] uppercase tracking-wide text-oro-600 mb-1 flex items-center gap-1">
@@ -989,7 +989,7 @@ const EditorMinuta = () => {
                         <div className="w-6 h-6 bg-primary-700 rounded-full flex items-center justify-center flex-shrink-0">
                           <Scale size={11} className="text-white" />
                         </div>
-                        <div className="bg-white border border-primary-100 rounded-2xl rounded-bl-sm px-3 py-2.5 shadow-sm max-w-[80%]">
+                        <div className="bg-white dark:bg-[#232745] border border-primary-100 dark:border-[#3d4270] rounded-2xl rounded-bl-sm px-3 py-2.5 shadow-sm max-w-[80%]">
                           <div className="flex items-center gap-1 mb-1.5">
                             {[0, 1, 2].map(d => (
                               <span
@@ -1019,7 +1019,7 @@ const EditorMinuta = () => {
                   </div>
 
                   {/* Input */}
-                  <div className="p-3 border-t border-primary-100 flex-shrink-0 bg-primary-50/50">
+                  <div className="p-3 border-t border-primary-100 dark:border-[#2d3158] flex-shrink-0 bg-primary-50/50 dark:bg-[#232745]/50">
                     <div className="flex gap-2 items-end">
                       <div className="flex-1">
                         <label htmlFor="chat-input" className="sr-only">
@@ -1036,11 +1036,11 @@ const EditorMinuta = () => {
                               aoPerguntarAssistente()
                             }
                           }}
-                          className="w-full px-3 py-2 border-2 border-primary-200 rounded-xl focus:border-primary-500 focus:outline-none text-xs transition-colors resize-none leading-relaxed"
+                          className="w-full px-3 py-2 border-2 border-primary-200 dark:border-[#3d4270] dark:bg-[#1c1f38] dark:text-slate-100 rounded-xl focus:border-primary-500 dark:focus:border-[#3d4270] focus:outline-none text-xs transition-colors resize-none leading-relaxed"
                           placeholder="Faça uma pergunta jurídica..."
                           disabled={carregandoChat}
                         />
-                        <p className="text-[9px] text-primary-300 mt-0.5 text-right">Enter para enviar · Shift+Enter para nova linha</p>
+                        <p className="text-[9px] text-primary-300 dark:text-slate-600 mt-0.5 text-right">Enter para enviar · Shift+Enter para nova linha</p>
                       </div>
                       <button
                         onClick={() => aoPerguntarAssistente()}
@@ -1117,14 +1117,14 @@ const EditorMinuta = () => {
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 flex flex-col max-h-[80vh]"
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-xl max-w-md w-full mx-4 flex flex-col max-h-[80vh]"
             >
-              <div className="flex items-center justify-between p-5 border-b border-primary-100 flex-shrink-0">
-                <h2 className="text-base font-display font-bold text-primary-800">Histórico de versões</h2>
+              <div className="flex items-center justify-between p-5 border-b border-primary-100 dark:border-[#2d3158] flex-shrink-0">
+                <h2 className="text-base font-display font-bold text-primary-800 dark:text-slate-100">Histórico de versões</h2>
                 <button
                   onClick={() => setExibirModalVersoes(false)}
                   aria-label="Fechar histórico de versões"
-                  className="text-primary-400 hover:text-primary-600 p-1.5 rounded-lg hover:bg-primary-50 transition-colors"
+                  className="text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-[#232745] transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -1133,49 +1133,49 @@ const EditorMinuta = () => {
                 {carregandoVersoes ? (
                   <div className="space-y-3">
                     {[0, 1, 2].map(i => (
-                      <div key={i} className="animate-pulse flex items-center justify-between p-3 rounded-xl bg-primary-50">
+                      <div key={i} className="animate-pulse flex items-center justify-between p-3 rounded-xl bg-primary-50 dark:bg-[#232745]">
                         <div className="space-y-2 flex-1">
-                          <div className="h-3 bg-primary-200 rounded w-24" />
-                          <div className="h-2.5 bg-primary-100 rounded w-36" />
+                          <div className="h-3 bg-primary-200 dark:bg-[#2d3158] rounded w-24" />
+                          <div className="h-2.5 bg-primary-100 dark:bg-[#2d3158] rounded w-36" />
                         </div>
-                        <div className="h-7 w-20 bg-primary-100 rounded-lg" />
+                        <div className="h-7 w-20 bg-primary-100 dark:bg-[#2d3158] rounded-lg" />
                       </div>
                     ))}
                   </div>
                 ) : versoes.length === 0 ? (
-                  <p className="text-sm text-primary-400 text-center py-10">Nenhuma versão salva ainda.</p>
+                  <p className="text-sm text-primary-400 dark:text-slate-500 text-center py-10">Nenhuma versão salva ainda.</p>
                 ) : (() => {
                   const maxV = Math.max(...versoes.map(v => v.versionNumber))
                   return (
                     <div className="space-y-2">
                       {versoes.map(v => (
-                        <div key={v.id} className="border border-primary-100 rounded-xl p-3">
+                        <div key={v.id} className="border border-primary-100 dark:border-[#2d3158] rounded-xl p-3">
                           <div className="flex items-center justify-between gap-3">
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm text-primary-800">Versão {v.versionNumber}</span>
+                                <span className="font-bold text-sm text-primary-800 dark:text-slate-100">Versão {v.versionNumber}</span>
                                 {v.versionNumber === maxV && (
                                   <span className="text-xs font-semibold bg-oro-100 text-oro-700 px-2 py-0.5 rounded-full">Atual</span>
                                 )}
                               </div>
-                              <p className="text-xs text-primary-400 mt-0.5">{formatVersionDate(v.createdAt)}</p>
+                              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">{formatVersionDate(v.createdAt)}</p>
                             </div>
                             {v.versionNumber !== maxV && confirmandoVersaoId !== v.id && (
                               <button
                                 onClick={() => setConfirmandoVersaoId(v.id)}
-                                className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                                className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
                               >
                                 Restaurar
                               </button>
                             )}
                           </div>
                           {confirmandoVersaoId === v.id && (
-                            <div className="mt-3 pt-3 border-t border-primary-100">
-                              <p className="text-xs text-primary-600 mb-2">Isso substituirá o conteúdo atual.</p>
+                            <div className="mt-3 pt-3 border-t border-primary-100 dark:border-[#2d3158]">
+                              <p className="text-xs text-primary-600 dark:text-slate-300 mb-2">Isso substituirá o conteúdo atual.</p>
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => setConfirmandoVersaoId(null)}
-                                  className="flex-1 text-xs py-1.5 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 transition-all"
+                                  className="flex-1 text-xs py-1.5 rounded-lg border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] transition-all"
                                 >
                                   Cancelar
                                 </button>
@@ -1209,27 +1209,27 @@ const EditorMinuta = () => {
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg"
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-lg"
             >
-              <div className="flex items-center justify-between p-6 border-b border-primary-100">
+              <div className="flex items-center justify-between p-6 border-b border-primary-100 dark:border-[#2d3158]">
                 <div className="flex items-center gap-3">
                   <ClipboardCheck size={20} className="text-primary-500" />
-                  <h2 className="text-lg font-display font-bold text-primary-800">Revisão Final</h2>
+                  <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100">Revisão Final</h2>
                 </div>
-                <button onClick={() => setExibirModalExportacao(false)} className="text-primary-400 hover:text-primary-600 p-1.5 rounded-lg hover:bg-primary-50">
+                <button onClick={() => setExibirModalExportacao(false)} className="text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-[#232745]">
                   <X size={20} />
                 </button>
               </div>
               <div className="p-6 space-y-5">
-                <div className="bg-primary-50 rounded-xl p-4">
-                  <p className="text-xs text-primary-400 uppercase tracking-wide font-bold mb-1">Proposição</p>
-                  <p className="font-bold text-primary-800">{tituloProposicao}</p>
-                  {tipoProposicao && <p className="text-sm text-primary-500 mt-0.5">{PROPOSAL_TYPE_LABELS[tipoProposicao] || tipoProposicao}</p>}
+                <div className="bg-primary-50 dark:bg-[#232745] rounded-xl p-4">
+                  <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-1">Proposição</p>
+                  <p className="font-bold text-primary-800 dark:text-slate-100">{tituloProposicao}</p>
+                  {tipoProposicao && <p className="text-sm text-primary-500 dark:text-slate-400 mt-0.5">{PROPOSAL_TYPE_LABELS[tipoProposicao] || tipoProposicao}</p>}
                 </div>
                 <div>
-                  <p className="text-xs text-primary-400 uppercase tracking-wide font-bold mb-2">Alertas Pendentes ({alertasPendentes.length})</p>
+                  <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-2">Alertas Pendentes ({alertasPendentes.length})</p>
                   {alertasPendentes.length === 0 ? (
-                    <div className="flex items-center gap-2 text-primary-700 bg-primary-50 rounded-lg px-3 py-2.5 text-sm">
+                    <div className="flex items-center gap-2 text-primary-700 dark:text-slate-200 bg-primary-50 dark:bg-[#232745] rounded-lg px-3 py-2.5 text-sm">
                       <CheckCircle size={15} /> Nenhum alerta pendente
                     </div>
                   ) : (
@@ -1243,9 +1243,9 @@ const EditorMinuta = () => {
                   )}
                 </div>
                 <div>
-                  <p className="text-xs text-primary-400 uppercase tracking-wide font-bold mb-2">Citações Utilizadas ({citacoesUsadas.length})</p>
+                  <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-2">Citações Utilizadas ({citacoesUsadas.length})</p>
                   {citacoesUsadas.length === 0 ? (
-                    <p className="text-xs text-primary-400 italic">Nenhuma citação registrada.</p>
+                    <p className="text-xs text-primary-400 dark:text-slate-500 italic">Nenhuma citação registrada.</p>
                   ) : (
                     <div className="space-y-1.5">
                       {citacoesUsadas.map((c, i) => (
@@ -1257,18 +1257,18 @@ const EditorMinuta = () => {
                     </div>
                   )}
                 </div>
-                <label className="flex items-start gap-3 cursor-pointer p-4 border-2 rounded-xl transition-all hover:bg-primary-50"
+                <label className="flex items-start gap-3 cursor-pointer p-4 border-2 rounded-xl transition-all hover:bg-primary-50 dark:hover:bg-[#232745]"
                   style={{ borderColor: exportacaoRevisada ? '#2563eb' : '#e8e8e8' }}>
                   <input type="checkbox" checked={exportacaoRevisada} onChange={e => setExportacaoRevisada(e.target.checked)}
                     className="mt-0.5 w-4 h-4 accent-primary-600 flex-shrink-0" />
-                  <span className="text-sm text-primary-700 leading-relaxed">
+                  <span className="text-sm text-primary-700 dark:text-slate-300 leading-relaxed">
                     Confirmo que revisei esta minuta com assessor jurídico e estou ciente dos alertas pendentes.
                   </span>
                 </label>
               </div>
               <div className="flex gap-3 p-6 pt-0">
                 <button onClick={() => setExibirModalExportacao(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all">
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all">
                   Voltar ao Editor
                 </button>
                 <button onClick={confirmarExportacao} disabled={!exportacaoRevisada}
@@ -1291,15 +1291,15 @@ const EditorMinuta = () => {
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
             >
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle size={22} className="text-amber-500" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
+              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
                 Alterações não salvas
               </h2>
-              <p className="text-sm text-primary-500 text-center mb-6 leading-relaxed">
+              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">
                 Você tem alterações que ainda não foram salvas. Se sair agora, elas serão perdidas.
               </p>
               <div className="flex flex-col gap-2">
@@ -1320,15 +1320,15 @@ const EditorMinuta = () => {
                     setTemAlteracoes(false)
                     if (destinoNavegacao) navigate(destinoNavegacao)
                   }}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium border border-primary-200
-                    text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
+                  className="w-full py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
                 >
                   Sair sem salvar
                 </button>
                 <button
                   onClick={() => { setExibirModalNaoSalvo(false); setDestinoNavegacao(null) }}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium text-primary-400
-                    hover:text-primary-600 transition-colors"
+                  className="w-full py-2.5 rounded-xl text-sm font-medium text-primary-400 dark:text-slate-500
+                    hover:text-primary-600 dark:hover:text-slate-300 transition-colors"
                 >
                   Cancelar
                 </button>
