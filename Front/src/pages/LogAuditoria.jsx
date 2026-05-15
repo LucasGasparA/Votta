@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Shield, LogIn, FilePlus, FileEdit, Trash2, Zap, Download, Activity } from 'lucide-react'
-import { api } from '../utils/api.js'
+import { api } from '../services/api.js'
 
 const ACTION_ICONS = {
   LOGIN:              LogIn,

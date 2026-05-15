@@ -9,9 +9,9 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../utils/api.js'
-import { exportToPDF } from '../utils/exportarPdf.js'
-import { exportToDocx } from '../utils/exportarDocx.js'
+import { api } from '../services/api.js'
+import { exportToPDF } from '../services/exportarPdf.js'
+import { exportToDocx } from '../services/exportarDocx.js'
 
 const SECTIONS = [
   { id: 'ementa',    label: 'Ementa',    icon: AlignLeft,  hint: 'A ementa resume de forma clara e objetiva o conteúdo da proposição.' },

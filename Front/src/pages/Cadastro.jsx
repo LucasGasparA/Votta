@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../utils/api.js'
+import { api } from '../services/api.js'
 import LogoVotta from '../components/LogoVotta'
 
 export default function Cadastro() {

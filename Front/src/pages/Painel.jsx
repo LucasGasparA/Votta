@@ -4,7 +4,7 @@ import { FileText, Clock, CheckCircle, AlertTriangle, TrendingUp, X, MapPin, Dow
 import { motion } from 'framer-motion'
 import CartaoEstatistica from '../components/CartaoEstatistica'
 import ListaMinutas from '../components/ListaMinutas'
-import { api } from '../utils/api.js'
+import { api } from '../services/api.js'
 import { calcularProgresso } from '../utils/progresso.js'
 import toast from 'react-hot-toast'
 

@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
-import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
-import { requirePlan } from '../utils/planMiddleware.js';
-import { prisma } from '../utils/db.js';
-import { logAudit } from '../utils/audit.js';
+import { requireAuth, AuthRequest } from '../middleware/auth.js';
+import { requirePlan } from '../middleware/plan.js';
+import { prisma } from '../lib/db.js';
+import { logAudit } from '../services/audit.js';
 
 const router = Router();
 router.use(requireAuth);

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/Layout'
-import { api } from './utils/api.js'
+import { api } from './services/api.js'
 import { TemaProvider } from './context/TemaContext'
 
 const Login               = lazy(() => import('./pages/Login'))

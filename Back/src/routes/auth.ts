@@ -3,10 +3,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { z } from 'zod';
-import { prisma } from '../utils/db.js';
-import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
-import { sendPasswordResetEmail, sendWelcomeEmail } from '../utils/mailer.js';
-import { logAudit } from '../utils/audit.js';
+import { prisma } from '../lib/db.js';
+import { requireAuth, AuthRequest } from '../middleware/auth.js';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/mailer.js';
+import { logAudit } from '../services/audit.js';
 
 const router = Router();
 

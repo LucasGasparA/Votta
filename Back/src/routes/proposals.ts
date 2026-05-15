@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { prisma } from '../utils/db.js';
-import { requireAuth, AuthRequest } from '../utils/authMiddleware.js';
-import { logAudit } from '../utils/audit.js';
-import { getUserPlan } from '../utils/planMiddleware.js';
+import { prisma } from '../lib/db.js';
+import { requireAuth, AuthRequest } from '../middleware/auth.js';
+import { logAudit } from '../services/audit.js';
+import { getUserPlan } from '../middleware/plan.js';
 
 const router = Router();
 router.use(requireAuth);

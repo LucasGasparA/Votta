@@ -3,7 +3,7 @@ import { Download, Bell, Sun, Moon, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Alternador from '../components/Alternador.jsx'
-import { api } from '../utils/api.js'
+import { api } from '../services/api.js'
 import { useTema } from '../context/TemaContext'
 
 const DEFAULT_SETTINGS = {

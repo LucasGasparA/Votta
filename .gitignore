@@ -55,3 +55,4 @@ Front/dist/
 
 # OS
 Thumbs.db
+Back/prisma/*.db

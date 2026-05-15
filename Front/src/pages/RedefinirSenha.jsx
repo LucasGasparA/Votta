@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { api } from '../utils/api.js'
+import { api } from '../services/api.js'
 import LogoVotta from '../components/LogoVotta'
 
 export default function RedefinirSenha() {
