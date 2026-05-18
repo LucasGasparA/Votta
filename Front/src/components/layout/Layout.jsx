@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Zap, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import LogoVotta from './LogoVotta'
+import Logo from '../Logo'
 
 function getInitials(name) {
   if (!name) return '?'
@@ -78,7 +78,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             isCollapsed ? 'p-3 justify-center' : 'p-4 gap-3'
           }`}
         >
-          <LogoVotta alturaIcone={28} semTexto={isCollapsed} classeTexto="text-base font-bold" className={isCollapsed ? '' : 'flex-1 min-w-0'} />
+          <Logo size={28} className={isCollapsed ? '' : 'flex-1 min-w-0'} />
 
           {!isCollapsed && (
             <>
@@ -199,6 +199,26 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           })}
         </nav>
 
+        {/* ── Banner Plano Gratuito ── */}
+        {!isCollapsed && usuario?.plan === 'BASIC' && (
+          <div className="mx-3 mb-2 p-3 bg-oro-50 dark:bg-[#2a2510] border border-oro-200 dark:border-oro-800 rounded-xl">
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <span className="text-[11px] font-bold text-oro-800 dark:text-oro-300 uppercase tracking-wide">Plano Gratuito</span>
+              <Zap size={12} className="text-oro-500 flex-shrink-0" />
+            </div>
+            <p className="text-[11px] text-oro-700 dark:text-oro-400 leading-snug mb-2">
+              Ative o Plano Profissional e desbloqueie o Assistente Jurídico com IA.
+            </p>
+            <Link
+              to="/planos"
+              onClick={() => setSidebarOpen(false)}
+              className="block w-full text-center text-[11px] font-bold py-1.5 rounded-lg bg-rosso-500 hover:bg-rosso-600 active:scale-[0.97] text-white transition-all"
+            >
+              Ver Planos
+            </Link>
+          </div>
+        )}
+
         {/* ── Rodapé: avatar ── */}
         <div className={`border-t border-primary-100 dark:border-[#2d3158] relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
 
@@ -260,12 +280,20 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             </button>
           ) : (
             <div className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-2.5 px-2 py-2'}`}>
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                style={{ background: corAvatar }}
-                title={usuario?.name}
-              >
-                {getInitials(usuario?.name)}
+              <div className="relative flex-shrink-0">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ background: corAvatar }}
+                  title={usuario?.name}
+                >
+                  {getInitials(usuario?.name)}
+                </div>
+                {isCollapsed && usuario?.plan === 'BASIC' && (
+                  <span
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-oro-400 border-2 border-white dark:border-[#191c33] rounded-full"
+                    title="Plano Gratuito"
+                  />
+                )}
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
@@ -329,7 +357,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           >
             <Menu size={22} />
           </button>
-          <LogoVotta alturaIcone={22} classeTexto="text-sm font-bold" />
+          <Logo size={28} />
           {usuario && (
             <button
               onClick={() => setSidebarOpen(true)}

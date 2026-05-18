@@ -1,74 +1,67 @@
-PROJETO
+# CLAUDE.md — Votta (Assistente Legislativo Municipal)
+
+## PROJETO
 SaaS para elaboração de minutas legislativas municipais com assistente jurídico por LLM + RAG.
 Usuários: procuradores, vereadores, servidores de câmaras municipais — público não-técnico, exige clareza máxima.
-Stack: React 18 + Vite + React Router + Tailwind CSS + Framer Motion + Lucide React (frontend) | TypeScript + Express + PostgreSQL + Prisma + Vertex AI/Gemini (backend)
 
-COMANDOS
-docker compose up — sobe o projeto completo
-docker compose up -d — sobe em background
-docker compose down — derruba
-docker compose logs -f — acompanha logs em tempo real
+## STACK
+React 18 + Vite + React Router + Tailwind CSS + Framer Motion + Lucide React (frontend)
+TypeScript + Express + PostgreSQL + Prisma + Vertex AI/Gemini (backend)
 
-ESTRUTURA
-src/components — Layout.jsx, StatCard.jsx, ProposalList.jsx
-src/pages — Login, Dashboard, SelectMunicipality, CreateProposal, ProposalEditor, Pricing
-src/utils — api.js, exportPdf.js
-src/App.jsx — rotas
-src/index.css
+## DEPLOY — Railway
+- Frontend: serviço "frontend" no Railway (build: npm install && npm run build | start: npx serve dist)
+- Backend: serviço "backend" no Railway (build: npm install && prisma generate && npm run build | start: prisma db push && node dist/index.js)
+- Deploy automático via push na branch main (.github/workflows/deploy.yml)
+- DATABASE_URL injetada automaticamente pelo plugin PostgreSQL do Railway
+- Variáveis de ambiente ficam no painel do Railway — nunca no código
 
-CORES — use sempre estas, nunca blue-/red-/yellow-* do Tailwind
+## COMANDOS LOCAIS
+npm run dev        (frontend — raiz do projeto)
+cd server && npm run dev   (backend)
+
+## FLUXO PRINCIPAL (caminho crítico — nunca quebre isso)
+Login → SelectMunicipality → CriarMinuta (wizard 5 etapas) → EditorMinuta (gera via IA) → Revisão humana obrigatória → Exportação PDF/DOCX
+
+⚠️ NUNCA remova a revisão humana antes da exportação — é requisito jurídico do produto.
+
+## PONTO DE ENTRADA
+Ao abrir o projeto, leia nesta ordem:
+1. Este arquivo
+2. src/App.jsx — rotas e navegação
+3. A skill relevante para a tarefa (ver abaixo)
+
+## SKILLS DISPONÍVEIS
+Leia a skill correspondente ANTES de escrever qualquer código:
+
+| Tarefa | Skill |
+|--------|-------|
+| Criar ou editar qualquer componente UI | .claude/skills/ui-components.md |
+| Animações, transições, Framer Motion | .claude/skills/animations.md |
+| Fluxo de exportação PDF ou DOCX | .claude/skills/export-flow.md |
+| Cores, tipografia, espaçamento, layout | .claude/skills/design-system.md |
+
+## CORES — use sempre estas, nunca blue-/red-/yellow-* do Tailwind
 primary-600 | #2563eb | Estrutura, navegação, botões normais
 primary-900 | #1a2952 | Sidebar, cabeçalhos
-rosso-500 | #dc2626 | CTAs de conversão, urgência
-oro-500 | #f59e0b | Badges, citações normativas
+rosso-500   | #dc2626 | CTAs de conversão, urgência
+oro-500     | #f59e0b | Badges, citações normativas
 
-REGRAS DE CÓDIGO
+## REGRAS INEGOCIÁVEIS
+- Componentes funcionais com hooks — nunca class components
+- Sem console.log no código final
+- Sem dependências novas sem perguntar antes
+- Sem alert(), confirm(), prompt() — use modais React
+- Sem any no TypeScript sem justificativa no comentário
+- Sem instalar shadcn/ui, MUI, Chakra, Ant Design ou qualquer lib de componentes
 
-Componentes funcionais com hooks — nunca class components
-PascalCase para componentes e arquivos (.jsx)
-Props desestruturadas na assinatura
-Sem console.log no código final
-Sem dependências novas sem perguntar antes
-Sem alert(), confirm(), prompt() — use modais React
-Sem any no TypeScript sem justificativa no comentário
+## CONTEXTO DE NEGÓCIO
+- Comprador: gestor público de câmara municipal — decisão lenta e coletiva
+- Plano Profissional (R$297/mês) é onde a conversão acontece
+- Argumento principal: reduz retrabalho jurídico e evita devolutivas por vício formal
+- Objeção frequente: LGPD e segurança — a interface deve transmitir seriedade
 
-
-REGRAS DE UI
-
-Mobile first: estilo base para mobile, md: e lg: para expandir
-Todo button sem texto visível: obrigatório aria-label
-Inputs sempre com label via htmlFor
-Todo elemento interativo: estados default / hover / focus / active / disabled
-Loading state obrigatório em toda operação assíncrona — nunca tela em branco
-Confirmação antes de ação destrutiva (deletar, sair sem salvar)
-Mensagens de erro: o que aconteceu + o que fazer
-
-
-ANIMAÇÕES (Framer Motion)
-
-Transições de página: opacity + x, duração 0.35s
-Microinterações: whileHover, whileTap, duração 0.2s
-AnimatePresence para elementos que entram/saem do DOM
-
-
-PROIBIDO — sem exceção
-
-Instalar shadcn/ui, MUI, Chakra, Ant Design ou qualquer lib de componentes
-Remover o human-in-the-loop do fluxo de exportação — requisito jurídico do produto
-Alterar identidade visual sem perguntar
-
-
-CONTEXTO DE NEGÓCIO
-
-Comprador: gestor público de câmara municipal — decisão lenta, coletiva
-Plano Profissional (R$297/mês) é onde a conversão acontece — nunca enfraqueça visualmente este card
-Principal argumento de venda: reduz retrabalho jurídico e evita devolutivas por vício formal
-Objeções frequentes: LGPD e segurança — a interface deve transmitir seriedade
-
-
-AO RECEBER UMA TAREFA
-
-Leia os arquivos relevantes antes de escrever qualquer código
-Se ambíguo, pergunte UMA coisa antes de começar
-Se houver abordagem melhor, proponha com justificativa rápida
-Ao terminar: 3 linhas do que mudou + pendências
+## AO RECEBER UMA TAREFA
+1. Leia a skill relevante
+2. Se ambíguo, pergunte UMA coisa antes de começar
+3. Se houver abordagem melhor, proponha com justificativa rápida
+4. Ao terminar: 3 linhas do que mudou + pendências

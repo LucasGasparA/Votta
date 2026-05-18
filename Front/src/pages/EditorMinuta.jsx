@@ -219,6 +219,7 @@ const EditorMinuta = () => {
   const [carregandoVersoes, setCarregandoVersoes]       = useState(false)
   const [confirmandoVersaoId, setConfirmandoVersaoId] = useState(null)
 
+  const [exibirModalUpgrade, setExibirModalUpgrade] = useState(false)
   const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   const [exportacaoRevisada, setExportacaoRevisada]   = useState(false)
   const [exibirModalNaoSalvo, setExibirModalNaoSalvo] = useState(false)
@@ -448,6 +449,11 @@ const EditorMinuta = () => {
         setBannerIncerteza('Não encontrei referência normativa clara para este ponto. Consulte a Procuradoria antes de prosseguir.')
       }
     } catch (e) {
+      if (e.upgrade) {
+        setChatAberto(false)
+        setExibirModalUpgrade(true)
+        return
+      }
       const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toLowerCase().includes('timeout')
       setHistoricoChat(prev => [...prev, {
         role: 'error',
@@ -1275,6 +1281,66 @@ const EditorMinuta = () => {
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed
                     ${exportacaoRevisada ? 'bg-primary-800 hover:bg-primary-900 text-white' : 'bg-primary-100 text-primary-300'}`}>
                   <Download size={15} /> {formatoExportacao === 'DOCX' ? 'Gerar DOCX' : 'Gerar PDF'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal Upgrade PRO ── */}
+      <AnimatePresence>
+        {exibirModalUpgrade && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            onClick={e => e.target === e.currentTarget && setExibirModalUpgrade(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-8"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 bg-primary-100 dark:bg-[#232745] rounded-2xl flex items-center justify-center mb-3">
+                  <Scale size={24} className="text-primary-600" />
+                </div>
+                <span className="px-2.5 py-0.5 bg-oro-100 text-oro-800 text-[11px] font-bold uppercase tracking-widest rounded-full mb-3">
+                  Recurso PRO
+                </span>
+                <h2 className="text-xl font-display font-bold text-primary-900 dark:text-slate-100 mb-2">
+                  Assistente Jurídico
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-[300px]">
+                  O chat com o Assistente Jurídico está disponível no Plano Profissional. Ele cita a base normativa em tempo real e reduz devolutivas por vício formal.
+                </p>
+              </div>
+
+              <div className="mt-5 bg-primary-50 dark:bg-[#232745] border border-primary-100 dark:border-[#3d4270] rounded-xl p-4 space-y-2.5">
+                {[
+                  'Citações normativas automáticas (CF/88, LOM)',
+                  'Análise de constitucionalidade em tempo real',
+                  'Reduz retrabalho jurídico e devolutivas',
+                ].map(item => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <CheckCircle size={14} className="text-primary-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-[13px] text-primary-800 dark:text-slate-300 leading-snug">{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex flex-col gap-2.5">
+                <button
+                  onClick={() => { setExibirModalUpgrade(false); navigate('/planos') }}
+                  className="w-full py-3 rounded-xl text-[15px] font-bold bg-rosso-500 hover:bg-rosso-600 active:bg-rosso-700 text-white transition-all active:scale-[0.97]"
+                >
+                  Ver Planos
+                </button>
+                <button
+                  onClick={() => setExibirModalUpgrade(false)}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270] text-slate-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-800 dark:hover:text-slate-200 transition-all active:scale-[0.97]"
+                >
+                  Fechar
                 </button>
               </div>
             </motion.div>

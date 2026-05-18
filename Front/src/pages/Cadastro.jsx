@@ -4,7 +4,7 @@ import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
-import LogoVotta from '../components/layout/LogoVotta'
+import Logo from '../components/Logo'
 
 export default function Cadastro() {
   const navigate = useNavigate()
@@ -64,7 +64,7 @@ export default function Cadastro() {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="w-full max-w-sm"
         >
-          <LogoVotta className="justify-center mb-7" />
+          <Logo size={40} withText={true} className="justify-center mb-7" />
 
           <h1 className="text-xl font-semibold text-center mb-6 text-primary-900 dark:text-slate-100">
             Criar conta

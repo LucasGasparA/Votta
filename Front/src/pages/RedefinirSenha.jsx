@@ -4,7 +4,7 @@ import { Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
-import LogoVotta from '../components/layout/LogoVotta'
+import Logo from '../components/Logo'
 
 export default function RedefinirSenha() {
   const [searchParams]                       = useSearchParams()
@@ -67,7 +67,7 @@ export default function RedefinirSenha() {
         transition={{ duration: 0.45, ease: 'easeOut' }}
         className="w-full max-w-sm"
       >
-        <LogoVotta className="justify-center mb-7" />
+        <Logo size={40} withText={true} className="justify-center mb-7" />
 
         {concluido ? (
           /* Sucesso */
