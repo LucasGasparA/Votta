@@ -49,6 +49,7 @@ Back/src/generated/
 # Local RAG vector database
 chroma_db/
 Back/chroma_db/
+Back/chroma_seed/
 
 # Python cache
 __pycache__/
