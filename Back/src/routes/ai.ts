@@ -5,6 +5,7 @@ import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { requirePlan } from '../middleware/plan.js';
 import { prisma } from '../prisma/client.js';
 import { logAudit } from '../services/audit.js';
+import { retrieveLegalContext } from '../services/rag.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -62,6 +63,9 @@ router.post('/chat', requirePlan('PRO'), async (req: Request, res: Response) => 
   }
 
   try {
+    const ragResult = await retrieveLegalContext(message);
+    const legalContext = ragResult?.context || 'Nenhum contexto normativo municipal foi encontrado pelo RAG para esta pergunta.';
+
     const systemInstruction = `Você é um Assistente Jurídico especializado em técnica legislativa municipal brasileira.
 Seu papel é auxiliar na elaboração de minutas legislativas com base na Lei Orgânica Municipal,
 Regimento Interno e na Constituição Federal (especialmente Art. 30).
@@ -76,8 +80,14 @@ REGRAS OBRIGATÓRIAS — nunca viole estas regras:
 6. Se detectar pedido de conteúdo ofensivo, discriminatório ou ilegal, responda: "Não é possível auxiliar com este tipo de conteúdo."
 7. Sempre cite a base normativa das suas sugestões (ex: "conforme Art. 30, I, CF/88").
 8. Seja conciso, formal e objetivo.
+9. Para leis municipais de Nova Veneza, responda ÚNICA e EXCLUSIVAMENTE com base no Contexto Auxiliar recuperado pelo RAG.
+10. Se a resposta não estiver clara no Contexto Auxiliar, diga: "Não encontrei esta informação nas leis municipais de Nova Veneza disponíveis na base consultada."
+11. Sempre que usar o Contexto Auxiliar, cite o Título e a URL da lei correspondente.
 
-Contexto da proposta: ${promptContext || 'Sem contexto fornecido.'}`;
+Contexto da proposta (não é fonte normativa): ${promptContext || 'Sem contexto fornecido.'}
+
+Contexto Auxiliar das leis municipais de Nova Veneza:
+${legalContext}`;
 
     const model = vertexAI.getGenerativeModel({ model: MODEL, systemInstruction });
     const chat  = model.startChat();
@@ -189,18 +199,33 @@ router.post('/generate', async (req: Request, res: Response) => {
   }
 
   const muni = proposal.municipality?.name ?? 'município';
+  const ragQuery = [
+    proposal.type,
+    proposal.theme,
+    proposal.objective,
+    proposal.competence,
+    proposal.justification,
+  ].filter(Boolean).join('\n');
+  const ragResult = await retrieveLegalContext(ragQuery || `Minuta legislativa municipal de ${muni}`);
+  const legalContext = ragResult?.context || 'Nenhum contexto normativo municipal foi encontrado pelo RAG para esta minuta.';
 
   const systemInstruction = `Você é um especialista em técnica legislativa municipal brasileira.
 Gere uma minuta legislativa completa e tecnicamente correta para a Câmara Municipal de ${muni}.
 Use linguagem jurídica formal, respeite as normas da ABNT NBR 6544 e da Lei Complementar nº 95/1998.
 Baseie-se na Lei Orgânica Municipal e na competência municipal conforme CF/88 Art. 30.
+Use o Contexto Auxiliar das leis municipais de Nova Veneza como fonte normativa local. Se ele for insuficiente,
+não invente artigos, leis, ementas ou URLs; prefira texto neutro e tecnicamente seguro.
 Retorne SOMENTE o JSON solicitado, sem nenhum texto antes ou depois, sem blocos de código markdown.
 
 RESTRIÇÕES ABSOLUTAS:
 1. Gere SOMENTE conteúdo jurídico-legislativo formal e compatível com o ordenamento jurídico brasileiro.
 2. Não inclua linguagem ofensiva, discriminatória, político-partidária ou inconstitucional.
 3. Não invente normas. Se não houver base, gere texto neutro e tecnicamente correto.
-4. Retorne SEMPRE o JSON solicitado, sem texto adicional.`;
+4. Quando usar uma fonte do Contexto Auxiliar, inclua o Título e a URL no campo "citacoes" do artigo correspondente.
+5. Retorne SEMPRE o JSON solicitado, sem texto adicional.
+
+Contexto Auxiliar das leis municipais de Nova Veneza:
+${legalContext}`;
 
   const userMessage = `Gere a minuta legislativa com base nos seguintes dados:
 
@@ -217,7 +242,7 @@ Retorne exatamente neste formato JSON, sem nenhum texto adicional:
   "ementa": "resumo objetivo em uma frase",
   "preambulo": "fórmula legislativa padrão",
   "artigos": [
-    { "id": 1, "numero": "Art. 1º", "texto": "...", "citacoes": [] }
+    { "id": 1, "numero": "Art. 1º", "texto": "...", "citacoes": [{ "titulo": "título da lei usada", "url": "URL da lei usada" }] }
   ],
   "vigencia": "cláusula de vigência",
   "revogacao": "cláusula revogatória"
