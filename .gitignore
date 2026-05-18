@@ -46,6 +46,14 @@ lerna-debug.log*
 # Prisma generated client
 Back/src/generated/
 
+# Local RAG vector database
+chroma_db/
+Back/chroma_db/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
 # Compiled output
 Back/dist/
 Front/dist/
