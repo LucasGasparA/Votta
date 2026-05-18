@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-set -eu
 
 TARGET_DIR="${CHROMA_DIR:-/app/chroma_db}"
 SEED_DIR="${CHROMA_SEED_DIR:-/app/chroma_seed}"
