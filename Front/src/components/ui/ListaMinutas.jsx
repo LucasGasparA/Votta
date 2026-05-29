@@ -59,55 +59,44 @@ const ListaMinutas = ({ proposals, onDelete }) => {
             </Link>
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="divide-y divide-slate-100 dark:divide-[#2d3158]">
             {proposals.map((proposal) => {
               const cfg = obterStatus(proposal.status)
               const StatusIcon = cfg.Icon
               return (
                 <div
                   key={proposal.id}
-                  className={`relative border-l-4 ${cfg.border} bg-white dark:bg-[#1c1f38] rounded-xl
-                    hover:bg-primary-50/50 dark:hover:bg-[#232745] transition-colors duration-150 group`}
+                  className="relative group"
                 >
                   <Link
                     to={`/minuta/${proposal.id}/editar`}
-                    className="block p-4"
+                    className="flex items-center justify-between py-3.5 px-1 hover:bg-slate-50 dark:hover:bg-[#232745] rounded-lg transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 min-w-0 pr-3">
-                        <h3 className="font-semibold text-primary-900 dark:text-slate-100 text-[15px] mb-0.5 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                          {proposal.title}
-                        </h3>
-                        <p className="text-xs text-primary-400 dark:text-slate-500 truncate">{proposal.type}</p>
-                      </div>
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${cfg.color}`}>
-                        <StatusIcon size={11} strokeWidth={2.5} />
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate group-hover:text-primary-600 transition-colors">
+                        {proposal.title}
+                      </p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{proposal.type}</p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${cfg.color}`}>
+                        <StatusIcon size={10} strokeWidth={2.5} />
                         {cfg.label}
                       </span>
+                      <span className="text-xs text-slate-300 dark:text-slate-600">{proposal.lastUpdate}</span>
                     </div>
-
-                    <div className="w-full bg-primary-100 dark:bg-[#2d3158] rounded-full h-1.5 mb-1.5">
-                      <div
-                        className={`${cfg.bar} h-1.5 rounded-full transition-all duration-700`}
-                        style={{ width: `${proposal.progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-primary-400 dark:text-slate-500">Atualizado {proposal.lastUpdate}</p>
                   </Link>
-
                   <button
                     onClick={e => {
                       e.preventDefault()
                       setAlvoExclusao({ id: proposal.id, title: proposal.title })
                     }}
                     aria-label={`Excluir proposição: ${proposal.title}`}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg text-primary-300
+                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-300
                       hover:text-rosso-500 hover:bg-rosso-50
-                      focus-visible:text-rosso-500 focus-visible:bg-rosso-50 focus-visible:opacity-100
-                      opacity-0 group-hover:opacity-100
-                      transition-all duration-150"
+                      opacity-0 group-hover:opacity-100 transition-all duration-150"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                   </button>
                 </div>
               )

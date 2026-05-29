@@ -119,44 +119,21 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
         </div>
 
         {/* ── Município ativo ── */}
-        {isCollapsed ? (
-          <div className="px-2 pt-3">
+        {!isCollapsed && municipioSelecionado && (
+          <div className="px-5 pt-4">
             <Link
               to="/selecionar-municipio"
               onClick={() => setSidebarOpen(false)}
-              title={municipioSelecionado
-                ? `${municipioSelecionado.nome} — ${municipioSelecionado.uf}`
-                : 'Selecionar município'}
-              className="p-2 bg-primary-50 rounded-xl border border-primary-200 flex justify-center hover:bg-primary-100 transition-colors"
+              className="flex items-center gap-2 text-xs text-slate-400 hover:text-primary-600 transition-colors"
             >
-              <MapPin size={15} className={municipioSelecionado ? 'text-primary-600' : 'text-primary-400'} />
-            </Link>
-          </div>
-        ) : (
-          <div className="px-4 pt-3">
-            <Link
-              to="/selecionar-municipio"
-              onClick={() => setSidebarOpen(false)}
-              className="block p-3 bg-primary-50 dark:bg-[#232745] rounded-xl border border-primary-200 dark:border-[#3d4270] hover:bg-primary-100 dark:hover:bg-[#2d3158] transition-colors"
-            >
-              <p className="text-[11px] text-primary-500 dark:text-slate-500 font-medium mb-0.5">Município ativo</p>
-              {municipioSelecionado ? (
-                <>
-                  <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 leading-tight">
-                    <span className="text-emerald-500 mr-1">●</span>
-                    {municipioSelecionado.nome}
-                  </p>
-                  <p className="text-xs text-primary-400 dark:text-slate-500">{municipioSelecionado.uf}</p>
-                </>
-              ) : (
-                <p className="text-sm text-primary-400 dark:text-slate-500 italic">Nenhum município selecionado</p>
-              )}
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+              {municipioSelecionado.nome}, {municipioSelecionado.uf}
             </Link>
           </div>
         )}
 
         {/* ── Navegação ── */}
-        <nav className="flex-1 overflow-y-auto min-h-0 p-2 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto min-h-0 px-3 pt-4 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = location.pathname === item.path
@@ -167,20 +144,23 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                 onClick={() => setSidebarOpen(false)}
                 title={isCollapsed ? item.label : undefined}
                 className={`
-                  relative flex items-center rounded-xl transition-all duration-200 text-sm font-medium
+                  relative flex items-center transition-all duration-150 text-sm
                   ${isCollapsed
-                    ? `justify-center p-3 ${isActive
-                        ? 'bg-primary-50 dark:bg-[#232745] text-primary-700 dark:text-slate-200'
-                        : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'
+                    ? `justify-center p-3 rounded-lg ${isActive
+                        ? 'text-primary-600'
+                        : 'text-slate-400 hover:text-slate-700'
                       }`
-                    : `gap-3 px-3 py-2.5 ${isActive
-                        ? 'bg-primary-50 dark:bg-[#232745] text-primary-700 dark:text-slate-200'
-                        : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'
+                    : `gap-3 pl-3 pr-3 py-2 rounded-lg ${isActive
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                       }`
                   }
                 `}
               >
-                <Icon size={17} className={isActive ? 'text-primary-600' : ''} />
+                {!isCollapsed && isActive && (
+                  <span className="absolute left-3 w-0.5 h-5 bg-primary-500 rounded-full" />
+                )}
+                <Icon size={16} className="flex-shrink-0" />
                 {!isCollapsed && <span>{item.label}</span>}
               </Link>
             )
@@ -193,7 +173,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-primary-50 dark:bg-[#141624] print:block print:bg-white">
+    <div className="h-screen flex overflow-hidden bg-white dark:bg-[#141624] print:block print:bg-white">
 
       {/* Sidebar desktop */}
       <aside
