@@ -24,7 +24,7 @@ export default function EsqueciSenha() {
     }
   }
 
-  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-[#e8e8e8] bg-[#fafafa] text-[#111] dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-[#b83b3d] focus:bg-white focus:shadow-[0_0_0_3px_rgba(184,59,61,0.08)] dark:focus:bg-[#232745]'
+  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-[#232745]'
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col items-center justify-center px-6 pb-16">
@@ -58,7 +58,7 @@ export default function EsqueciSenha() {
             </p>
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors"
+              className="flex items-center justify-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
             >
               <ArrowLeft size={14} />
               Voltar ao login
@@ -87,8 +87,7 @@ export default function EsqueciSenha() {
               <button
                 type="submit"
                 disabled={carregando}
-                className="w-full py-3.5 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: '#b83b3d', color: '#fff', marginTop: '4px' }}
+                className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary-500 hover:bg-primary-600 text-white"
               >
                 {carregando ? (
                   <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto"
@@ -100,7 +99,7 @@ export default function EsqueciSenha() {
             <div className="text-center mt-5">
               <Link
                 to="/login"
-                className="flex items-center justify-center gap-2 text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors"
+                className="flex items-center justify-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
               >
                 <ArrowLeft size={14} />
                 Voltar ao login

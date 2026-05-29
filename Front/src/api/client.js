@@ -38,8 +38,7 @@ async function request(path, options = {}) {
     const serverMsg = data?.error;
     const fallback  = STATUS_MESSAGES[res.status] || `Erro inesperado (código ${res.status}).`;
     const err = new Error(serverMsg || fallback);
-    if (data?.upgrade) err.upgrade = true;
-    throw err;
+throw err;
   }
 
   return data;

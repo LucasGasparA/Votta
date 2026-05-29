@@ -42,11 +42,11 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="card p-6 mb-6 border-2 border-primary-500 bg-gradient-to-br from-primary-50 dark:from-[#232745] to-white dark:to-[#1c1f38]"
+          className="card p-6 mb-6 border-2 border-primary-200 bg-primary-50 dark:bg-[#232745]"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-              <Check className="text-white" size={20} />
+            <div className="w-10 h-10 bg-primary-100 dark:bg-[#2d3158] rounded-lg flex items-center justify-center">
+              <Check className="text-primary-500" size={20} />
             </div>
             <div>
               <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Município Atual</p>
@@ -72,8 +72,8 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${isSelected ? 'bg-primary-600' : 'bg-primary-100 dark:bg-[#232745]'}`}>
-              <MapPin className={isSelected ? 'text-white' : 'text-primary-600'} size={24} />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-[#232745]">
+              <MapPin className="text-primary-500" size={24} />
             </div>
             <div>
               <h3 className="text-lg font-display font-bold text-primary-900 dark:text-slate-100">Nova Veneza</h3>
@@ -81,8 +81,8 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
             </div>
           </div>
           {isSelected && (
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <Check className="text-white" size={16} />
+            <div className="w-8 h-8 bg-primary-100 dark:bg-[#2d3158] rounded-full flex items-center justify-center flex-shrink-0">
+              <Check className="text-primary-500" size={16} />
             </div>
           )}
         </div>

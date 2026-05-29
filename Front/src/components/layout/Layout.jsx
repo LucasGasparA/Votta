@@ -10,7 +10,7 @@ function getInitials(name) {
 }
 
 const AVATAR_COLORS = [
-  '#2563eb', '#7c3aed', '#059669', '#d97706', '#dc2626', '#0891b2', '#ea580c',
+  '#3D7BCC', '#7c3aed', '#059669', '#d97706', '#dc2626', '#0891b2', '#ea580c',
 ]
 
 function nameToColor(name) {
@@ -181,131 +181,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                 `}
               >
                 <Icon size={17} className={isActive ? 'text-primary-600' : ''} />
-                {!isCollapsed && (
-                  <>
-                    <span>{item.label}</span>
-                    {item.path === '/planos' && (
-                      <span className="ml-auto text-[10px] font-bold bg-oro-100 text-oro-700 px-1.5 py-0.5 rounded-full">
-                        PRO
-                      </span>
-                    )}
-                  </>
-                )}
-                {isCollapsed && item.path === '/planos' && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-oro-400 rounded-full" />
-                )}
+                {!isCollapsed && <span>{item.label}</span>}
               </Link>
             )
           })}
         </nav>
 
-        {/* ── Banner Plano Gratuito ── */}
-        {!isCollapsed && usuario?.plan === 'BASIC' && (
-          <div className="mx-3 mb-2 p-3 bg-oro-50 dark:bg-[#2a2510] border border-oro-200 dark:border-oro-800 rounded-xl">
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <span className="text-[11px] font-bold text-oro-800 dark:text-oro-300 uppercase tracking-wide">Plano Gratuito</span>
-              <Zap size={12} className="text-oro-500 flex-shrink-0" />
-            </div>
-            <p className="text-[11px] text-oro-700 dark:text-oro-400 leading-snug mb-2">
-              Ative o Plano Profissional e desbloqueie o Assistente Jurídico com IA.
-            </p>
-            <Link
-              to="/planos"
-              onClick={() => setSidebarOpen(false)}
-              className="block w-full text-center text-[11px] font-bold py-1.5 rounded-lg bg-rosso-500 hover:bg-rosso-600 active:scale-[0.97] text-white transition-all"
-            >
-              Ver Planos
-            </Link>
-          </div>
-        )}
 
-        {/* ── Rodapé: avatar ── */}
-        <div className={`border-t border-primary-100 dark:border-[#2d3158] relative flex-shrink-0 ${isCollapsed ? 'p-2' : 'p-3'}`}>
-
-          {/* Dropdown — apenas no mobile */}
-          {mobile && (
-            <AnimatePresence>
-              {showUserMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 6 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-[#1c1f38] rounded-xl shadow-lg border border-primary-100 dark:border-[#2d3158] py-1 z-50"
-                >
-                  <Link
-                    to="/configuracoes"
-                    onClick={() => { setShowUserMenu(false); setSidebarOpen(false) }}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] cursor-pointer transition-colors w-full text-left"
-                  >
-                    <Settings size={15} />
-                    Configurações
-                  </Link>
-                  <div className="border-t border-primary-100 dark:border-[#2d3158] my-1" />
-                  <button
-                    onClick={aoSolicitarLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
-                  >
-                    <LogOut size={15} />
-                    Sair
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
-
-          {mobile ? (
-            <button
-              onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all hover:bg-primary-100 dark:hover:bg-[#232745] hover:ring-1 hover:ring-primary-200 dark:hover:ring-[#3d4270]"
-              aria-label="Menu do usuário"
-              title="Configurações e sair"
-            >
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                style={{ background: corAvatar }}
-              >
-                {getInitials(usuario?.name)}
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-semibold text-primary-800 dark:text-slate-100 truncate leading-tight">{usuario?.name || '—'}</p>
-                <p className="text-[10px] text-primary-400 dark:text-slate-500 truncate leading-tight mt-0.5">
-                  {municipioSelecionado?.nome || usuario?.email || ''}
-                </p>
-              </div>
-              <ChevronDown
-                size={14}
-                className={`text-primary-500 dark:text-slate-500 flex-shrink-0 transition-transform duration-150 ${showUserMenu ? 'rotate-180' : ''}`}
-              />
-            </button>
-          ) : (
-            <div className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-2.5 px-2 py-2'}`}>
-              <div className="relative flex-shrink-0">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: corAvatar }}
-                  title={usuario?.name}
-                >
-                  {getInitials(usuario?.name)}
-                </div>
-                {isCollapsed && usuario?.plan === 'BASIC' && (
-                  <span
-                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-oro-400 border-2 border-white dark:border-[#191c33] rounded-full"
-                    title="Plano Gratuito"
-                  />
-                )}
-              </div>
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-primary-800 dark:text-slate-100 truncate leading-tight">{usuario?.name || '—'}</p>
-                  <p className="text-[10px] text-primary-400 dark:text-slate-500 truncate leading-tight mt-0.5">
-                    {municipioSelecionado?.nome || usuario?.email || ''}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </>
     )
   }

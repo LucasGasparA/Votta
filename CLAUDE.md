@@ -38,13 +38,16 @@ Leia a skill correspondente ANTES de escrever qualquer código:
 | Criar ou editar qualquer componente UI | .claude/skills/ui-components.md |
 | Animações, transições, Framer Motion | .claude/skills/animations.md |
 | Fluxo de exportação PDF ou DOCX | .claude/skills/export-flow.md |
-| Cores, tipografia, espaçamento, layout | .claude/skills/design-system.md |
+| Espaçamento, layout e estrutura | .claude/skills/design-system.md |
+| **Estética, cores, tipografia, visual geral** | **frontend-design (skill global)** |
 
-## CORES — use sempre estas, nunca blue-/red-/yellow-* do Tailwind
-primary-600 | #2563eb | Estrutura, navegação, botões normais
-primary-900 | #1a2952 | Sidebar, cabeçalhos
-rosso-500   | #dc2626 | CTAs de conversão, urgência
-oro-500     | #f59e0b | Badges, citações normativas
+## ESTÉTICA VISUAL
+A skill `frontend-design` é a autoridade em decisões visuais. Antes de criar ou redesenhar qualquer tela, siga o processo dela: defina direção estética, tipografia distinta, paleta coesa com acento forte, composição espacial intencional.
+
+Contexto do produto que deve guiar a direção estética:
+- Público jurídico-público (procuradores, vereadores) — seriedade sem rigidez
+- Produto SaaS moderno — não governo, não corporativo genérico
+- Transmite: confiança, precisão, clareza — evita: pesado, antiquado, sobrecarregado
 
 ## REGRAS INEGOCIÁVEIS
 - Componentes funcionais com hooks — nunca class components

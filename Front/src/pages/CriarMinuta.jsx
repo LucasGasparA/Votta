@@ -14,6 +14,32 @@ const LOADING_STEPS = [
   { icon: '✅', text: 'Finalizando a minuta...' },
 ]
 
+const STORAGE_KEY = 'votta:wizard'
+
+const DADOS_INICIAIS = { type: '', theme: '', objective: '', competence: '', hasFinancialImpact: null, estimatedImpact: '', justification: '' }
+
+function lerWizardSalvo() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+const COMPETENCE_OPTIONS = [
+  {
+    value: 'Sim, exclusiva',
+    tooltip: 'O município tem competência própria para legislar sobre este assunto, sem depender de normas federais ou estaduais (ex: transporte local, limpeza urbana, iluminação pública).',
+  },
+  {
+    value: 'Sim, concorrente',
+    tooltip: 'O município compartilha a competência com Estado e União. A lei municipal deve respeitar as normas gerais federais (ex: saúde, educação, meio ambiente, habitação).',
+  },
+  {
+    value: 'Não tenho certeza',
+    tooltip: 'Selecione esta opção se tiver dúvida. O assistente jurídico consultará a Lei Orgânica do Município e a CF/88 para verificar a competência automaticamente.',
+  },
+]
+
 const CriarMinuta = () => {
   const navigate = useNavigate()
   const { municipioSelecionado } = useOutletContext() ?? {}
@@ -24,21 +50,16 @@ const CriarMinuta = () => {
       navigate('/selecionar-municipio')
     }
   }, [municipioSelecionado, navigate])
-  const [etapaAtual, setEtapaAtual]           = useState(0)
+
+  const wizardSalvo = lerWizardSalvo()
+  const [etapaAtual, setEtapaAtual]           = useState(wizardSalvo?.etapa ?? 0)
   const [direcao, setDirecao]                 = useState(1)
   const [enviando, setEnviando]               = useState(false)
   const [tentouProximo, setTentouProximo]     = useState(false)
   const [gerando, setGerando]                 = useState(false)
   const [etapaGeracao, setEtapaGeracao]       = useState(0)
-  const [dadosFormulario, setDadosFormulario] = useState({
-    type: '',
-    theme: '',
-    objective: '',
-    competence: '',
-    hasFinancialImpact: null,
-    estimatedImpact: '',
-    justification: '',
-  })
+  const [exibirModalCancelar, setExibirModalCancelar] = useState(false)
+  const [dadosFormulario, setDadosFormulario] = useState(wizardSalvo?.dados ?? DADOS_INICIAIS)
 
   const proposalTypes = [
     { value: 'pl_ordinaria',    label: 'Projeto de Lei Ordinária',    description: 'Lei municipal de competência do município (maioria simples)',     icon: '📜' },
@@ -48,11 +69,10 @@ const CriarMinuta = () => {
   ]
 
   const steps = [
-    { id: 0, title: 'Tipo de Proposição',   description: 'Escolha o tipo de documento legislativo' },
-    { id: 1, title: 'Tema e Objetivo',      description: 'Defina o assunto e objetivo' },
-    { id: 2, title: 'Competência',          description: 'Verifique competência municipal' },
-    { id: 3, title: 'Impacto Orçamentário', description: 'Avalie impactos financeiros' },
-    { id: 4, title: 'Justificativa',        description: 'Fundamente a proposição' },
+    { id: 0, title: 'Tipo de Proposição',        description: 'Escolha o tipo de documento legislativo' },
+    { id: 1, title: 'Tema e Objetivo',           description: 'Defina o assunto e objetivo' },
+    { id: 2, title: 'Competência e Impacto',     description: 'Competência municipal e impacto orçamentário' },
+    { id: 3, title: 'Justificativa',             description: 'Fundamente a proposição' },
   ]
 
   const atualizar = (key, value) => setDadosFormulario(prev => ({ ...prev, [key]: value }))
@@ -74,9 +94,8 @@ const CriarMinuta = () => {
     switch (etapaAtual) {
       case 0: return dadosFormulario.type !== ''
       case 1: return dadosFormulario.theme.trim() !== '' && dadosFormulario.objective.trim() !== ''
-      case 2: return dadosFormulario.competence !== ''
-      case 3: return dadosFormulario.hasFinancialImpact !== null
-      case 4: return dadosFormulario.justification.length >= 50
+      case 2: return dadosFormulario.competence !== '' && dadosFormulario.hasFinancialImpact !== null
+      case 3: return dadosFormulario.justification.length >= 50
       default: return false
     }
   }
@@ -89,9 +108,11 @@ const CriarMinuta = () => {
         if (!dadosFormulario.theme.trim())     return 'Preencha o tema da proposição.'
         if (!dadosFormulario.objective.trim()) return 'Preencha o objetivo principal.'
         return null
-      case 2: return 'Selecione a competência municipal.'
-      case 3: return 'Informe se esta proposição tem impacto orçamentário.'
-      case 4: return `A justificativa precisa ter pelo menos 50 caracteres. (${dadosFormulario.justification.length}/50)`
+      case 2:
+        if (!dadosFormulario.competence)                    return 'Selecione a competência municipal.'
+        if (dadosFormulario.hasFinancialImpact === null)    return 'Informe se esta proposição tem impacto orçamentário.'
+        return null
+      case 3: return `A justificativa precisa ter pelo menos 50 caracteres. (${dadosFormulario.justification.length}/50)`
       default: return null
     }
   }
@@ -119,6 +140,7 @@ const CriarMinuta = () => {
 
       await new Promise(r => setTimeout(r, 800))
 
+      try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* noop */ }
       toast.success('Minuta gerada com sucesso!')
       navigate(`/minuta/${data.id}/editar`)
     } catch (e) {
@@ -130,6 +152,10 @@ const CriarMinuta = () => {
     }
   }
 
+  useEffect(() => {
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ dados: dadosFormulario, etapa: etapaAtual })) } catch { /* noop */ }
+  }, [dadosFormulario, etapaAtual])
+
   const tamanhoJustificativa      = dadosFormulario.justification.length
   const percentualProgresso  = (etapaAtual / (steps.length - 1)) * 100
   const motivoBloqueio  = tentouProximo ? obterMotivoBloqueio() : null
@@ -138,7 +164,7 @@ const CriarMinuta = () => {
     const step = LOADING_STEPS[etapaGeracao]
     const pct  = Math.round(((etapaGeracao + 1) / LOADING_STEPS.length) * 100)
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 flex flex-col items-center justify-center p-6 z-50">
+      <div className="fixed inset-0 bg-primary-50 dark:bg-[#141624] flex flex-col items-center justify-center p-6 z-50">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
 
           {/* Ícone animado */}
@@ -206,7 +232,7 @@ const CriarMinuta = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-primary-50 via-white to-oro-50 dark:from-[#141624] dark:via-[#141624] dark:to-[#141624] p-4 md:p-6">
+    <div className="bg-white dark:bg-[#141624] p-4 md:p-6">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
@@ -218,10 +244,19 @@ const CriarMinuta = () => {
             </h1>
             <p className="text-primary-500 dark:text-slate-400 text-sm">Wizard guiado com assistência jurídica inteligente</p>
           </div>
-          <Link to="/painel" className="flex items-center gap-1.5 text-sm text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 transition-colors mt-1">
+          <button
+            onClick={() => {
+              const sujo = dadosFormulario.type !== '' || dadosFormulario.theme !== '' ||
+                dadosFormulario.objective !== '' || dadosFormulario.competence !== '' ||
+                dadosFormulario.hasFinancialImpact !== null || dadosFormulario.justification !== ''
+              if (sujo) setExibirModalCancelar(true)
+              else navigate('/painel')
+            }}
+            className="flex items-center gap-1.5 text-sm text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 transition-colors mt-1"
+          >
             <X size={16} />
             Cancelar
-          </Link>
+          </button>
         </motion.div>
 
         {/* Progress Card */}
@@ -361,75 +396,85 @@ const CriarMinuta = () => {
               </div>
             )}
 
-            {/* Passo 2 */}
+            {/* Passo 2 — Competência + Impacto (unificado) */}
             {etapaAtual === 2 && (
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-2">A matéria é de competência municipal?</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {['Sim, exclusiva', 'Sim, concorrente', 'Não tenho certeza'].map(option => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => atualizar('competence', option)}
-                      className={`flex items-center justify-between text-left p-4 border-2 rounded-xl transition-all duration-200
-                        ${dadosFormulario.competence === option
-                          ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                          : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
-                        }`}
-                    >
-                      <span className="font-medium text-primary-800 dark:text-slate-200 text-sm">{option}</span>
-                      {dadosFormulario.competence === option && <Check size={16} className="text-primary-600" />}
-                    </button>
-                  ))}
-                </div>
-                {dadosFormulario.competence === 'Não tenho certeza' && (
-                  <div className="flex items-start gap-3 p-4 bg-oro-50 border border-oro-200 rounded-xl">
-                    <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={18} />
-                    <p className="text-sm text-oro-800">O assistente jurídico consultará a Lei Orgânica do Município para verificar a competência.</p>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <label className="text-sm font-medium text-primary-700 dark:text-slate-300">A matéria é de competência municipal?</label>
                   </div>
-                )}
+                  <div className="grid grid-cols-1 gap-2">
+                    {COMPETENCE_OPTIONS.map(({ value, tooltip }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => atualizar('competence', value)}
+                        className={`flex items-center justify-between text-left p-4 border-2 rounded-xl transition-all duration-200
+                          ${dadosFormulario.competence === value
+                            ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                            : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
+                          }`}
+                      >
+                        <span className="font-medium text-primary-800 dark:text-slate-200 text-sm">{value}</span>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {dadosFormulario.competence === value && <Check size={15} className="text-primary-600" />}
+                          <div className="relative group">
+                            <Info size={14} className="text-primary-300 hover:text-primary-500 cursor-help transition-colors" onClick={e => e.stopPropagation()} />
+                            <div className="absolute right-0 bottom-full mb-2 w-64 bg-primary-900 dark:bg-[#0f254a] text-white text-xs rounded-xl px-3 py-2.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-20 leading-relaxed">
+                              {tooltip}
+                              <div className="absolute right-1.5 top-full border-4 border-transparent border-t-primary-900 dark:border-t-[#0f254a]" />
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {dadosFormulario.competence === 'Não tenho certeza' && (
+                    <div className="flex items-start gap-3 p-3 mt-2 bg-oro-50 border border-oro-200 rounded-xl">
+                      <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={16} />
+                      <p className="text-xs text-oro-800">O assistente jurídico verificará a competência automaticamente.</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-primary-100 dark:border-[#2d3158] pt-5">
+                  <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-3">Esta proposição tem impacto orçamentário?</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => atualizar('hasFinancialImpact', value)}
+                        className={`text-left p-4 border-2 rounded-xl transition-all duration-200
+                          ${dadosFormulario.hasFinancialImpact === value
+                            ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
+                            : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
+                          }`}
+                      >
+                        <p className="font-semibold text-primary-800 dark:text-slate-100 text-sm mb-0.5">{label}</p>
+                        <p className="text-xs text-primary-500 dark:text-slate-400">{desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                  {dadosFormulario.hasFinancialImpact && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Estimativa de Impacto (R$)</label>
+                      <input
+                        type="text"
+                        value={dadosFormulario.estimatedImpact}
+                        onChange={e => atualizar('estimatedImpact', e.target.value)}
+                        className="input-field"
+                        placeholder="Ex: 150.000,00"
+                      />
+                      <p className="text-xs text-primary-400 dark:text-slate-500 mt-1">Será necessário anexar estimativa de impacto orçamentário-financeiro</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-            {/* Passo 3 */}
+            {/* Passo 3 — Justificativa */}
             {etapaAtual === 3 && (
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-2">Esta proposição tem impacto orçamentário?</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => atualizar('hasFinancialImpact', value)}
-                      className={`text-left p-5 border-2 rounded-xl transition-all duration-200
-                        ${dadosFormulario.hasFinancialImpact === value
-                          ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                          : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
-                        }`}
-                    >
-                      <h3 className="font-display font-bold text-primary-800 dark:text-slate-100 mb-1">{label}</h3>
-                      <p className="text-xs text-primary-500 dark:text-slate-400">{desc}</p>
-                    </button>
-                  ))}
-                </div>
-                {dadosFormulario.hasFinancialImpact && (
-                  <div>
-                    <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Estimativa de Impacto (R$)</label>
-                    <input
-                      type="text"
-                      value={dadosFormulario.estimatedImpact}
-                      onChange={e => atualizar('estimatedImpact', e.target.value)}
-                      className="input-field"
-                      placeholder="Ex: 150.000,00"
-                    />
-                    <p className="text-xs text-primary-400 dark:text-slate-500 mt-1">Necessário anexar estimativa de impacto orçamentário-financeiro</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Passo 4 */}
-            {etapaAtual === 4 && (
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
@@ -504,7 +549,7 @@ const CriarMinuta = () => {
               disabled={enviando}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all
                 ${podeAvancar() && !enviando
-                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-lg'
+                  ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm'
                   : 'bg-primary-100 dark:bg-[#232745] text-primary-300 dark:text-slate-600 cursor-not-allowed'
                 }`}
             >
@@ -514,6 +559,50 @@ const CriarMinuta = () => {
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {exibirModalCancelar && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 16 }}
+              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            >
+              <div className="w-12 h-12 bg-oro-50 dark:bg-oro-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={22} className="text-oro-500" />
+              </div>
+              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
+                Cancelar preenchimento?
+              </h2>
+              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">
+                Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setExibirModalCancelar(false)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                >
+                  Continuar
+                </button>
+                <button
+                  onClick={() => navigate('/painel')}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
+                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                >
+                  Sim, cancelar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

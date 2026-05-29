@@ -29,10 +29,10 @@ function construirEstatisticas(proposals) {
   const rate       = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return [
-    { label: 'Em Andamento',      value: String(inProgress), icon: Clock,         color: 'bg-primary-500',  trend: `${total} total` },
-    { label: 'Concluídas',        value: String(completed),  icon: CheckCircle,   color: 'bg-primary-700',  trend: 'aprovadas' },
-    { label: 'Pendentes Revisão', value: String(pending),    icon: AlertTriangle, color: 'bg-oro-500',      trend: pending > 0 ? 'Requer atenção' : 'Tudo em dia' },
-    { label: 'Taxa de Aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'bg-primary-600',  trend: `${total} proposições` },
+    { label: 'Em Andamento',      value: String(inProgress), icon: Clock,         color: 'text-primary-500', trend: `${total} total` },
+    { label: 'Concluídas',        value: String(completed),  icon: CheckCircle,   color: 'text-primary-600', trend: 'aprovadas' },
+    { label: 'Pendentes Revisão', value: String(pending),    icon: AlertTriangle, color: 'text-oro-500',     trend: pending > 0 ? 'Requer atenção' : 'Tudo em dia' },
+    { label: 'Taxa de Aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'text-primary-500', trend: `${total} proposições` },
   ]
 }
 
@@ -76,7 +76,7 @@ const Painel = () => {
   const aoExcluir = async (proposalId) => {
     try {
       await api.del('/proposals/' + proposalId)
-      setProposals(prev => prev.filter(p => p.id !== proposalId))
+      setProposicoes(prev => prev.filter(p => p.id !== proposalId))
       setTotal(t => t - 1)
       toast.success('Proposição excluída.')
     } catch (e) {
@@ -219,12 +219,12 @@ const Painel = () => {
               <div className="space-y-2">
                 <Link
                   to="/criar-minuta"
-                  className="flex items-center gap-3 p-3 rounded-xl bg-primary-600 hover:bg-primary-700 active:scale-[0.98] transition-all group"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-primary-50 border border-primary-200 hover:bg-primary-100 hover:border-primary-300 active:scale-[0.98] transition-all group"
                 >
-                  <FileText className="text-white/80 flex-shrink-0" size={16} />
+                  <FileText className="text-primary-500 flex-shrink-0" size={16} />
                   <div>
-                    <p className="text-sm font-semibold text-white leading-tight">Nova Proposição</p>
-                    <p className="text-xs text-white/60 leading-tight mt-0.5">Iniciar pelo wizard guiado</p>
+                    <p className="text-sm font-semibold text-primary-800 dark:text-slate-200 leading-tight">Nova Proposição</p>
+                    <p className="text-xs text-primary-400 leading-tight mt-0.5">Iniciar pelo wizard guiado</p>
                   </div>
                 </Link>
 

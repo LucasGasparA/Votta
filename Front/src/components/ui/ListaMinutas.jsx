@@ -10,13 +10,13 @@ const STATUS_CONFIG = {
 }
 
 const EmptyStateSVG = () => (
-  <svg width="120" height="100" viewBox="0 0 120 100" fill="none" className="mx-auto mb-5 opacity-60">
-    <rect x="20" y="15" width="80" height="70" rx="6" fill="#dbeafe" />
-    <rect x="30" y="28" width="60" height="6" rx="3" fill="#93c5fd" />
-    <rect x="30" y="40" width="45" height="4" rx="2" fill="#bfdbfe" />
-    <rect x="30" y="50" width="52" height="4" rx="2" fill="#bfdbfe" />
-    <rect x="30" y="60" width="38" height="4" rx="2" fill="#bfdbfe" />
-    <circle cx="88" cy="72" r="18" fill="#1d4ed8" />
+  <svg width="120" height="100" viewBox="0 0 120 100" fill="none" className="mx-auto mb-5 opacity-50">
+    <rect x="20" y="15" width="80" height="70" rx="6" fill="#D5E6F9" />
+    <rect x="30" y="28" width="60" height="6" rx="3" fill="#7DAEE8" />
+    <rect x="30" y="40" width="45" height="4" rx="2" fill="#AACCF2" />
+    <rect x="30" y="50" width="52" height="4" rx="2" fill="#AACCF2" />
+    <rect x="30" y="60" width="38" height="4" rx="2" fill="#AACCF2" />
+    <circle cx="88" cy="72" r="18" fill="#3D7BCC" />
     <path d="M81 72l5 5 10-10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
@@ -52,7 +52,7 @@ const ListaMinutas = ({ proposals, onDelete }) => {
             <p className="text-sm text-primary-400 dark:text-slate-500 mb-5">Crie sua primeira proposição legislativa em minutos com o wizard guiado.</p>
             <Link
               to="/criar-minuta"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm rounded-xl hover:bg-primary-700 active:scale-[0.97] transition-all font-semibold shadow-md shadow-primary-200"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-50 border border-primary-200 text-primary-700 text-sm rounded-xl hover:bg-primary-100 hover:border-primary-300 active:scale-[0.97] transition-all font-semibold"
             >
               <PlusCircle size={15} />
               Criar agora

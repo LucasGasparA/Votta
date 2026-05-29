@@ -18,7 +18,7 @@ const createSchema = z.object({
   competence: z.string().max(100).optional(),
   hasFinancialImpact: z.boolean().optional(),
   estimatedImpact: z.string().max(100).optional(),
-  justification: z.string().max(10000).optional(),
+  justification: z.string().min(50, 'Justificativa deve ter pelo menos 50 caracteres').max(10000).optional(),
   municipalityId: z.string().optional(),
 });
 

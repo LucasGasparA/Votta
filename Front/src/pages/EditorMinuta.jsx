@@ -196,6 +196,7 @@ const EditorMinuta = () => {
   const { municipioSelecionado } = useOutletContext() ?? {}
   const [carregando, setCarregando]             = useState(true)
   const [salvando, setSalvando]                 = useState(false)
+  const [ultimoSalvo, setUltimoSalvo]           = useState(null)
   const [temAlteracoes, setTemAlteracoes]                   = useState(false)
   const [tituloProposicao, setTituloProposicao]       = useState('Proposição')
   const [tipoProposicao, setTipoProposicao]         = useState('')
@@ -206,7 +207,7 @@ const EditorMinuta = () => {
   const [mensagemAssistente, setMensagemAssistente] = useState('')
   const [historicoChat, setHistoricoChat]           = useState(() => {
     try {
-      const saved = localStorage.getItem(`legisla:chat:${id}`)
+      const saved = sessionStorage.getItem(`legisla:chat:${id}`)
       return saved ? JSON.parse(saved) : []
     } catch { return [] }
   })
@@ -219,8 +220,7 @@ const EditorMinuta = () => {
   const [carregandoVersoes, setCarregandoVersoes]       = useState(false)
   const [confirmandoVersaoId, setConfirmandoVersaoId] = useState(null)
 
-  const [exibirModalUpgrade, setExibirModalUpgrade] = useState(false)
-  const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
+const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   const [exportacaoRevisada, setExportacaoRevisada]   = useState(false)
   const [exibirModalNaoSalvo, setExibirModalNaoSalvo] = useState(false)
   const [destinoNavegacao, setDestinoNavegacao] = useState(null)
@@ -282,7 +282,7 @@ const EditorMinuta = () => {
   useEffect(() => {
     try {
       const limited = historicoChat.slice(-50)
-      localStorage.setItem(`legisla:chat:${id}`, JSON.stringify(limited))
+      sessionStorage.setItem(`legisla:chat:${id}`, JSON.stringify(limited))
     } catch { /* quota exceeded — ignore */ }
   }, [historicoChat, id])
 
@@ -375,6 +375,7 @@ const EditorMinuta = () => {
       await api.put('/proposals/' + id, { content: JSON.stringify(pendingDocRef.current) })
       setDoc({ ...pendingDocRef.current })
       setTemAlteracoes(false)
+      setUltimoSalvo(new Date())
       toast.success('Salvo!')
     } catch (e) {
       toast.error(e.message)
@@ -393,6 +394,14 @@ const EditorMinuta = () => {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [aoSalvar])
+
+  useEffect(() => {
+    if (!temAlteracoes) return
+    const timer = setInterval(() => {
+      aoSalvar()
+    }, 30_000)
+    return () => clearInterval(timer)
+  }, [temAlteracoes, aoSalvar])
 
   const carregarVersoes = async () => {
     setCarregandoVersoes(true)
@@ -428,7 +437,7 @@ const EditorMinuta = () => {
 
   const limparChat = () => {
     setHistoricoChat([])
-    try { localStorage.removeItem(`legisla:chat:${id}`) } catch { /* noop */ }
+    try { sessionStorage.removeItem(`legisla:chat:${id}`) } catch { /* noop */ }
   }
 
   const aoPerguntarAssistente = async (overrideMsg) => {
@@ -449,12 +458,7 @@ const EditorMinuta = () => {
         setBannerIncerteza('Não encontrei referência normativa clara para este ponto. Consulte a Procuradoria antes de prosseguir.')
       }
     } catch (e) {
-      if (e.upgrade) {
-        setChatAberto(false)
-        setExibirModalUpgrade(true)
-        return
-      }
-      const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toLowerCase().includes('timeout')
+const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toLowerCase().includes('timeout')
       setHistoricoChat(prev => [...prev, {
         role: 'error',
         text: isTimeout
@@ -634,7 +638,13 @@ const EditorMinuta = () => {
                 </div>
               )
             })()}
-            <span className="text-xs text-primary-400 dark:text-slate-500 hidden lg:block">Ctrl+S</span>
+            {ultimoSalvo ? (
+              <span className="text-xs text-primary-400 dark:text-slate-500 hidden lg:block">
+                Salvo às {ultimoSalvo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            ) : (
+              <span className="text-xs text-primary-400 dark:text-slate-500 hidden lg:block">Ctrl+S para salvar</span>
+            )}
             <button
               onClick={abrirModalVersoes}
               aria-label="Ver histórico de versões"
@@ -693,7 +703,7 @@ const EditorMinuta = () => {
                   key={sId}
                   onClick={() => setSecaoAtiva(sId)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all active:scale-[0.97]
-                    ${secaoAtiva === sId ? 'bg-primary-600 text-white shadow-sm' : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'}`}
+                    ${secaoAtiva === sId ? 'bg-primary-100 text-primary-700 dark:bg-[#232745] dark:text-slate-100' : 'text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 dark:hover:text-slate-200'}`}
                 >
                   <Icon size={15} />
                   {label}
@@ -863,7 +873,7 @@ const EditorMinuta = () => {
             style={{ height: minimizado ? 'auto' : '440px' }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary-800 to-primary-600 px-4 py-3 text-white flex-shrink-0">
+            <div className="bg-primary-500 px-4 py-3 text-white flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -970,8 +980,8 @@ const EditorMinuta = () => {
                       )
                       return (
                         <div key={i} className="flex justify-start items-end gap-1.5">
-                          <div className="w-6 h-6 bg-primary-700 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Scale size={11} className="text-white" />
+                          <div className="w-6 h-6 bg-primary-100 dark:bg-[#232745] rounded-full flex items-center justify-center flex-shrink-0">
+                            <Scale size={11} className="text-primary-500" />
                           </div>
                           <div className={`rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[80%] leading-relaxed ${
                             msg.hasCit
@@ -1073,13 +1083,14 @@ const EditorMinuta = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.15 }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.93 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setChatAberto(true)}
             aria-label="Abrir Assistente Jurídico"
-            className="fixed bottom-6 right-6 w-14 h-14 bg-primary-700 hover:bg-primary-800 text-white rounded-full shadow-xl flex items-center justify-center transition-colors z-50 print:hidden"
+            className="fixed bottom-6 right-6 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center gap-2 px-4 py-3 transition-colors z-50 print:hidden"
           >
-            <Scale size={22} />
+            <Scale size={18} />
+            <span className="text-sm font-semibold">Assistente Jurídico</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -1226,33 +1237,39 @@ const EditorMinuta = () => {
                   <X size={20} />
                 </button>
               </div>
-              <div className="p-6 space-y-5">
+              <div className="p-6 space-y-4">
                 <div className="bg-primary-50 dark:bg-[#232745] rounded-xl p-4">
                   <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-1">Proposição</p>
                   <p className="font-bold text-primary-800 dark:text-slate-100">{tituloProposicao}</p>
                   {tipoProposicao && <p className="text-sm text-primary-500 dark:text-slate-400 mt-0.5">{PROPOSAL_TYPE_LABELS[tipoProposicao] || tipoProposicao}</p>}
                 </div>
+
                 <div>
-                  <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-2">Alertas Pendentes ({alertasPendentes.length})</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold">Verificação do documento</p>
+                    {alertasPendentes.length > 0 && (
+                      <span className="text-[10px] text-primary-400 dark:text-slate-500">Itens gerados pela IA podem ser ignorados</span>
+                    )}
+                  </div>
                   {alertasPendentes.length === 0 ? (
-                    <div className="flex items-center gap-2 text-primary-700 dark:text-slate-200 bg-primary-50 dark:bg-[#232745] rounded-lg px-3 py-2.5 text-sm">
-                      <CheckCircle size={15} /> Nenhum alerta pendente
+                    <div className="flex items-center gap-2 text-primary-600 dark:text-slate-200 bg-primary-50 dark:bg-[#232745] border border-primary-200 dark:border-[#3d4270] rounded-xl px-3 py-3 text-sm">
+                      <CheckCircle size={15} className="text-primary-500 flex-shrink-0" />
+                      <span>Documento verificado — pronto para exportação.</span>
                     </div>
                   ) : (
                     <div className="space-y-1.5">
                       {alertasPendentes.map((v, i) => (
-                        <div key={i} className="flex items-start gap-2 text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-xs">
-                          <AlertTriangle size={13} className="text-amber-500 flex-shrink-0 mt-0.5" />{v.message}
+                        <div key={i} className="flex items-start gap-2 text-primary-600 dark:text-slate-300 bg-primary-50 dark:bg-[#232745] border border-primary-100 dark:border-[#2d3158] rounded-lg px-3 py-2.5 text-xs">
+                          <AlertTriangle size={13} className="text-primary-400 flex-shrink-0 mt-0.5" />{v.message}
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
-                <div>
-                  <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-2">Citações Utilizadas ({citacoesUsadas.length})</p>
-                  {citacoesUsadas.length === 0 ? (
-                    <p className="text-xs text-primary-400 dark:text-slate-500 italic">Nenhuma citação registrada.</p>
-                  ) : (
+
+                {citacoesUsadas.length > 0 && (
+                  <div>
+                    <p className="text-xs text-primary-400 dark:text-slate-500 uppercase tracking-wide font-bold mb-2">Citações normativas ({citacoesUsadas.length})</p>
                     <div className="space-y-1.5">
                       {citacoesUsadas.map((c, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs text-primary-700 bg-oro-50 rounded-lg px-3 py-2">
@@ -1261,14 +1278,15 @@ const EditorMinuta = () => {
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+
                 <label className="flex items-start gap-3 cursor-pointer p-4 border-2 rounded-xl transition-all hover:bg-primary-50 dark:hover:bg-[#232745]"
-                  style={{ borderColor: exportacaoRevisada ? '#2563eb' : '#e8e8e8' }}>
+                  style={{ borderColor: exportacaoRevisada ? '#3D7BCC' : '#e0e8f4' }}>
                   <input type="checkbox" checked={exportacaoRevisada} onChange={e => setExportacaoRevisada(e.target.checked)}
                     className="mt-0.5 w-4 h-4 accent-primary-600 flex-shrink-0" />
                   <span className="text-sm text-primary-700 dark:text-slate-300 leading-relaxed">
-                    Confirmo que revisei esta minuta com assessor jurídico e estou ciente dos alertas pendentes.
+                    Confirmo que revisei o conteúdo desta minuta e assumo a responsabilidade jurídica pela exportação.
                   </span>
                 </label>
               </div>
@@ -1279,68 +1297,8 @@ const EditorMinuta = () => {
                 </button>
                 <button onClick={confirmarExportacao} disabled={!exportacaoRevisada}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed
-                    ${exportacaoRevisada ? 'bg-primary-800 hover:bg-primary-900 text-white' : 'bg-primary-100 text-primary-300'}`}>
+                    ${exportacaoRevisada ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'bg-primary-100 text-primary-300'}`}>
                   <Download size={15} /> {formatoExportacao === 'DOCX' ? 'Gerar DOCX' : 'Gerar PDF'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Modal Upgrade PRO ── */}
-      <AnimatePresence>
-        {exibirModalUpgrade && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
-            onClick={e => e.target === e.currentTarget && setExibirModalUpgrade(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 16 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-8"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 bg-primary-100 dark:bg-[#232745] rounded-2xl flex items-center justify-center mb-3">
-                  <Scale size={24} className="text-primary-600" />
-                </div>
-                <span className="px-2.5 py-0.5 bg-oro-100 text-oro-800 text-[11px] font-bold uppercase tracking-widest rounded-full mb-3">
-                  Recurso PRO
-                </span>
-                <h2 className="text-xl font-display font-bold text-primary-900 dark:text-slate-100 mb-2">
-                  Assistente Jurídico
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-[300px]">
-                  O chat com o Assistente Jurídico está disponível no Plano Profissional. Ele cita a base normativa em tempo real e reduz devolutivas por vício formal.
-                </p>
-              </div>
-
-              <div className="mt-5 bg-primary-50 dark:bg-[#232745] border border-primary-100 dark:border-[#3d4270] rounded-xl p-4 space-y-2.5">
-                {[
-                  'Citações normativas automáticas (CF/88, LOM)',
-                  'Análise de constitucionalidade em tempo real',
-                  'Reduz retrabalho jurídico e devolutivas',
-                ].map(item => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <CheckCircle size={14} className="text-primary-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[13px] text-primary-800 dark:text-slate-300 leading-snug">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 flex flex-col gap-2.5">
-                <button
-                  onClick={() => { setExibirModalUpgrade(false); navigate('/planos') }}
-                  className="w-full py-3 rounded-xl text-[15px] font-bold bg-rosso-500 hover:bg-rosso-600 active:bg-rosso-700 text-white transition-all active:scale-[0.97]"
-                >
-                  Ver Planos
-                </button>
-                <button
-                  onClick={() => setExibirModalUpgrade(false)}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270] text-slate-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-800 dark:hover:text-slate-200 transition-all active:scale-[0.97]"
-                >
-                  Fechar
                 </button>
               </div>
             </motion.div>

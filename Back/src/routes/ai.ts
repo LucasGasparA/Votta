@@ -160,8 +160,8 @@ router.post('/generate', async (req: Request, res: Response) => {
 
   const { proposalId } = parsed.data;
 
-  const proposal = await prisma.proposal.findUnique({
-    where: { id: proposalId },
+  const proposal = await prisma.proposal.findFirst({
+    where: { id: proposalId, userId: (req as AuthRequest).user.userId },
     include: { municipality: true },
   });
 

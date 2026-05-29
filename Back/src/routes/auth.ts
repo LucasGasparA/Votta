@@ -122,14 +122,6 @@ router.post('/logout', (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-//const forgotPasswordLimiter = rateLimit({
-//  windowMs: 15 * 60 * 1000,
-//  max: 5,
-//  message: { error: 'Muitas tentativas. Aguarde 15 minutos.' },
-//  standardHeaders: true,
-//  legacyHeaders: false,
-//});
-
 const forgotSchema = z.object({
   email: z.string().email('E-mail inválido'),
 });
