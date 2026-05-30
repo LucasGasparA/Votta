@@ -66,7 +66,7 @@ const Painel = () => {
     api.get('/proposals?limit=50')
       .then(({ proposals }) => {
         setEstatisticas(construirEstatisticas(proposals))
-        setProposicoes(proposals.slice(0, 5).map(paraItemLista))
+        setProposicoes(proposals.map(paraItemLista))
         setTotal(proposals.length)
       })
       .catch(() => toast.error('Não foi possível carregar as proposições.'))
@@ -89,10 +89,10 @@ const Painel = () => {
   const primeiroNome    = usuario?.name?.split(' ')[0] ?? ''
   const listaExibida = somentePendentes
     ? proposicoes.filter(p => p.status === 'pendente_revisao')
-    : proposicoes
+    : proposicoes.slice(0, 5)
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl">
+    <div className="p-6 md:p-10 max-w-6xl mx-auto">
 
       {/* Cabeçalho */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
@@ -180,7 +180,13 @@ const Painel = () => {
                     </button>
                   )}
                 </div>
-                <ListaMinutas proposals={listaExibida} onDelete={aoExcluir} />
+                <ListaMinutas
+                  proposals={listaExibida}
+                  onDelete={aoExcluir}
+                  title={somentePendentes ? 'Pendentes de revisão' : 'Proposições recentes'}
+                  emptyTitle={somentePendentes ? 'Nenhuma pendência encontrada' : undefined}
+                  emptyDescription={somentePendentes ? 'As proposições carregadas não têm revisão pendente.' : undefined}
+                />
               </>
             )}
           </div>

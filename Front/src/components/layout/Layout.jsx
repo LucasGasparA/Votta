@@ -167,6 +167,37 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           })}
         </nav>
 
+        {!isCollapsed && usuario && (
+          <div className="border-t border-primary-100 dark:border-[#2d3158] p-3 space-y-1">
+            <div className="flex items-center gap-3 px-2 py-2 mb-1 min-w-0">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+                style={{ background: corAvatar }}
+              >
+                {getInitials(usuario.name)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 truncate">{usuario.name}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{usuario.email}</p>
+              </div>
+            </div>
+            <Link
+              to="/configuracoes"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#232745] hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
+            >
+              <Settings size={16} />
+              Configurações
+            </Link>
+            <button
+              onClick={aoSolicitarLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
+          </div>
+        )}
 
       </>
     )
