@@ -537,8 +537,8 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
   return (
     <div className="h-screen flex flex-col bg-primary-50 dark:bg-[#141624] print:bg-white">
       {/* Top Bar */}
-      <div className="bg-white dark:bg-[#1c1f38] border-b border-primary-200 dark:border-[#2d3158] px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
-        <div className="flex items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#1c1f38] border-b border-primary-200 dark:border-[#2d3158] px-3 md:px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
+        <div className="flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navegacaoSegura('/painel')}
@@ -570,7 +570,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
                   title="Clique para renomear"
                   className="text-base font-display font-bold text-primary-800 dark:text-slate-100 truncate
                     hover:text-primary-600 dark:hover:text-slate-300 hover:underline decoration-dashed underline-offset-2
-                    transition-colors text-left max-w-[200px] md:max-w-xs"
+                    transition-colors text-left max-w-[140px] sm:max-w-[220px] md:max-w-xs"
                 >
                   {tituloProposicao}
                 </button>
@@ -648,7 +648,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
             <button
               onClick={abrirModalVersoes}
               aria-label="Ver histórico de versões"
-              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 rounded-xl hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 text-sm border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 rounded-lg hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
             >
               <History size={15} />
               <span className="hidden md:inline">Versões</span>
@@ -656,15 +656,15 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
             <button
               onClick={aoSalvar}
               disabled={salvando}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] border border-primary-200 dark:border-[#3d4270] rounded-lg transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 md:py-1.5 text-sm text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] border border-primary-200 dark:border-[#3d4270] rounded-lg transition-all disabled:opacity-50"
             >
               <Save size={14} />
-              <span>{salvando ? 'Salvando...' : 'Salvar'}</span>
+              <span className="hidden sm:inline">{salvando ? 'Salvando...' : 'Salvar'}</span>
             </button>
             <button
               onClick={aoClicarExportar}
               disabled={exportando}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 md:py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download size={14} />
               <span className="hidden md:inline">{exportando ? 'Gerando...' : (formatoExportacao === 'DOCX' ? 'Exportar DOCX' : 'Exportar PDF')}</span>
@@ -675,7 +675,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
 
       <div className="flex flex-1 overflow-hidden print:block">
         {/* Main Editor */}
-        <div className="flex-1 overflow-y-auto p-6 print:hidden">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 print:hidden">
 
           {/* Banner de incerteza */}
           <AnimatePresence>
@@ -696,7 +696,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
           </AnimatePresence>
 
           {/* Seção Nav */}
-          <div className="card p-3 mb-5">
+          <div className="rounded-lg border border-primary-100 bg-white p-2.5 mb-4 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]">
             <div className="flex items-center gap-1 overflow-x-auto">
               {SECTIONS.map(({ id: sId, label, icon: Icon }) => (
                 <button
@@ -713,7 +713,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
           </div>
 
           {/* Validações */}
-          <div className="space-y-2 mb-5">
+          <div className="space-y-2 mb-4">
             {validacoes.map((v, i) => (
               <motion.div
                 key={i}
@@ -734,7 +734,7 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
           </div>
 
           {/* Conteúdo */}
-          <div className="card p-8" key={chaveDoc}>
+          <div className="rounded-lg border border-primary-100 bg-white p-5 md:p-7 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]" key={chaveDoc}>
             {(() => {
               const section = SECTIONS.find(s => s.id === secaoAtiva)
               const Icon = section?.icon ?? FileText
@@ -1087,10 +1087,10 @@ const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toL
             whileTap={{ scale: 0.95 }}
             onClick={() => setChatAberto(true)}
             aria-label="Abrir Assistente Jurídico"
-            className="fixed bottom-6 right-6 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center gap-2 px-4 py-3 transition-colors z-50 print:hidden"
+            className="fixed bottom-5 right-5 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center gap-2 px-3.5 py-3 transition-colors z-50 print:hidden"
           >
             <Scale size={18} />
-            <span className="text-sm font-semibold">Assistente Jurídico</span>
+            <span className="hidden sm:inline text-sm font-semibold">Assistente Jurídico</span>
           </motion.button>
         )}
       </AnimatePresence>

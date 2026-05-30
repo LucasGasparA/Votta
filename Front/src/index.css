@@ -13,6 +13,18 @@
     @apply bg-white text-slate-900 font-body antialiased;
   }
 
+  button, a, input, textarea, select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+
+  .dark button,
+  .dark a,
+  .dark input,
+  .dark textarea,
+  .dark select {
+    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-[#141624];
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }

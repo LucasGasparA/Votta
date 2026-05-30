@@ -1,18 +1,26 @@
 import { useState, useEffect } from 'react'
-import { FileText, ArrowRight, ArrowLeft, Check, Scale, AlertCircle, X, Info } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Check,
+  ClipboardList,
+  FileCheck2,
+  FileText,
+  Info,
+  Landmark,
+  Lightbulb,
+  PenLine,
+  Scale,
+  ScrollText,
+  Search,
+  X,
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate, Link, useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
-
-const LOADING_STEPS = [
-  { icon: '📋', text: 'Registrando sua proposição...' },
-  { icon: '🔍', text: 'Analisando competência municipal...' },
-  { icon: '⚖️',  text: 'Consultando a Lei Orgânica Municipal...' },
-  { icon: '✍️',  text: 'Redigindo ementa e preâmbulo...' },
-  { icon: '📜', text: 'Estruturando os artigos...' },
-  { icon: '✅', text: 'Finalizando a minuta...' },
-]
 
 const STORAGE_KEY = 'votta:wizard'
 
@@ -40,6 +48,42 @@ const COMPETENCE_OPTIONS = [
   },
 ]
 
+const GENERATION_STEPS = [
+  { Icon: ClipboardList, text: 'Registrando a proposição...' },
+  { Icon: Search,        text: 'Analisando competência municipal...' },
+  { Icon: Scale,         text: 'Consultando a Lei Orgânica Municipal...' },
+  { Icon: PenLine,       text: 'Redigindo ementa e preâmbulo...' },
+  { Icon: ScrollText,    text: 'Estruturando os artigos...' },
+  { Icon: FileCheck2,    text: 'Finalizando a minuta...' },
+]
+
+const PROPOSAL_TYPES = [
+  {
+    value: 'pl_ordinaria',
+    label: 'Projeto de Lei Ordinária',
+    description: 'Lei municipal de competência do município, aprovada por maioria simples.',
+    Icon: ScrollText,
+  },
+  {
+    value: 'pl_complementar',
+    label: 'Projeto de Lei Complementar',
+    description: 'Complementa a Lei Orgânica em matérias específicas, com quórum qualificado.',
+    Icon: BookOpen,
+  },
+  {
+    value: 'decreto',
+    label: 'Decreto Municipal',
+    description: 'Ato do Executivo para regulamentar leis e organizar a administração.',
+    Icon: Landmark,
+  },
+  {
+    value: 'indicacao',
+    label: 'Indicação',
+    description: 'Sugestão ao Executivo para melhorias, obras ou serviços públicos.',
+    Icon: Lightbulb,
+  },
+]
+
 const CriarMinuta = () => {
   const navigate = useNavigate()
   const { municipioSelecionado } = useOutletContext() ?? {}
@@ -60,13 +104,6 @@ const CriarMinuta = () => {
   const [etapaGeracao, setEtapaGeracao]       = useState(0)
   const [exibirModalCancelar, setExibirModalCancelar] = useState(false)
   const [dadosFormulario, setDadosFormulario] = useState(wizardSalvo?.dados ?? DADOS_INICIAIS)
-
-  const proposalTypes = [
-    { value: 'pl_ordinaria',    label: 'Projeto de Lei Ordinária',    description: 'Lei municipal de competência do município (maioria simples)',     icon: '📜' },
-    { value: 'pl_complementar', label: 'Projeto de Lei Complementar', description: 'Complementa a LOM em matérias específicas (maioria absoluta)',     icon: '📋' },
-    { value: 'decreto',         label: 'Decreto Municipal',           description: 'Ato administrativo do Executivo para regulamentar leis',           icon: '📄' },
-    { value: 'indicacao',       label: 'Indicação',                   description: 'Sugestão ao Executivo para realização de melhorias ou serviços',   icon: '💡' },
-  ]
 
   const steps = [
     { id: 0, title: 'Tipo de Proposição',        description: 'Escolha o tipo de documento legislativo' },
@@ -124,7 +161,7 @@ const CriarMinuta = () => {
     setEtapaGeracao(0)
 
     const stepInterval = setInterval(() => {
-      setEtapaGeracao(s => Math.min(s + 1, LOADING_STEPS.length - 1))
+      setEtapaGeracao(s => Math.min(s + 1, GENERATION_STEPS.length - 1))
     }, 3000)
 
     try {
@@ -136,7 +173,7 @@ const CriarMinuta = () => {
       await api.post('/ai/generate', { proposalId: data.id })
 
       clearInterval(stepInterval)
-      setEtapaGeracao(LOADING_STEPS.length - 1)
+      setEtapaGeracao(GENERATION_STEPS.length - 1)
 
       await new Promise(r => setTimeout(r, 800))
 
@@ -161,8 +198,9 @@ const CriarMinuta = () => {
   const motivoBloqueio  = tentouProximo ? obterMotivoBloqueio() : null
 
   if (gerando) {
-    const step = LOADING_STEPS[etapaGeracao]
-    const pct  = Math.round(((etapaGeracao + 1) / LOADING_STEPS.length) * 100)
+    const step = GENERATION_STEPS[etapaGeracao]
+    const StepIcon = step.Icon
+    const pct  = Math.round(((etapaGeracao + 1) / GENERATION_STEPS.length) * 100)
     return (
       <div className="fixed inset-0 bg-primary-50 dark:bg-[#141624] flex flex-col items-center justify-center p-6 z-50">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
@@ -176,10 +214,10 @@ const CriarMinuta = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.7 }}
                 transition={{ duration: 0.25 }}
-                className="text-4xl"
+                className="text-primary-600"
                 aria-hidden="true"
               >
-                {step.icon}
+                <StepIcon size={34} strokeWidth={1.8} />
               </motion.span>
             </AnimatePresence>
           </div>
@@ -232,17 +270,17 @@ const CriarMinuta = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-[#141624] p-4 md:p-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-full bg-slate-50/70 dark:bg-[#141624] p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-5">
+        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4 mb-5">
           <div>
-            <h1 className="text-2xl font-display font-bold text-primary-800 dark:text-slate-100 mb-0.5 flex items-center gap-3">
+            <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-100 mb-1 flex items-center gap-3">
               <FileText className="text-primary-600" size={26} />
               Nova Proposição
             </h1>
-            <p className="text-primary-500 dark:text-slate-400 text-sm">Wizard guiado com assistência jurídica inteligente</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Preencha os dados essenciais antes de gerar a minuta.</p>
           </div>
           <button
             onClick={() => {
@@ -263,7 +301,7 @@ const CriarMinuta = () => {
         <motion.div
           initial={{ opacity: 0, scaleX: 0.9 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          className="card p-4 mb-4"
+          className="rounded-lg border border-slate-200 bg-white p-4 mb-4 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
         >
           {/* Indicador textual */}
           <div className="flex items-center justify-between mb-3">
@@ -325,7 +363,7 @@ const CriarMinuta = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direcao * -40 }}
             transition={{ duration: 0.25 }}
-            className="card p-5 mb-4"
+            className="rounded-lg border border-slate-200 bg-white p-5 md:p-6 mb-4 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
           >
             <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100 mb-0.5">{steps[etapaAtual].title}</h2>
             <p className="text-primary-400 dark:text-slate-500 text-sm mb-4">{steps[etapaAtual].description}</p>
@@ -333,7 +371,9 @@ const CriarMinuta = () => {
             {/* Passo 0 */}
             {etapaAtual === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {proposalTypes.map(type => (
+                {PROPOSAL_TYPES.map(type => {
+                  const TypeIcon = type.Icon
+                  return (
                   <button
                     key={type.value}
                     type="button"
@@ -344,7 +384,13 @@ const CriarMinuta = () => {
                         : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270] hover:shadow-sm'
                       }`}
                   >
-                    <div className="text-3xl mb-2">{type.icon}</div>
+                    <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${
+                      dadosFormulario.type === type.value
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-slate-100 text-slate-500 dark:bg-[#232745] dark:text-slate-300'
+                    }`}>
+                      <TypeIcon size={20} />
+                    </div>
                     <h3 className="font-display font-bold text-primary-800 dark:text-slate-100 text-sm mb-1">{type.label}</h3>
                     <p className="text-xs text-primary-500 dark:text-slate-400 leading-relaxed">{type.description}</p>
                     {dadosFormulario.type === type.value && (
@@ -354,7 +400,8 @@ const CriarMinuta = () => {
                       </div>
                     )}
                   </button>
-                ))}
+                  )
+                })}
               </div>
             )}
 
@@ -508,7 +555,7 @@ const CriarMinuta = () => {
         </AnimatePresence>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
+        <div className="sticky bottom-0 z-10 -mx-4 mt-6 flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/95 px-4 py-3 backdrop-blur dark:border-[#2d3158] dark:bg-[#141624]/95 md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-0">
           <button
             onClick={etapaAnterior}
             disabled={etapaAtual === 0}

@@ -1,0 +1,19 @@
+FROM node:20-slim
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip python3-venv python3-dev \
+    gcc g++ && \
+    rm -rf /var/lib/apt/lists/* && \
+    python3 -m venv /opt/rag-venv
+
+COPY requirements.txt ./
+RUN /opt/rag-venv/bin/pip install --no-cache-dir -r requirements.txt
+
+COPY package*.json ./
+RUN npm install
+
+COPY prisma ./prisma
+RUN npx prisma generate
+
+CMD ["sh", "-c", "npx prisma generate && npx prisma db push && npm run dev"]

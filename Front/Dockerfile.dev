@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+# --host expõe o servidor Vite em 0.0.0.0 (necessário dentro do container)
+CMD ["npm", "run", "dev", "--", "--host"]

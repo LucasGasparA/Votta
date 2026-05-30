@@ -1,111 +1,110 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { PlusCircle, Clock, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle, Clock, FileText, PlusCircle, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUS_CONFIG = {
-  em_andamento:     { label: 'Em Andamento',    color: 'bg-primary-100 text-primary-700', bar: 'bg-primary-500', border: 'border-l-primary-400', Icon: Clock },
-  pendente_revisao: { label: 'Pendente Revisão', color: 'bg-oro-100 text-oro-700',        bar: 'bg-oro-500',     border: 'border-l-oro-500',    Icon: AlertTriangle },
-  concluido:        { label: 'Concluído',        color: 'bg-primary-50 text-primary-800', bar: 'bg-primary-700', border: 'border-l-primary-700', Icon: CheckCircle },
+  em_andamento:     { label: 'Em andamento',       color: 'bg-primary-50 text-primary-700 border-primary-100', Icon: Clock },
+  pendente_revisao: { label: 'Aguardando revisão', color: 'bg-oro-50 text-oro-800 border-oro-100',             Icon: AlertTriangle },
+  concluido:        { label: 'Aprovada',           color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: CheckCircle },
 }
 
-const EmptyStateSVG = () => (
-  <svg width="120" height="100" viewBox="0 0 120 100" fill="none" className="mx-auto mb-5 opacity-50">
-    <rect x="20" y="15" width="80" height="70" rx="6" fill="#D5E6F9" />
-    <rect x="30" y="28" width="60" height="6" rx="3" fill="#7DAEE8" />
-    <rect x="30" y="40" width="45" height="4" rx="2" fill="#AACCF2" />
-    <rect x="30" y="50" width="52" height="4" rx="2" fill="#AACCF2" />
-    <rect x="30" y="60" width="38" height="4" rx="2" fill="#AACCF2" />
-    <circle cx="88" cy="72" r="18" fill="#3D7BCC" />
-    <path d="M81 72l5 5 10-10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const ListaMinutas = ({ proposals, onDelete }) => {
+const ListaMinutas = ({
+  proposals,
+  onDelete,
+  title = 'Proposições recentes',
+  emptyTitle = 'Nenhuma proposição ainda',
+  emptyDescription = 'Crie sua primeira proposição legislativa em minutos com o fluxo guiado.',
+}) => {
   const [alvoExclusao, setAlvoExclusao] = useState(null)
 
   const obterStatus = (status) => STATUS_CONFIG[status] ?? STATUS_CONFIG.em_andamento
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.2 }}
-      className="lg:col-span-2"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 }}
+      className="rounded-lg border border-slate-200 bg-white shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
     >
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">Proposições Recentes</h2>
-          <Link
-            to="/criar-minuta"
-            className="flex items-center gap-1.5 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold transition-colors"
-          >
-            <PlusCircle size={15} />
-            Nova
-          </Link>
-        </div>
-
-        {proposals.length === 0 ? (
-          <div className="text-center py-10">
-            <EmptyStateSVG />
-            <p className="text-primary-700 dark:text-slate-300 font-semibold mb-1.5">Nenhuma proposição ainda</p>
-            <p className="text-sm text-primary-400 dark:text-slate-500 mb-5">Crie sua primeira proposição legislativa em minutos com o wizard guiado.</p>
-            <Link
-              to="/criar-minuta"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-50 border border-primary-200 text-primary-700 text-sm rounded-xl hover:bg-primary-100 hover:border-primary-300 active:scale-[0.97] transition-all font-semibold"
-            >
-              <PlusCircle size={15} />
-              Criar agora
-            </Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-100 dark:divide-[#2d3158]">
-            {proposals.map((proposal) => {
-              const cfg = obterStatus(proposal.status)
-              const StatusIcon = cfg.Icon
-              return (
-                <div
-                  key={proposal.id}
-                  className="relative group"
-                >
-                  <Link
-                    to={`/minuta/${proposal.id}/editar`}
-                    className="flex items-center justify-between py-3.5 px-1 hover:bg-slate-50 dark:hover:bg-[#232745] rounded-lg transition-colors"
-                  >
-                    <div className="flex-1 min-w-0 pr-4">
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate group-hover:text-primary-600 transition-colors">
-                        {proposal.title}
-                      </p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{proposal.type}</p>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${cfg.color}`}>
-                        <StatusIcon size={10} strokeWidth={2.5} />
-                        {cfg.label}
-                      </span>
-                      <span className="text-xs text-slate-300 dark:text-slate-600">{proposal.lastUpdate}</span>
-                    </div>
-                  </Link>
-                  <button
-                    onClick={e => {
-                      e.preventDefault()
-                      setAlvoExclusao({ id: proposal.id, title: proposal.title })
-                    }}
-                    aria-label={`Excluir proposição: ${proposal.title}`}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-300
-                      hover:text-rosso-500 hover:bg-rosso-50
-                      opacity-0 group-hover:opacity-100 transition-all duration-150"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        )}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-[#2d3158]">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+        <Link
+          to="/criar-minuta"
+          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-[#232745] transition-colors"
+        >
+          <PlusCircle size={15} />
+          Nova
+        </Link>
       </div>
 
-      {/* Modal de confirmação de exclusão */}
+      {proposals.length === 0 ? (
+        <div className="px-5 py-12 text-center">
+          <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-[#232745] dark:text-slate-300">
+            <FileText size={22} />
+          </div>
+          <p className="font-semibold text-slate-800 dark:text-slate-100">{emptyTitle}</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{emptyDescription}</p>
+          <Link
+            to="/criar-minuta"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+          >
+            <PlusCircle size={15} />
+            Criar proposição
+          </Link>
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100 dark:divide-[#2d3158]">
+          {proposals.map((proposal) => {
+            const cfg = obterStatus(proposal.status)
+            const StatusIcon = cfg.Icon
+
+            return (
+              <div key={proposal.id} className="grid grid-cols-[1fr_auto] gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-[#232745]/60 transition-colors">
+                <Link to={`/minuta/${proposal.id}/editar`} className="min-w-0">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 sm:flex dark:bg-[#232745] dark:text-slate-300">
+                      <FileText size={17} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-900 hover:text-primary-700 dark:text-slate-100 dark:hover:text-primary-300">
+                        {proposal.title}
+                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="truncate">{proposal.type}</span>
+                        <span aria-hidden="true">/</span>
+                        <span>Atualizada em {proposal.lastUpdate}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="flex items-center gap-2">
+                  <span className={`hidden sm:inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${cfg.color}`}>
+                    <StatusIcon size={12} strokeWidth={2.5} />
+                    {cfg.label}
+                  </span>
+                  <Link
+                    to={`/minuta/${proposal.id}/editar`}
+                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-[#1c1f38] transition-colors"
+                  >
+                    Abrir
+                    <ArrowRight size={13} />
+                  </Link>
+                  <button
+                    onClick={() => setAlvoExclusao({ id: proposal.id, title: proposal.title })}
+                    aria-label={`Excluir proposição: ${proposal.title}`}
+                    className="rounded-md p-2 text-slate-400 hover:bg-rosso-50 hover:text-rosso-600 transition-colors"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       <AnimatePresence>
         {alvoExclusao && (
           <motion.div
@@ -115,31 +114,25 @@ const ListaMinutas = ({ proposals, onDelete }) => {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
           >
             <motion.div
-              initial={{ scale: 0.95, y: 16 }}
+              initial={{ scale: 0.96, y: 14 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              exit={{ scale: 0.96, y: 14 }}
+              className="w-full max-w-sm rounded-lg bg-white p-6 shadow-2xl dark:bg-[#1c1f38]"
             >
-              <div className="w-12 h-12 bg-rosso-50 dark:bg-rosso-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trash2 size={22} className="text-rosso-500" />
+              <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-rosso-50 dark:bg-rosso-900/20">
+                <Trash2 size={21} className="text-rosso-500" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
-                Excluir proposição?
-              </h2>
-              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-1 leading-relaxed">
-                Você está prestes a excluir:
+              <h2 className="text-center text-lg font-semibold text-slate-900 dark:text-slate-100">Excluir proposição?</h2>
+              <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
+                Esta ação remove a proposição e não pode ser desfeita.
               </p>
-              <p className="text-sm font-semibold text-primary-800 dark:text-slate-200 text-center mb-6 px-2 truncate">
-                "{alvoExclusao.title}"
+              <p className="mt-4 truncate rounded-md bg-slate-50 px-3 py-2 text-center text-sm font-medium text-slate-800 dark:bg-[#232745] dark:text-slate-200">
+                {alvoExclusao.title}
               </p>
-              <p className="text-xs text-rosso-500 text-center mb-6">
-                Esta ação não pode ser desfeita.
-              </p>
-              <div className="flex gap-3">
+              <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => setAlvoExclusao(null)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                  className="flex-1 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-[#3d4270] dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
                 >
                   Cancelar
                 </button>
@@ -148,8 +141,7 @@ const ListaMinutas = ({ proposals, onDelete }) => {
                     onDelete(alvoExclusao.id)
                     setAlvoExclusao(null)
                   }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
-                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                  className="flex-1 rounded-lg bg-rosso-500 px-3 py-2.5 text-sm font-semibold text-white hover:bg-rosso-600 transition-colors"
                 >
                   Excluir
                 </button>

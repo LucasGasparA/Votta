@@ -2,21 +2,24 @@ import { motion } from 'framer-motion'
 
 const CartaoEstatistica = ({ stat, index }) => {
   const Icon = stat.icon
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.06 * index, type: 'spring', stiffness: 140 }}
-      className="pl-4 border-l-2 border-primary-200"
+      transition={{ delay: 0.04 * index, type: 'spring', stiffness: 150 }}
+      className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
     >
-      <p className="text-xs text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-        <Icon className={stat.color} size={12} />
-        {stat.label}
-      </p>
-      <p className="text-4xl font-semibold text-slate-900 dark:text-slate-100 leading-none">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          {stat.label}
+        </p>
+        <Icon className={stat.color} size={17} />
+      </div>
+      <p className="mt-4 text-3xl font-semibold leading-none text-slate-950 dark:text-slate-100">
         {stat.value}
       </p>
-      <p className="text-xs text-slate-400 mt-1.5">{stat.trend}</p>
+      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{stat.trend}</p>
     </motion.div>
   )
 }
