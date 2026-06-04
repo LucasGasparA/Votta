@@ -1,14 +1,19 @@
 import { motion } from 'framer-motion'
 
-const CartaoEstatistica = ({ stat, index }) => {
+const CartaoEstatistica = ({ stat, index, onClick, clickable }) => {
   const Icon = stat.icon
 
   return (
     <motion.div
+      onClick={onClick}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.04 * index, type: 'spring', stiffness: 150 }}
-      className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
+      className={`rounded-lg border bg-white p-4 shadow-sm dark:bg-[#1c1f38] transition-all
+        ${clickable
+          ? 'border-slate-200 dark:border-[#2d3158] cursor-pointer hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-md hover:ring-2 hover:ring-primary-100 dark:hover:ring-primary-900/40'
+          : 'border-slate-200 dark:border-[#2d3158]'
+        }`}
     >
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">

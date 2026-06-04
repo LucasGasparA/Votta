@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Zap, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Logo from '../Logo'
 
@@ -25,7 +25,6 @@ const PAGE_TITLES = {
   '/criar-minuta':          'Nova Proposição',
   '/selecionar-municipio':  'Selecionar Município',
   '/configuracoes':         'Configurações',
-  '/planos':                'Planos',
   '/auditoria':             'Trilha de Auditoria',
 }
 
@@ -51,12 +50,21 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
     ? 'Editor de Proposição'
     : PAGE_TITLES[location.pathname] ?? ''
 
-  const navItems = [
-    { path: '/painel',               icon: Home,       label: 'Painel' },
-    { path: '/criar-minuta',         icon: PlusCircle, label: 'Nova Proposição' },
-    { path: '/selecionar-municipio', icon: MapPin,      label: 'Município' },
-    { path: '/auditoria',            icon: Shield,      label: 'Auditoria' },
-    { path: '/planos',               icon: Zap,         label: 'Planos' },
+  const navGroups = [
+    {
+      label: 'Trabalho',
+      items: [
+        { path: '/painel',       icon: Home,       label: 'Painel' },
+        { path: '/criar-minuta', icon: PlusCircle, label: 'Nova Proposição', highlight: true },
+      ],
+    },
+    {
+      label: 'Gestão',
+      items: [
+        { path: '/selecionar-municipio', icon: MapPin,  label: 'Município' },
+        { path: '/auditoria',            icon: Shield,  label: 'Auditoria' },
+      ],
+    },
   ]
 
   const corAvatar = nameToColor(usuario?.name)
@@ -133,71 +141,65 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
         )}
 
         {/* ── Navegação ── */}
-        <nav className="flex-1 overflow-y-auto min-h-0 px-3 pt-4 space-y-0.5">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = location.pathname === item.path
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setSidebarOpen(false)}
-                title={isCollapsed ? item.label : undefined}
-                className={`
-                  relative flex items-center transition-all duration-150 text-sm
-                  ${isCollapsed
-                    ? `justify-center p-3 rounded-lg ${isActive
-                        ? 'text-primary-600'
-                        : 'text-slate-400 hover:text-slate-700'
-                      }`
-                    : `gap-3 pl-3 pr-3 py-2 rounded-lg ${isActive
-                        ? 'bg-primary-50 text-primary-700 font-medium'
-                        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                      }`
-                  }
-                `}
-              >
-                {!isCollapsed && isActive && (
-                  <span className="absolute left-3 w-0.5 h-5 bg-primary-500 rounded-full" />
-                )}
-                <Icon size={16} className="flex-shrink-0" />
-                {!isCollapsed && <span>{item.label}</span>}
-              </Link>
-            )
-          })}
-        </nav>
+        <nav className="flex-1 overflow-y-auto min-h-0 px-3 pt-4 space-y-4">
+          {navGroups.map((group) => (
+            <div key={group.label}>
+              {!isCollapsed && (
+                <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-600">
+                  {group.label}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = location.pathname === item.path
 
-        {!isCollapsed && usuario && (
-          <div className="border-t border-primary-100 dark:border-[#2d3158] p-3 space-y-1">
-            <div className="flex items-center gap-3 px-2 py-2 mb-1 min-w-0">
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
-                style={{ background: corAvatar }}
-              >
-                {getInitials(usuario.name)}
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 truncate">{usuario.name}</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{usuario.email}</p>
+                  if (item.highlight) {
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setSidebarOpen(false)}
+                        title={isCollapsed ? item.label : undefined}
+                        className={`
+                          flex items-center transition-all duration-150 text-sm font-medium
+                          bg-primary-600 hover:bg-primary-700 text-white rounded-lg
+                          ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}
+                        `}
+                      >
+                        <Icon size={16} className="flex-shrink-0" />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </Link>
+                    )
+                  }
+
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setSidebarOpen(false)}
+                      title={isCollapsed ? item.label : undefined}
+                      className={`
+                        relative flex items-center transition-all duration-150 text-sm
+                        ${isCollapsed
+                          ? `justify-center p-3 rounded-lg ${isActive ? 'text-primary-600' : 'text-slate-400 hover:text-slate-700'}`
+                          : `gap-3 pl-3 pr-3 py-2 rounded-lg ${isActive ? 'bg-primary-50 text-primary-700 font-medium' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
+                        }
+                      `}
+                    >
+                      {!isCollapsed && isActive && (
+                        <span className="absolute left-3 w-0.5 h-5 bg-primary-500 rounded-full" />
+                      )}
+                      <Icon size={16} className="flex-shrink-0" />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
-            <Link
-              to="/configuracoes"
-              onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#232745] hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
-            >
-              <Settings size={16} />
-              Configurações
-            </Link>
-            <button
-              onClick={aoSolicitarLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
-            >
-              <LogOut size={16} />
-              Sair
-            </button>
-          </div>
-        )}
+          ))}
+        </nav>
+
 
       </>
     )

@@ -28,12 +28,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
         <p style="color:#555;line-height:1.6;margin:0 0 16px">
           Sua conta foi criada com sucesso. Você já pode começar a elaborar minutas legislativas com assistência jurídica por IA.
         </p>
-        <p style="color:#555;line-height:1.6;margin:0 0 24px">
-          Seu plano atual é o <strong>Básico</strong>, que inclui até 3 proposições por mês.
-          Para acesso ilimitado e ao assistente jurídico completo, conheça o Plano Profissional.
-        </p>
-
-        <a href="${process.env.APP_URL}/planos"
+        <a href="${process.env.APP_URL}"
            style="display:inline-block;background:#b83b3d;color:#fff;text-decoration:none;
                   padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px">
           Começar agora

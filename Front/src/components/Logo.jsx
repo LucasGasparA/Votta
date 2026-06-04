@@ -1,4 +1,4 @@
-import logoSrc from '../assets/Votta.svg'
+import logoSrc from '../assets/Votta_logo-removebg-preview.png'
 
 const Logo = ({ size = 32, withText = false, className = '' }) => {
   return (
