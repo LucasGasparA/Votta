@@ -9,7 +9,6 @@ const Painel              = lazy(() => import('./pages/Painel'))
 const SelecionarMunicipio = lazy(() => import('./pages/SelecionarMunicipio'))
 const CriarMinuta         = lazy(() => import('./pages/CriarMinuta'))
 const EditorMinuta        = lazy(() => import('./pages/EditorMinuta'))
-const Planos              = lazy(() => import('./pages/Planos'))
 const EsqueciSenha        = lazy(() => import('./pages/EsqueciSenha'))
 const RedefinirSenha      = lazy(() => import('./pages/RedefinirSenha'))
 const Configuracoes       = lazy(() => import('./pages/Configuracoes'))
@@ -120,7 +119,6 @@ function App() {
           />
           <Route path="criar-minuta"           element={<CriarMinuta />} />
           <Route path="minuta/:id/editar"      element={<EditorMinuta />} />
-          <Route path="planos"                 element={<Planos />} />
           <Route path="configuracoes"          element={<Configuracoes />} />
           <Route path="auditoria"              element={<LogAuditoria />} />
         </Route>

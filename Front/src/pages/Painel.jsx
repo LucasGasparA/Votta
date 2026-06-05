@@ -7,7 +7,6 @@ import {
   Clock,
   FileText,
   Plus,
-  TrendingUp,
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -35,13 +34,12 @@ function construirEstatisticas(proposals) {
   const inProgress = proposals.filter(p => p.status === 'DRAFT').length
   const completed  = proposals.filter(p => p.status === 'APPROVED').length
   const pending    = proposals.filter(p => p.status === 'REVIEW').length
-  const rate       = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return [
     { label: 'Em andamento',      value: String(inProgress), icon: Clock,         color: 'text-primary-500', trend: `${total} no total` },
     { label: 'Aprovadas',         value: String(completed),  icon: CheckCircle,   color: 'text-emerald-600', trend: 'prontas para uso' },
-    { label: 'Aguardando revisão', value: String(pending),   icon: AlertTriangle, color: 'text-oro-600',     trend: pending > 0 ? 'ação recomendada' : 'sem pendências' },
-    { label: 'Taxa de aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'text-primary-600', trend: `${total} proposições` },
+    { label: 'Aguardando revisão', value: String(pending),   icon: AlertTriangle, color: 'text-oro-600',     trend: pending > 0 ? 'ação recomendada' : 'sem pendências', clickable: true },
+    { label: 'Total criadas',     value: String(total),      icon: FileText,      color: 'text-primary-600', trend: 'desde o início' },
   ]
 }
 
@@ -61,13 +59,12 @@ function construirEstatisticasDeItens(items) {
   const inProgress = items.filter(p => p.status === 'em_andamento').length
   const completed  = items.filter(p => p.status === 'concluido').length
   const pending    = items.filter(p => p.status === 'pendente_revisao').length
-  const rate       = total > 0 ? Math.round((completed / total) * 100) : 0
 
   return [
     { label: 'Em andamento',      value: String(inProgress), icon: Clock,         color: 'text-primary-500', trend: `${total} no total` },
     { label: 'Aprovadas',         value: String(completed),  icon: CheckCircle,   color: 'text-emerald-600', trend: 'prontas para uso' },
-    { label: 'Aguardando revisão', value: String(pending),   icon: AlertTriangle, color: 'text-oro-600',     trend: pending > 0 ? 'ação recomendada' : 'sem pendências' },
-    { label: 'Taxa de aprovação', value: `${rate}%`,         icon: TrendingUp,    color: 'text-primary-600', trend: `${total} proposições` },
+    { label: 'Aguardando revisão', value: String(pending),   icon: AlertTriangle, color: 'text-oro-600',     trend: pending > 0 ? 'ação recomendada' : 'sem pendências', clickable: true },
+    { label: 'Total criadas',     value: String(total),      icon: FileText,      color: 'text-primary-600', trend: 'desde o início' },
   ]
 }
 
@@ -184,7 +181,15 @@ const Painel = () => {
                   <div className="h-3 bg-slate-100 rounded w-20" />
                 </div>
               ))
-            : estatisticas.map((stat, index) => <CartaoEstatistica key={stat.label} stat={stat} index={index} />)
+            : estatisticas.map((stat, index) => (
+                <CartaoEstatistica
+                  key={stat.label}
+                  stat={stat}
+                  index={index}
+                  clickable={stat.clickable}
+                  onClick={stat.clickable ? () => setSomentePendentes(true) : undefined}
+                />
+              ))
           }
         </motion.section>
 

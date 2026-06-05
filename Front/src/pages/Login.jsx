@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -7,6 +7,7 @@ import { api } from '../api/client.js'
 import Logo from '../components/Logo'
 
 export default function Login({ aoEntrar }) {
+  const navigate = useNavigate()
   const [email,        setEmail]        = useState('')
   const [senha,        setSenha]        = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
@@ -20,6 +21,7 @@ export default function Login({ aoEntrar }) {
     try {
       await api.post('/auth/login', { email, password: senha })
       aoEntrar()
+      navigate('/painel')
     } catch (err) {
       const msg = err.message || 'E-mail ou senha incorretos'
       setErro(msg)
@@ -74,13 +76,13 @@ export default function Login({ aoEntrar }) {
                     type="button"
                     onClick={() => setMostrarSenha(v => !v)}
                     aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                    className="text-primary-400 hover:text-primary-600 dark:text-slate-500 transition-colors"
+                    className="text-slate-500 hover:text-slate-700 dark:text-slate-500 transition-colors"
                   >
                     {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                   <Link
                     to="/esqueci-senha"
-                    className="text-xs font-semibold uppercase tracking-wider text-rosso-500 hover:text-rosso-600 transition-colors"
+                    className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-slate-800 transition-colors"
                   >
                     Esqueceu?
                   </Link>
@@ -105,9 +107,9 @@ export default function Login({ aoEntrar }) {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5 text-primary-400 dark:text-slate-500">
+          <p className="text-center text-sm mt-5 text-slate-600 dark:text-slate-400">
             Não tem conta?{' '}
-            <Link to="/cadastro" className="font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
+            <Link to="/cadastro" className="font-medium text-slate-800 hover:text-slate-900 underline transition-colors">
               Criar conta grátis
             </Link>
           </p>

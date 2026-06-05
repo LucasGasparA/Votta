@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
-import { requirePlan } from '../middleware/plan.js';
 import { prisma } from '../prisma/client.js';
 import { logAudit } from '../services/audit.js';
 import { retrieveLegalContext } from '../services/rag.js';
@@ -23,7 +22,7 @@ function zodError(error: z.ZodError): string {
 
 const PROJECT_ID           = process.env.GCP_PROJECT_ID;
 const LOCATION             = process.env.GCP_LOCATION || 'us-central1';
-const MODEL                = process.env.GCP_MODEL    || 'gemini-1.5-pro';
+const MODEL                = process.env.GCP_MODEL    || 'gemini-2.5-pro';
 const GCP_CREDENTIALS_JSON = process.env.GCP_CREDENTIALS_JSON;
 const LLM_TIMEOUT_MS = 30_000;
 
@@ -45,7 +44,7 @@ const vertexAI = PROJECT_ID
     })
   : null;
 
-router.post('/chat', requirePlan('PRO'), async (req: Request, res: Response) => {
+router.post('/chat', async (req: Request, res: Response) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: zodError(parsed.error) });

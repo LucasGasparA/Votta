@@ -145,9 +145,9 @@ export default function Cadastro() {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5 text-primary-400 dark:text-slate-500">
+          <p className="text-center text-sm mt-5 text-slate-600 dark:text-slate-400">
             Já tem conta?{' '}
-            <Link to="/login" className="font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
+            <Link to="/login" className="font-medium text-slate-800 hover:text-slate-900 underline transition-colors">
               Entrar
             </Link>
           </p>

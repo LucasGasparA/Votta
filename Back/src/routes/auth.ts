@@ -103,15 +103,13 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
     const userId = (req as AuthRequest).user.userId;
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, role: true, plan: true, planExpiresAt: true },
+      select: { id: true, name: true, email: true, role: true },
     });
     if (!user) {
       res.status(404).json({ error: 'Usuário não encontrado' });
       return;
     }
-    const effectivePlan =
-      user.planExpiresAt && user.planExpiresAt < new Date() ? 'BASIC' : user.plan;
-    res.json({ user: { ...user, plan: effectivePlan } });
+    res.json({ user });
   } catch {
     res.status(500).json({ error: 'Erro no servidor' });
   }

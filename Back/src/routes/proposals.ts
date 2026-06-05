@@ -3,8 +3,6 @@ import { z } from 'zod';
 import { prisma } from '../prisma/client.js';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { logAudit } from '../services/audit.js';
-import { getUserPlan } from '../middleware/plan.js';
-
 const router = Router();
 router.use(requireAuth);
 
@@ -95,23 +93,6 @@ router.post('/', async (req: Request, res: Response) => {
   const userId = (req as AuthRequest).user.userId;
 
   try {
-    const plan = await getUserPlan(userId);
-    if (plan === 'BASIC') {
-      const inicioMes = new Date();
-      inicioMes.setDate(1);
-      inicioMes.setHours(0, 0, 0, 0);
-      const totalMes = await prisma.proposal.count({
-        where: { userId, createdAt: { gte: inicioMes } },
-      });
-      if (totalMes >= 3) {
-        res.status(403).json({
-          error: 'Você atingiu o limite de 3 proposições por mês do Plano Básico. Faça upgrade para criar proposições ilimitadas.',
-          upgrade: true,
-        });
-        return;
-      }
-    }
-
     let munId = municipalityId;
     if (!munId) {
       const mun = await prisma.municipality.findFirst();

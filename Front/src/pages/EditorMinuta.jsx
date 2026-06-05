@@ -458,7 +458,8 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
         setBannerIncerteza('Não encontrei referência normativa clara para este ponto. Consulte a Procuradoria antes de prosseguir.')
       }
     } catch (e) {
-const isTimeout = e.message?.toLowerCase().includes('demorou') || e.message?.toLowerCase().includes('timeout')
+      const msg = e.message ?? ''
+      const isTimeout = msg.toLowerCase().includes('demorou') || msg.toLowerCase().includes('timeout')
       setHistoricoChat(prev => [...prev, {
         role: 'error',
         text: isTimeout

@@ -59,7 +59,6 @@ Contexto do produto que deve guiar a direção estética:
 
 ## CONTEXTO DE NEGÓCIO
 - Comprador: gestor público de câmara municipal — decisão lenta e coletiva
-- Plano Profissional (R$297/mês) é onde a conversão acontece
 - Argumento principal: reduz retrabalho jurídico e evita devolutivas por vício formal
 - Objeção frequente: LGPD e segurança — a interface deve transmitir seriedade
 

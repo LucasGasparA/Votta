@@ -51,7 +51,7 @@ export default function RedefinirSenha() {
           <p className="text-sm mb-4 text-primary-400 dark:text-slate-500">
             Link de recuperação inválido ou expirado.
           </p>
-          <Link to="/esqueci-senha" className="text-sm font-medium text-rosso-500 hover:text-rosso-600 transition-colors">
+          <Link to="/esqueci-senha" className="text-sm font-medium text-slate-700 hover:text-slate-900 underline transition-colors">
             Solicitar novo link
           </Link>
         </div>
