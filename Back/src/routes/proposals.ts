@@ -120,8 +120,8 @@ router.post('/', async (req: Request, res: Response) => {
     });
     res.json(proposal);
     void logAudit({ userId, action: 'PROPOSAL_CREATED', entityType: 'PROPOSAL', entityId: proposal.id, detail: { title: proposal.title, municipalityId: proposal.municipalityId }, ip: req.ip });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error('Erro ao criar proposição:', error?.message ?? error);
     res.status(500).json({ error: 'Erro ao criar proposição' });
   }
 });
