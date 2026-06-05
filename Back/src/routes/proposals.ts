@@ -30,7 +30,7 @@ const updateSchema = z.object({
   estimatedImpact: z.string().max(100).optional(),
   justification: z.string().max(10000).optional(),
   content: z.string().optional(),
-  status: z.string().max(50).optional(),
+  status: z.enum(['DRAFT', 'REVIEW', 'APPROVED']).optional(),
 });
 
 function zodError(error: z.ZodError): string {
@@ -162,15 +162,17 @@ router.put('/:id', async (req: Request, res: Response) => {
       return;
     }
 
-    const proposal = await prisma.proposal.update({ where: { id: existing.id }, data: parsed.data });
-
-    const versionCount = await prisma.proposalVersion.count({ where: { proposalId: proposal.id } });
-    await prisma.proposalVersion.create({
-      data: {
-        proposalId: proposal.id,
-        content: proposal.content || '{}',
-        versionNumber: versionCount + 1,
-      },
+    const proposal = await prisma.$transaction(async (tx) => {
+      const updated = await tx.proposal.update({ where: { id: existing.id }, data: parsed.data });
+      const versionCount = await tx.proposalVersion.count({ where: { proposalId: updated.id } });
+      await tx.proposalVersion.create({
+        data: {
+          proposalId: updated.id,
+          content: updated.content || '{}',
+          versionNumber: versionCount + 1,
+        },
+      });
+      return updated;
     });
 
     res.json(proposal);

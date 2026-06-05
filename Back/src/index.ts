@@ -35,6 +35,19 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+const isProd = process.env.NODE_ENV === 'production';
+const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+
+app.use((req, res, next) => {
+  if (!isProd || ['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  const origin = req.headers.origin || req.headers.referer || '';
+  if (frontendUrl && !origin.startsWith(frontendUrl)) {
+    res.status(403).json({ error: 'Origem não autorizada' });
+    return;
+  }
+  next();
+});
+
 if (process.env.NODE_ENV !== 'production') {
   app.use((req, _res, next) => {
     console.log(`📍 ${req.method} ${req.path}`);

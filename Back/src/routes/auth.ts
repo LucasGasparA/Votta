@@ -3,12 +3,37 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { z } from 'zod';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../prisma/client.js';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/mailer.js';
 import { logAudit } from '../services/audit.js';
 
 const router = Router();
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Muitas tentativas de login. Aguarde 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Muitos cadastros deste IP. Aguarde 1 hora.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const forgotLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Muitas solicitações de recuperação. Aguarde 1 hora.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const registerSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -35,7 +60,7 @@ function signToken(userId: string, role: string) {
   return jwt.sign({ userId, role }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 }
 
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register', registerLimiter, async (req: Request, res: Response) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
@@ -66,7 +91,7 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', loginLimiter, async (req: Request, res: Response) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
@@ -130,7 +155,7 @@ const resetSchema = z.object({
 });
 
 // POST /auth/forgot-password
-router.post('/forgot-password', async (req: Request, res: Response) => {
+router.post('/forgot-password', forgotLimiter, async (req: Request, res: Response) => {
   const parsed = forgotSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
@@ -162,7 +187,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
 });
 
 // POST /auth/reset-password
-router.post('/reset-password', async (req: Request, res: Response) => {
+router.post('/reset-password', forgotLimiter, async (req: Request, res: Response) => {
   const parsed = resetSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });

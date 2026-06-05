@@ -75,14 +75,18 @@ export default function EsqueciSenha() {
             </p>
 
             <form onSubmit={aoEnviar} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="E-mail"
-                required
-                className={inputBase}
-              />
+              <div>
+                <label htmlFor="email" className="sr-only">E-mail</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="E-mail"
+                  required
+                  className={inputBase}
+                />
+              </div>
 
               <button
                 type="submit"

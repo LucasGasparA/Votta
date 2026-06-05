@@ -466,7 +466,7 @@ const CriarMinuta = () => {
                       </button>
                     ))}
                   </div>
-                  {dadosFormulario.competence === 'Não tenho certeza' && (
+                  {dadosFormulario.competence === 'incerto' && (
                     <div className="flex items-start gap-3 p-3 mt-2 bg-oro-50 border border-oro-200 rounded-xl">
                       <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={16} />
                       <p className="text-xs text-oro-800">O assistente jurídico verificará a competência automaticamente.</p>

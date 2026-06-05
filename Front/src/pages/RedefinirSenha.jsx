@@ -107,7 +107,9 @@ export default function RedefinirSenha() {
             <form onSubmit={aoEnviar} className="space-y-3">
               {/* Nova senha */}
               <div className="relative">
+                <label htmlFor="nova-senha" className="sr-only">Nova senha</label>
                 <input
+                  id="nova-senha"
                   type={mostrarSenha ? 'text' : 'password'}
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
@@ -128,7 +130,9 @@ export default function RedefinirSenha() {
 
               {/* Confirmar senha */}
               <div className="relative">
+                <label htmlFor="confirmar-senha" className="sr-only">Confirmar nova senha</label>
                 <input
+                  id="confirmar-senha"
                   type={mostrarConfirmacao ? 'text' : 'password'}
                   value={confirmacao}
                   onChange={e => setConfirmacao(e.target.value)}

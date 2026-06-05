@@ -71,27 +71,37 @@ export default function Cadastro() {
           </h1>
 
           <form onSubmit={aoEnviar} className="space-y-3">
-            <input
-              type="text"
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-              placeholder="Nome completo"
-              required
-              className={inputBase}
-            />
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="E-mail"
-              required
-              className={inputBase}
-            />
+            <div>
+              <label htmlFor="nome" className="sr-only">Nome completo</label>
+              <input
+                id="nome"
+                type="text"
+                value={nome}
+                onChange={e => setNome(e.target.value)}
+                placeholder="Nome completo"
+                required
+                className={inputBase}
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="sr-only">E-mail</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="E-mail"
+                required
+                className={inputBase}
+              />
+            </div>
 
             {/* Senha */}
             <div>
               <div className="relative">
+                <label htmlFor="senha" className="sr-only">Senha</label>
                 <input
+                  id="senha"
                   type={mostrarSenha ? 'text' : 'password'}
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
@@ -114,7 +124,9 @@ export default function Cadastro() {
 
             {/* Confirmar senha */}
             <div className="relative">
+              <label htmlFor="confirmacao" className="sr-only">Confirmar senha</label>
               <input
+                id="confirmacao"
                 type={mostrarConfirmacao ? 'text' : 'password'}
                 value={confirmacao}
                 onChange={e => setConfirmacao(e.target.value)}

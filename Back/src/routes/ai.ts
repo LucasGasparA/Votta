@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
+import rateLimit from 'express-rate-limit';
 import { VertexAI } from '@google-cloud/vertexai';
 import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { prisma } from '../prisma/client.js';
@@ -8,6 +9,14 @@ import { retrieveLegalContext } from '../services/rag.js';
 
 const router = Router();
 router.use(requireAuth);
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Limite de requisições atingido. Aguarde 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const chatSchema = z.object({
   proposalId: z.string().optional(),
@@ -44,14 +53,29 @@ const vertexAI = PROJECT_ID
     })
   : null;
 
-router.post('/chat', async (req: Request, res: Response) => {
+router.post('/chat', aiLimiter, async (req: Request, res: Response) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: zodError(parsed.error) });
     return;
   }
 
-  const { message, promptContext } = parsed.data;
+  const userId = (req as AuthRequest).user.userId;
+  const { message, proposalId } = parsed.data;
+  let promptContext = parsed.data.promptContext;
+
+  if (proposalId) {
+    const proposal = await prisma.proposal.findFirst({
+      where: { id: proposalId, userId },
+    });
+    if (!proposal) {
+      res.status(403).json({ error: 'Proposição não encontrada ou sem permissão.' });
+      return;
+    }
+    if (proposal.content) {
+      promptContext = proposal.content;
+    }
+  }
 
   if (!vertexAI) {
     res.json({
@@ -150,7 +174,7 @@ function buildDemoContent(proposal: any) {
   };
 }
 
-router.post('/generate', async (req: Request, res: Response) => {
+router.post('/generate', aiLimiter, async (req: Request, res: Response) => {
   const parsed = generateSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: zodError(parsed.error) });
