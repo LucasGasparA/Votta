@@ -153,10 +153,10 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                         onClick={() => setSidebarOpen(false)}
                         title={isCollapsed ? item.label : undefined}
                         className={`
-                          flex items-center transition-all duration-150 text-sm font-medium rounded-lg
-                          ${isActive
-                            ? `bg-primary-600 hover:bg-primary-700 text-white ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}`
-                            : `border border-primary-200 text-primary-600 hover:bg-primary-50 hover:border-primary-300 ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}`
+                          relative flex items-center transition-all duration-150 text-sm rounded-lg
+                          ${isCollapsed
+                            ? `justify-center p-3 ${isActive ? 'bg-primary-600 text-white' : 'text-slate-400 hover:text-slate-700'}`
+                            : `gap-3 pl-3 pr-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
                           }
                         `}
                       >
@@ -173,16 +173,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                       onClick={() => setSidebarOpen(false)}
                       title={isCollapsed ? item.label : undefined}
                       className={`
-                        relative flex items-center transition-all duration-150 text-sm
+                        flex items-center transition-all duration-150 text-sm rounded-lg
                         ${isCollapsed
-                          ? `justify-center p-3 rounded-lg ${isActive ? 'text-primary-600' : 'text-slate-400 hover:text-slate-700'}`
-                          : `gap-3 pl-3 pr-3 py-2 rounded-lg ${isActive ? 'bg-primary-50 text-primary-700 font-medium' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
+                          ? `justify-center p-3 ${isActive ? 'bg-primary-600 text-white' : 'text-slate-400 hover:text-slate-700'}`
+                          : `gap-3 px-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
                         }
                       `}
                     >
-                      {!isCollapsed && isActive && (
-                        <span className="absolute left-3 w-0.5 h-5 bg-primary-500 rounded-full" />
-                      )}
                       <Icon size={16} className="flex-shrink-0" />
                       {!isCollapsed && <span>{item.label}</span>}
                     </Link>
