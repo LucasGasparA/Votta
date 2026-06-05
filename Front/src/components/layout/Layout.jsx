@@ -81,21 +81,25 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
     return (
       <>
         {/* ── Cabeçalho: logo + botão recolher ── */}
-        <div
-          className={`border-b border-primary-100 dark:border-[#2d3158] flex items-center flex-shrink-0 ${
-            isCollapsed ? 'p-3 justify-center' : 'p-4 gap-3'
-          }`}
-        >
-          <Logo size={28} className={isCollapsed ? '' : 'flex-1 min-w-0'} />
-
-          {!isCollapsed && (
+        <div className="border-b border-primary-100 dark:border-[#2d3158] flex items-center flex-shrink-0 p-4 gap-3">
+          {isCollapsed && !mobile ? (
+            <button
+              onClick={() => setCollapsed(false)}
+              aria-label="Expandir menu"
+              title="Expandir menu"
+              className="mx-auto"
+            >
+              <Logo size={28} />
+            </button>
+          ) : (
             <>
+              <Logo size={28} withText={true} className="flex-1 min-w-0" />
 
               {mobile && (
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Fechar menu"
-                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-600 dark:hover:text-slate-300 transition-colors"
+                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-600 dark:hover:text-slate-300 transition-colors flex-shrink-0"
                 >
                   <X size={18} />
                 </button>
@@ -112,17 +116,6 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                 </button>
               )}
             </>
-          )}
-
-          {isCollapsed && !mobile && (
-            <button
-              onClick={() => setCollapsed(false)}
-              aria-label="Expandir menu"
-              title="Expandir menu"
-              className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors"
-            >
-              <ChevronRight size={18} />
-            </button>
           )}
         </div>
 
@@ -141,13 +134,11 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
         )}
 
         {/* ── Navegação ── */}
-        <nav className="flex-1 overflow-y-auto min-h-0 px-3 pt-4 space-y-4">
-          {navGroups.map((group) => (
+        <nav className="flex-1 overflow-y-auto min-h-0 px-3 pt-4 space-y-1">
+          {navGroups.map((group, groupIndex) => (
             <div key={group.label}>
-              {!isCollapsed && (
-                <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  {group.label}
-                </p>
+              {groupIndex > 0 && (
+                <div className={`${isCollapsed ? 'my-2' : 'my-3'} border-t border-primary-100 dark:border-[#2d3158]`} />
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
@@ -162,9 +153,11 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                         onClick={() => setSidebarOpen(false)}
                         title={isCollapsed ? item.label : undefined}
                         className={`
-                          flex items-center transition-all duration-150 text-sm font-medium
-                          bg-primary-600 hover:bg-primary-700 text-white rounded-lg
-                          ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}
+                          flex items-center transition-all duration-150 text-sm font-medium rounded-lg
+                          ${isActive
+                            ? `bg-primary-600 hover:bg-primary-700 text-white ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}`
+                            : `border border-primary-200 text-primary-600 hover:bg-primary-50 hover:border-primary-300 ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2'}`
+                          }
                         `}
                       >
                         <Icon size={16} className="flex-shrink-0" />

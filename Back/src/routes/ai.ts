@@ -22,7 +22,7 @@ function zodError(error: z.ZodError): string {
 
 const PROJECT_ID           = process.env.GCP_PROJECT_ID;
 const LOCATION             = process.env.GCP_LOCATION || 'us-central1';
-const MODEL                = process.env.GCP_MODEL    || 'gemini-1.5-pro';
+const MODEL                = process.env.GCP_MODEL    || 'gemini-2.5-pro';
 const GCP_CREDENTIALS_JSON = process.env.GCP_CREDENTIALS_JSON;
 const LLM_TIMEOUT_MS = 30_000;
 
