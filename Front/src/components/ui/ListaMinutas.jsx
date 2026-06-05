@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowRight, CheckCircle, Clock, FileText, PlusCircle, Trash2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, FileText, PlusCircle, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
 
 const STATUS_CONFIG = {
   em_andamento:     { label: 'Em andamento',       color: 'bg-primary-50 text-primary-700 border-primary-100', Icon: Clock },
@@ -17,8 +18,36 @@ const ListaMinutas = ({
   emptyDescription = 'Crie sua primeira proposição legislativa em minutos com o fluxo guiado.',
 }) => {
   const [alvoExclusao, setAlvoExclusao] = useState(null)
+  const timerRef = useRef(null)
 
   const obterStatus = (status) => STATUS_CONFIG[status] ?? STATUS_CONFIG.em_andamento
+
+  const confirmarExclusao = () => {
+    const { id } = alvoExclusao
+    setAlvoExclusao(null)
+
+    let cancelado = false
+
+    const toastId = toast(
+      (t) => (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-slate-700">Proposição excluída.</span>
+          <button
+            onClick={() => { cancelado = true; clearTimeout(timerRef.current); toast.dismiss(t.id) }}
+            className="text-xs font-semibold text-primary-600 hover:text-primary-800 transition-colors"
+          >
+            Desfazer
+          </button>
+        </div>
+      ),
+      { duration: 4000 }
+    )
+
+    timerRef.current = setTimeout(() => {
+      if (!cancelado) onDelete(id)
+      toast.dismiss(toastId)
+    }, 4000)
+  }
 
   return (
     <motion.div
@@ -84,13 +113,6 @@ const ListaMinutas = ({
                     <StatusIcon size={12} strokeWidth={2.5} />
                     {cfg.label}
                   </span>
-                  <Link
-                    to={`/minuta/${proposal.id}/editar`}
-                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-[#1c1f38] transition-colors"
-                  >
-                    Abrir
-                    <ArrowRight size={13} />
-                  </Link>
                   <button
                     onClick={() => setAlvoExclusao({ id: proposal.id, title: proposal.title })}
                     aria-label={`Excluir proposição: ${proposal.title}`}
@@ -117,7 +139,7 @@ const ListaMinutas = ({
               initial={{ scale: 0.96, y: 14 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.96, y: 14 }}
-              className="w-full max-w-sm rounded-lg bg-white p-6 shadow-2xl dark:bg-[#1c1f38]"
+              className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#1c1f38]"
             >
               <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-rosso-50 dark:bg-rosso-900/20">
                 <Trash2 size={21} className="text-rosso-500" />
@@ -137,10 +159,7 @@ const ListaMinutas = ({
                   Cancelar
                 </button>
                 <button
-                  onClick={() => {
-                    onDelete(alvoExclusao.id)
-                    setAlvoExclusao(null)
-                  }}
+                  onClick={confirmarExclusao}
                   className="flex-1 rounded-lg bg-rosso-500 px-3 py-2.5 text-sm font-semibold text-white hover:bg-rosso-600 transition-colors"
                 >
                   Excluir

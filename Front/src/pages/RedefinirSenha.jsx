@@ -77,8 +77,8 @@ export default function RedefinirSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[#f0fdf4] dark:bg-[#232745]">
-              <CheckCircle size={24} className="text-green-600" />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-[#232745]">
+              <CheckCircle size={24} className="text-emerald-600" />
             </div>
             <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">
               Senha redefinida!

@@ -13,10 +13,12 @@ export default function Login({ aoEntrar }) {
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [carregando,   setCarregando]   = useState(false)
   const [erro,         setErro]         = useState('')
+  const [camposComErro, setCamposComErro] = useState([])
 
   const aoEnviar = async (e) => {
     e.preventDefault()
     setErro('')
+    setCamposComErro([])
     setCarregando(true)
     try {
       await api.post('/auth/login', { email, password: senha })
@@ -25,6 +27,7 @@ export default function Login({ aoEntrar }) {
     } catch (err) {
       const msg = err.message || 'E-mail ou senha incorretos'
       setErro(msg)
+      setCamposComErro(['email', 'senha'])
       toast.error(msg)
     } finally {
       setCarregando(false)
@@ -51,10 +54,10 @@ export default function Login({ aoEntrar }) {
                 id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={e => { setEmail(e.target.value); setCamposComErro(p => p.filter(c => c !== 'email')) }}
                 placeholder="E-mail"
                 required
-                className="input-field py-3.5 text-sm"
+                className={`input-field py-3.5 text-sm ${camposComErro.includes('email') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
               />
             </div>
 
@@ -65,28 +68,28 @@ export default function Login({ aoEntrar }) {
                   id="senha"
                   type={mostrarSenha ? 'text' : 'password'}
                   value={senha}
-                  onChange={e => setSenha(e.target.value)}
+                  onChange={e => { setSenha(e.target.value); setCamposComErro(p => p.filter(c => c !== 'senha')) }}
                   placeholder="Senha"
                   minLength={6}
                   required
-                  className="input-field py-3.5 pr-32 text-sm"
+                  className={`input-field py-3.5 pr-12 text-sm ${camposComErro.includes('senha') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setMostrarSenha(v => !v)}
-                    aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                    className="text-slate-500 hover:text-slate-700 dark:text-slate-500 transition-colors"
-                  >
-                    {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                  <Link
-                    to="/esqueci-senha"
-                    className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-slate-800 transition-colors"
-                  >
-                    Esqueceu?
-                  </Link>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setMostrarSenha(v => !v)}
+                  aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-500 transition-colors"
+                >
+                  {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <div className="flex justify-end mt-1.5">
+                <Link
+                  to="/esqueci-senha"
+                  className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
+                >
+                  Esqueceu a senha?
+                </Link>
               </div>
             </div>
 
