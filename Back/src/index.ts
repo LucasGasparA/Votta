@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
@@ -27,6 +28,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter((o): o is string => Boolean(o));
 
+app.use(helmet());
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,

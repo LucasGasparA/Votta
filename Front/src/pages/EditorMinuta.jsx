@@ -523,7 +523,8 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   }
 
   const adicionarArtigo = () => {
-    const n = pendingDocRef.current.artigos.length + 1
+    const ids = pendingDocRef.current.artigos.map(a => a.id)
+    const n = ids.length > 0 ? Math.max(...ids) + 1 : 1
     const newArticle = { id: n, numero: `Art. ${n}º`, texto: '', citacoes: [] }
     pendingDocRef.current = {
       ...pendingDocRef.current,

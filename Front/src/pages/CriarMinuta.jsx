@@ -89,6 +89,7 @@ const PROPOSAL_TYPES = [
 
 const CriarMinuta = () => {
   const [tooltip, setTooltip] = useState(null) // { value, x, y }
+  const [municipioVerificado, setMunicipioVerificado] = useState(false)
   const navigate = useNavigate()
   const { municipioSelecionado } = useOutletContext() ?? {}
 
@@ -96,6 +97,8 @@ const CriarMinuta = () => {
     if (!municipioSelecionado) {
       toast.error('Selecione um município antes de criar uma proposição.')
       navigate('/selecionar-municipio')
+    } else {
+      setMunicipioVerificado(true)
     }
   }, [municipioSelecionado, navigate])
 
@@ -279,6 +282,8 @@ const CriarMinuta = () => {
       </div>
     )
   }
+
+  if (!municipioVerificado) return null
 
   return (
     <div className="min-h-full bg-slate-50/70 dark:bg-[#141624] px-6 py-5">
