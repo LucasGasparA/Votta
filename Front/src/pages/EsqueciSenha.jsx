@@ -44,8 +44,8 @@ export default function EsqueciSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[#fef2f2] dark:bg-[#232745]">
-              <Mail size={24} className="text-rosso-500" />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-[#232745]">
+              <Mail size={24} className="text-emerald-500" />
             </div>
             <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">
               Verifique seu e-mail
@@ -63,6 +63,12 @@ export default function EsqueciSenha() {
               <ArrowLeft size={14} />
               Voltar ao login
             </Link>
+            <button
+              onClick={() => setEnviado(false)}
+              className="mt-3 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              Tentar com outro e-mail
+            </button>
           </motion.div>
         ) : (
           /* Formulário */

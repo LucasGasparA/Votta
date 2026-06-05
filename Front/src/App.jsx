@@ -40,15 +40,10 @@ function App() {
       .finally(() => setCarregando(false))
   }, [])
 
-  const aoEntrar = () => {
-    api.get('/auth/me')
-      .then(({ user }) => {
-        definirAutenticado(true)
-        setUsuario(user)
-      })
-      .catch(() => {
-        definirAutenticado(false)
-      })
+  const aoEntrar = async () => {
+    const { user } = await api.get('/auth/me')
+    definirAutenticado(true)
+    setUsuario(user)
   }
 
   const aoSelecionarMunicipio = (municipio) => {

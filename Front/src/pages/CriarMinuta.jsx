@@ -168,22 +168,27 @@ const CriarMinuta = () => {
       setEtapaGeracao(s => Math.min(s + 1, GENERATION_STEPS.length - 1))
     }, 3000)
 
+    let proposalId = null
     try {
       const data = await api.post('/proposals', {
         ...dadosFormulario,
         municipalityId: municipioSelecionado?.id,
       })
+      proposalId = data.id
 
-      await api.post('/ai/generate', { proposalId: data.id })
-
-      clearInterval(stepInterval)
-      setEtapaGeracao(GENERATION_STEPS.length - 1)
-
-      await new Promise(r => setTimeout(r, 800))
+      try {
+        await api.post('/ai/generate', { proposalId })
+        clearInterval(stepInterval)
+        setEtapaGeracao(GENERATION_STEPS.length - 1)
+        await new Promise(r => setTimeout(r, 800))
+        toast.success('Minuta gerada com sucesso!')
+      } catch {
+        clearInterval(stepInterval)
+        toast.error('A IA não conseguiu gerar a minuta. Você pode editar o conteúdo manualmente.')
+      }
 
       try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* noop */ }
-      toast.success('Minuta gerada com sucesso!')
-      navigate(`/minuta/${data.id}/editar`)
+      navigate(`/minuta/${proposalId}/editar`)
     } catch (e) {
       clearInterval(stepInterval)
       setGerando(false)
@@ -411,9 +416,15 @@ const CriarMinuta = () => {
                     placeholder="Ex: Coleta Seletiva de Lixo Reciclável"
                     autoFocus
                   />
-                  {tentouProximo && !dadosFormulario.theme.trim() && (
-                    <p className="text-xs text-rosso-500 mt-1">Campo obrigatório.</p>
-                  )}
+                  <div className="flex items-center justify-between mt-1">
+                    {tentouProximo && !dadosFormulario.theme.trim()
+                      ? <p className="text-xs text-rosso-500">Campo obrigatório.</p>
+                      : <span />
+                    }
+                    <p className={`text-xs ${dadosFormulario.theme.length > 490 ? 'text-rosso-500' : 'text-slate-400'}`}>
+                      {dadosFormulario.theme.length}/500
+                    </p>
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="objective" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-0.5">
@@ -430,9 +441,15 @@ const CriarMinuta = () => {
                     className={`input-field min-h-[80px] resize-none ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Instituir um programa municipal de coleta seletiva com pontos de entrega voluntária"
                   />
-                  {tentouProximo && !dadosFormulario.objective.trim() && (
-                    <p className="text-xs text-rosso-500 mt-1">Campo obrigatório.</p>
-                  )}
+                  <div className="flex items-center justify-between mt-1">
+                    {tentouProximo && !dadosFormulario.objective.trim()
+                      ? <p className="text-xs text-rosso-500">Campo obrigatório.</p>
+                      : <span />
+                    }
+                    <p className={`text-xs ${dadosFormulario.objective.length > 4800 ? 'text-rosso-500' : 'text-slate-400'}`}>
+                      {dadosFormulario.objective.length}/5000
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -580,7 +597,7 @@ const CriarMinuta = () => {
             ) : (
               <button
                 onClick={aoFinalizar}
-                disabled={enviando}
+                disabled={!podeAvancar() || enviando}
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm transition-all
                   ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 dark:bg-[#232745] text-primary-300 dark:text-slate-600 cursor-not-allowed'}`}
               >
@@ -644,7 +661,7 @@ const CriarMinuta = () => {
                   Continuar
                 </button>
                 <button
-                  onClick={() => navigate('/painel')}
+                  onClick={() => { try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* noop */ } navigate('/painel') }}
                   className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
                     hover:bg-rosso-600 active:scale-[0.97] transition-all"
                 >

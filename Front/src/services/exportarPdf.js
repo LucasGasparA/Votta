@@ -145,7 +145,7 @@ export async function exportToPDF(proposalTitle = 'Proposição', doc, municipal
 
   /* ── Salvar ───────────────────────────────────────────────────── */
   const filename = proposalTitle
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')   // remove acentos
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9\s]/g, '').trim()
     .replace(/\s+/g, '_')
     .substring(0, 60) || 'proposicao';

@@ -154,7 +154,7 @@ export async function exportToDocx(proposalTitle = 'Proposição', doc, municipa
   const blob = await Packer.toBlob(document)
 
   const filename = proposalTitle
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9\s]/g, '').trim()
     .replace(/\s+/g, '_')
     .substring(0, 60) || 'proposicao'

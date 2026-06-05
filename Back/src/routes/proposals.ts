@@ -164,14 +164,16 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     const proposal = await prisma.$transaction(async (tx) => {
       const updated = await tx.proposal.update({ where: { id: existing.id }, data: parsed.data });
-      const versionCount = await tx.proposalVersion.count({ where: { proposalId: updated.id } });
-      await tx.proposalVersion.create({
-        data: {
-          proposalId: updated.id,
-          content: updated.content || '{}',
-          versionNumber: versionCount + 1,
-        },
-      });
+      if (parsed.data.content !== undefined) {
+        const versionCount = await tx.proposalVersion.count({ where: { proposalId: updated.id } });
+        await tx.proposalVersion.create({
+          data: {
+            proposalId: updated.id,
+            content: updated.content || '{}',
+            versionNumber: versionCount + 1,
+          },
+        });
+      }
       return updated;
     });
 

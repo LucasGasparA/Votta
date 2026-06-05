@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, CheckCircle, Clock, FileText, PlusCircle, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -19,6 +19,8 @@ const ListaMinutas = ({
 }) => {
   const [alvoExclusao, setAlvoExclusao] = useState(null)
   const timerRef = useRef(null)
+
+  useEffect(() => () => clearTimeout(timerRef.current), [])
 
   const obterStatus = (status) => STATUS_CONFIG[status] ?? STATUS_CONFIG.em_andamento
 

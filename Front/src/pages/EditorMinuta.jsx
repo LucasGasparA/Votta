@@ -501,6 +501,9 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
   const alertasPendentes  = useMemo(() => validacoes.filter(v => v.type === 'warning' || v.type === 'error'), [validacoes])
   const citacoesUsadas  = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
+  const docVazio = useMemo(() =>
+    !doc.ementa?.trim() && !doc.preambulo?.trim() && !doc.artigos?.length && !doc.vigencia?.trim() && !doc.revogacao?.trim()
+  , [doc])
   const formatoExportacao   = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('legisla:settings') || '{}').exportFormat || 'PDF' }
     catch { return 'PDF' }
@@ -713,6 +716,16 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
             </div>
           </div>
 
+          {/* Banner — minuta vazia */}
+          {docVazio && (
+            <div className="flex items-start gap-3 p-4 mb-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={17} />
+              <p className="text-sm text-amber-800">
+                A minuta ainda não tem conteúdo. Se a geração por IA falhou, você pode digitar diretamente em cada seção abaixo.
+              </p>
+            </div>
+          )}
+
           {/* Validações */}
           <div className="space-y-2 mb-4">
             {validacoes.map((v, i) => (
@@ -786,7 +799,9 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                         <div className="flex items-start gap-4">
                           <span className="px-2.5 py-1 bg-primary-100 dark:bg-[#232745] text-primary-700 dark:text-slate-300 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
                           <div className="flex-1">
-                            <textarea defaultValue={artigo.texto} onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
+                            <textarea defaultValue={artigo.texto}
+                              onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
+                              onFocus={e => { activeTextareaRef.current = e.target }}
                               className="w-full px-3 py-2.5 border-2 border-primary-100 dark:border-[#2d3158] dark:bg-[#232745] dark:text-slate-100 rounded-lg focus:border-primary-400 dark:focus:border-[#3d4270] focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
                               placeholder="Texto do artigo..." />
                             {artigo.citacoes?.length > 0 && (
@@ -1296,9 +1311,9 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all">
                   Voltar ao Editor
                 </button>
-                <button onClick={confirmarExportacao} disabled={!exportacaoRevisada}
+                <button onClick={confirmarExportacao} disabled={!exportacaoRevisada || docVazio}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:cursor-not-allowed
-                    ${exportacaoRevisada ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'bg-primary-100 text-primary-300'}`}>
+                    ${exportacaoRevisada && !docVazio ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'bg-primary-100 text-primary-300'}`}>
                   <Download size={15} /> {formatoExportacao === 'DOCX' ? 'Gerar DOCX' : 'Gerar PDF'}
                 </button>
               </div>

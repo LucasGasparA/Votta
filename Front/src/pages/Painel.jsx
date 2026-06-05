@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useOutletContext, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -54,19 +54,6 @@ function paraItemLista(p) {
   }
 }
 
-function construirEstatisticasDeItens(items) {
-  const total      = items.length
-  const inProgress = items.filter(p => p.status === 'em_andamento').length
-  const completed  = items.filter(p => p.status === 'concluido').length
-  const pending    = items.filter(p => p.status === 'pendente_revisao').length
-
-  return [
-    { label: 'Em andamento',      value: String(inProgress), icon: Clock,         color: 'text-primary-500', trend: `${total} no total` },
-    { label: 'Aprovadas',         value: String(completed),  icon: CheckCircle,   color: 'text-emerald-600', trend: 'prontas para uso' },
-    { label: 'Aguardando revisão', value: String(pending),   icon: AlertTriangle, color: 'text-oro-600',     trend: pending > 0 ? 'ação recomendada' : 'sem pendências', clickable: true },
-    { label: 'Total criadas',     value: String(total),      icon: FileText,      color: 'text-primary-600', trend: 'desde o início' },
-  ]
-}
 
 function obterSaudacao() {
   const h = new Date().getHours()
@@ -75,35 +62,61 @@ function obterSaudacao() {
   return 'Boa noite'
 }
 
+const LIMIT = 20
+
 const Painel = () => {
   const { municipioSelecionado, usuario } = useOutletContext() ?? {}
-  const [estatisticas, setEstatisticas] = useState(construirEstatisticas([]))
-  const [proposicoes,  setProposicoes]  = useState([])
-  const [carregando,   setCarregando]   = useState(true)
-  const [total,        setTotal]        = useState(0)
+  const [estatisticas,   setEstatisticas]   = useState(construirEstatisticas([]))
+  const [rawProposals,   setRawProposals]   = useState([])
+  const [proposicoes,    setProposicoes]    = useState([])
+  const [carregando,     setCarregando]     = useState(true)
+  const [carregandoMais, setCarregandoMais] = useState(false)
+  const [total,          setTotal]          = useState(0)
+  const [pagina,         setPagina]         = useState(1)
   const [somentePendentes, setSomentePendentes] = useState(false)
 
   useEffect(() => {
-    api.get('/proposals?limit=50')
-      .then(({ proposals }) => {
+    api.get(`/proposals?limit=${LIMIT}&page=1`)
+      .then(({ proposals, total: t }) => {
         setEstatisticas(construirEstatisticas(proposals))
+        setRawProposals(proposals)
         setProposicoes(proposals.map(paraItemLista))
-        setTotal(proposals.length)
+        setTotal(t)
+        setPagina(1)
       })
       .catch(() => toast.error('Não foi possível carregar as proposições.'))
       .finally(() => setCarregando(false))
   }, [])
 
+  const carregarMais = useCallback(async () => {
+    const next = pagina + 1
+    setCarregandoMais(true)
+    try {
+      const { proposals } = await api.get(`/proposals?limit=${LIMIT}&page=${next}`)
+      setRawProposals(prev => {
+        const merged = [...prev, ...proposals]
+        setEstatisticas(construirEstatisticas(merged))
+        return merged
+      })
+      setProposicoes(prev => [...prev, ...proposals.map(paraItemLista)])
+      setPagina(next)
+    } catch {
+      toast.error('Não foi possível carregar mais proposições.')
+    } finally {
+      setCarregandoMais(false)
+    }
+  }, [pagina])
+
   const aoExcluir = async (proposalId) => {
     try {
       await api.del('/proposals/' + proposalId)
-      setProposicoes(prev => {
+      setRawProposals(prev => {
         const next = prev.filter(p => p.id !== proposalId)
-        setEstatisticas(construirEstatisticasDeItens(next))
-        setTotal(next.length)
+        setEstatisticas(construirEstatisticas(next))
         return next
       })
-      toast.success('Proposição excluída.')
+      setProposicoes(prev => prev.filter(p => p.id !== proposalId))
+      setTotal(prev => prev - 1)
     } catch (e) {
       toast.error(e.message)
     }
@@ -112,9 +125,10 @@ const Painel = () => {
   const navigate        = useNavigate()
   const totalPendentes  = Number(estatisticas[2]?.value ?? 0)
   const primeiroNome    = usuario?.name?.split(' ')[0] ?? ''
+  const temMais         = proposicoes.length < total
   const listaExibida    = somentePendentes
     ? proposicoes.filter(p => p.status === 'pendente_revisao')
-    : proposicoes.slice(0, 6)
+    : proposicoes
 
   return (
     <div className="min-h-full bg-slate-50/70 dark:bg-[#141624]">
@@ -241,6 +255,17 @@ const Painel = () => {
                 emptyTitle={somentePendentes ? 'Nenhuma pendência encontrada' : undefined}
                 emptyDescription={somentePendentes ? 'As proposições carregadas não têm revisão pendente.' : undefined}
               />
+              {!somentePendentes && temMais && (
+                <div className="mt-3 flex justify-center">
+                  <button
+                    onClick={carregarMais}
+                    disabled={carregandoMais}
+                    className="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors disabled:opacity-50"
+                  >
+                    {carregandoMais ? 'Carregando...' : `Carregar mais (${total - proposicoes.length} restantes)`}
+                  </button>
+                </div>
+              )}
             </section>
 
             <aside className="space-y-3">
@@ -277,7 +302,10 @@ const Painel = () => {
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <dt className="text-slate-500 dark:text-slate-400">Total</dt>
-                    <dd className="font-medium text-slate-800 dark:text-slate-200">{total}</dd>
+                    <dd className="font-medium text-slate-800 dark:text-slate-200">
+                      {total}
+                      {temMais && <span className="ml-1 text-xs text-slate-400">({proposicoes.length} exibidas)</span>}
+                    </dd>
                   </div>
                 </dl>
               </div>

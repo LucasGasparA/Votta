@@ -22,7 +22,7 @@ export default function Login({ aoEntrar }) {
     setCarregando(true)
     try {
       await api.post('/auth/login', { email, password: senha })
-      aoEntrar()
+      await aoEntrar()
       navigate('/painel')
     } catch (err) {
       const msg = err.message || 'E-mail ou senha incorretos'

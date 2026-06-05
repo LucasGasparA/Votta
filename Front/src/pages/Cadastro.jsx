@@ -18,9 +18,11 @@ export default function Cadastro() {
 
   const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-[#232745]'
 
+  const senhasNaoCoincidem = confirmacao.length > 0 && senha !== confirmacao
+
   const aoEnviar = async (e) => {
     e.preventDefault()
-    if (senha !== confirmacao) {
+    if (senhasNaoCoincidem) {
       toast.error('As senhas não coincidem')
       return
     }
@@ -133,7 +135,7 @@ export default function Cadastro() {
                 placeholder="Confirmar senha"
                 minLength={6}
                 required
-                className={`${inputBase} pr-12`}
+                className={`${inputBase} pr-12 ${senhasNaoCoincidem ? 'border-rosso-400 focus:border-rosso-400' : ''}`}
               />
               <button
                 type="button"
@@ -143,6 +145,9 @@ export default function Cadastro() {
               >
                 {mostrarConfirmacao ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
+              {senhasNaoCoincidem && (
+                <p className="text-xs text-rosso-500 mt-1">As senhas não coincidem.</p>
+              )}
             </div>
 
             <button
