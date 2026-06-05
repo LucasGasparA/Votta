@@ -26,6 +26,7 @@ settings         String    @default("{}")
 
 model Municipality {
   id        String   @id @default(uuid())
+  ibgeId    String   @unique
   name      String
   state     String
   createdAt DateTime @default(now())
@@ -65,6 +66,8 @@ model ProposalVersion {
   content       String
   versionNumber Int
   createdAt     DateTime @default(now())
+
+  @@unique([proposalId, versionNumber])
 }
 
 model AuditLog {

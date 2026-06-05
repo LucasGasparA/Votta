@@ -6,6 +6,7 @@ import { requireAuth, AuthRequest } from '../middleware/auth.js';
 import { prisma } from '../prisma/client.js';
 import { logAudit } from '../services/audit.js';
 import { retrieveLegalContext } from '../services/rag.js';
+import { normalizeProposalContent, ProposalContent } from '../services/proposalContent.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -19,7 +20,7 @@ const aiLimiter = rateLimit({
 });
 
 const chatSchema = z.object({
-  proposalId: z.string().optional(),
+  proposalId: z.string().uuid().optional(),
   message: z.string().min(1, 'Mensagem não pode ser vazia').max(2000),
   promptContext: z.string().max(20000).optional(),
 });
@@ -174,6 +175,26 @@ function buildDemoContent(proposal: any) {
   };
 }
 
+async function saveGeneratedContent(proposalId: string, content: ProposalContent) {
+  const serialized = JSON.stringify(content);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.proposal.update({ where: { id: proposalId }, data: { content: serialized } });
+    const latest = await tx.proposalVersion.findFirst({
+      where: { proposalId },
+      orderBy: { versionNumber: 'desc' },
+      select: { versionNumber: true },
+    });
+    await tx.proposalVersion.create({
+      data: {
+        proposalId,
+        content: serialized,
+        versionNumber: (latest?.versionNumber ?? 0) + 1,
+      },
+    });
+  });
+}
+
 router.post('/generate', aiLimiter, async (req: Request, res: Response) => {
   const parsed = generateSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -214,9 +235,8 @@ router.post('/generate', aiLimiter, async (req: Request, res: Response) => {
 
   // Modo demonstração — Vertex AI não configurado
   if (!vertexAI) {
-    const content = buildDemoContent(proposal);
-    await prisma.proposal.update({ where: { id: proposalId }, data: { content: JSON.stringify(content) } });
-    await prisma.proposalVersion.create({ data: { proposalId, content: JSON.stringify(content), versionNumber: 1 } });
+    const content = normalizeProposalContent(buildDemoContent(proposal));
+    await saveGeneratedContent(proposalId, content);
     res.json({ content });
     return;
   }
@@ -300,8 +320,8 @@ Retorne exatamente neste formato JSON, sem nenhum texto adicional:
       }));
     }
 
-    await prisma.proposal.update({ where: { id: proposalId }, data: { content: JSON.stringify(content) } });
-    await prisma.proposalVersion.create({ data: { proposalId, content: JSON.stringify(content), versionNumber: 1 } });
+    content = normalizeProposalContent(content);
+    await saveGeneratedContent(proposalId, content);
 
     res.json({ content });
     void logAudit({ userId: (req as AuthRequest).user.userId, action: 'PROPOSAL_GENERATED', entityType: 'PROPOSAL', entityId: proposalId, ip: req.ip });

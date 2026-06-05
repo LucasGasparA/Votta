@@ -93,6 +93,12 @@ const DEFAULT_SUGGESTIONS = [
   'Revise a técnica redacional desta minuta',
 ]
 
+const DEFAULT_EDITOR_SETTINGS = {
+  exportFormat: 'PDF',
+  validationAlerts: true,
+  unsavedReminder: true,
+}
+
 const THINKING_MESSAGES = [
   'Consultando a Lei Orgânica Municipal...',
   'Verificando conformidade constitucional...',
@@ -201,6 +207,14 @@ const EditorMinuta = () => {
   const [tituloProposicao, setTituloProposicao]       = useState('Proposição')
   const [tipoProposicao, setTipoProposicao]         = useState('')
   const [statusProposicao, setStatusProposicao]     = useState('DRAFT')
+  const [municipioProposicao, setMunicipioProposicao] = useState(null)
+  const [editorSettings, setEditorSettings] = useState(() => {
+    try {
+      return { ...DEFAULT_EDITOR_SETTINGS, ...JSON.parse(localStorage.getItem('legisla:settings') || '{}') }
+    } catch {
+      return DEFAULT_EDITOR_SETTINGS
+    }
+  })
   const [secaoAtiva, setSecaoAtiva]       = useState('ementa')
   const [chatAberto, setChatAberto]             = useState(false)
   const [minimizado, setMinimizado]           = useState(false)
@@ -262,6 +276,15 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
         if (data.title)  setTituloProposicao(data.title)
         if (data.type)   setTipoProposicao(data.type)
         if (data.status) setStatusProposicao(data.status)
+        if (data.municipality) {
+          setMunicipioProposicao({
+            id: data.municipality.id,
+            ibgeId: data.municipality.ibgeId,
+            nome: data.municipality.name,
+            nomeOficial: data.municipality.name,
+            uf: data.municipality.state,
+          })
+        }
         if (data.content && data.content !== '{}') {
           try {
             const loaded = JSON.parse(data.content)
@@ -274,6 +297,16 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
       .catch(() => toast.error('Não foi possível carregar a proposição.'))
       .finally(() => setCarregando(false))
   }, [id])
+
+  useEffect(() => {
+    api.get('/settings')
+      .then(data => {
+        const merged = { ...DEFAULT_EDITOR_SETTINGS, ...data }
+        setEditorSettings(merged)
+        try { localStorage.setItem('legisla:settings', JSON.stringify(merged)) } catch { /* noop */ }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -297,6 +330,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   }, [carregandoChat])
 
   useEffect(() => {
+    if (!editorSettings.unsavedReminder) return
     const onBeforeUnload = (e) => {
       if (temAlteracoes) {
         e.preventDefault()
@@ -305,7 +339,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  }, [temAlteracoes])
+  }, [temAlteracoes, editorSettings.unsavedReminder])
 
   const pendingDocRef = useRef({ ementa: '', preambulo: '', artigos: [], vigencia: '', revogacao: '' })
   const flushTimerRef = useRef(null)
@@ -360,7 +394,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   }
 
   const navegacaoSegura = (target) => {
-    if (temAlteracoes) {
+    if (temAlteracoes && editorSettings.unsavedReminder) {
       setDestinoNavegacao(target)
       setExibirModalNaoSalvo(true)
     } else {
@@ -501,13 +535,11 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
   const alertasPendentes  = useMemo(() => validacoes.filter(v => v.type === 'warning' || v.type === 'error'), [validacoes])
   const citacoesUsadas  = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
+  const municipioDocumento = municipioProposicao || municipioSelecionado
   const docVazio = useMemo(() =>
     !doc.ementa?.trim() && !doc.preambulo?.trim() && !doc.artigos?.length && !doc.vigencia?.trim() && !doc.revogacao?.trim()
   , [doc])
-  const formatoExportacao   = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('legisla:settings') || '{}').exportFormat || 'PDF' }
-    catch { return 'PDF' }
-  }, [])
+  const formatoExportacao = editorSettings.exportFormat || 'PDF'
 
   const aoClicarExportar = () => { setExportacaoRevisada(false); setExibirModalExportacao(true) }
   const confirmarExportacao = () => {
@@ -516,8 +548,8 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
     const isDocx = formatoExportacao === 'DOCX'
     toast.promise(
       (isDocx
-        ? exportToDocx(tituloProposicao, pendingDocRef.current, municipioSelecionado)
-        : exportToPDF(tituloProposicao, pendingDocRef.current, municipioSelecionado)
+        ? exportToDocx(tituloProposicao, pendingDocRef.current, municipioDocumento)
+        : exportToPDF(tituloProposicao, pendingDocRef.current, municipioDocumento)
       ).finally(() => setExportando(false)),
       {
         loading: isDocx ? 'Gerando DOCX...' : 'Gerando PDF...',
@@ -727,6 +759,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
           )}
 
           {/* Validações */}
+          {editorSettings.validationAlerts && (
           <div className="space-y-2 mb-4">
             {validacoes.map((v, i) => (
               <motion.div
@@ -746,6 +779,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
               </motion.div>
             ))}
           </div>
+          )}
 
           {/* Conteúdo */}
           <div className="rounded-lg border border-primary-100 bg-white p-5 md:p-7 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]" key={chaveDoc}>
@@ -808,7 +842,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                               <div className="mt-2 flex flex-wrap gap-1.5">
                                 {artigo.citacoes.map((c, i) => (
                                   <span key={i} className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-oro-100 text-oro-800 text-xs rounded-full">
-                                    <Scale size={10} />{c}
+                                    <Scale size={10} />{typeof c === 'string' ? c : c.titulo || c.url || ''}
                                   </span>
                                 ))}
                               </div>
@@ -1116,7 +1150,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
         <div className="text-center mb-12">
           <h1 className="text-2xl font-bold uppercase tracking-wide">Estado de Santa Catarina</h1>
           <h2 className="text-xl font-bold uppercase tracking-wide">
-            Câmara Municipal de {municipioSelecionado?.nomeOficial || municipioSelecionado?.nome || 'Nova Veneza'}
+            Câmara Municipal de {municipioDocumento?.nomeOficial || municipioDocumento?.nome || 'Nova Veneza'}
           </h2>
           <div className="mt-4 border-t border-black pt-4 text-right w-1/2 ml-auto">
             <p className="italic font-bold">{doc.ementa}</p>
@@ -1132,7 +1166,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
         <div className="mb-12 text-justify leading-relaxed"><p>{doc.revogacao}</p></div>
         <div className="mt-24 text-center">
           <p>
-            {municipioSelecionado?.nomeOficial || municipioSelecionado?.nome || 'Nova Veneza'}/{municipioSelecionado?.uf || 'SC'}, {new Date().toLocaleDateString('pt-BR')}
+            {municipioDocumento?.nomeOficial || municipioDocumento?.nome || 'Nova Veneza'}/{municipioDocumento?.uf || 'SC'}, {new Date().toLocaleDateString('pt-BR')}
           </p>
           <div className="mt-12 border-t border-black w-64 mx-auto pt-2">
             <p className="font-bold">Assinatura</p>

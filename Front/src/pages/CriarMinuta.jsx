@@ -172,7 +172,9 @@ const CriarMinuta = () => {
     try {
       const data = await api.post('/proposals', {
         ...dadosFormulario,
-        municipalityId: municipioSelecionado?.id,
+        municipalityIbgeId: municipioSelecionado?.ibgeId,
+        municipalityName: municipioSelecionado?.nome,
+        municipalityState: municipioSelecionado?.uf,
       })
       proposalId = data.id
 

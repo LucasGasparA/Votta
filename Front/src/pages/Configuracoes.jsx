@@ -195,9 +195,9 @@ const Configuracoes = () => {
             <div className="flex items-center justify-between px-5 py-4 gap-6">
               <div>
                 <p className="text-sm text-primary-700 dark:text-slate-300 font-medium">Notificações por e-mail</p>
-                <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Resumo semanal de proposições</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Resumo semanal de proposições (em breve)</p>
               </div>
-              <Alternador checked={settings.emailNotifications} onChange={v => atualizar('emailNotifications', v)} />
+              <Alternador checked={false} onChange={() => {}} disabled />
             </div>
           </div>
         </div>
