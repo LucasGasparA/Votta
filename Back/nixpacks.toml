@@ -1,10 +1,10 @@
 [phases.setup]
-nixPkgs = ["...", "python312", "python312Packages.pip", "gcc"]
+nixPkgs = ["python312", "python312Packages.pip", "gcc"]
 
 [phases.install]
 cmds = [
   "npm ci",
-  "python -m pip install --user -r requirements.txt"
+  "pip3 install --user -r requirements.txt"
 ]
 
 [phases.build]
