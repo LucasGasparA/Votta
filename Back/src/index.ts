@@ -4,6 +4,14 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
+process.on('unhandledRejection', (reason) => {
+  console.error('❌ UnhandledRejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('❌ UncaughtException:', err);
+  process.exit(1);
+});
+
 import proposalRoutes from './routes/proposals.js';
 import aiRoutes from './routes/ai.js';
 import authRoutes from './routes/auth.js';

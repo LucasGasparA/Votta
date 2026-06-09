@@ -1,5 +1,3 @@
-providers = ["node"]
-
 [phases.build]
 cmds = [
   "npx prisma generate",

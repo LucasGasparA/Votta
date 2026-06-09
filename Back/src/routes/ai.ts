@@ -51,13 +51,18 @@ function parseCredentials() {
   }
 }
 
-const vertexAI = PROJECT_ID
-  ? new VertexAI({
-      project: PROJECT_ID,
-      location: LOCATION,
-      googleAuthOptions: { credentials: parseCredentials() },
-    })
-  : null;
+let _vertexAI: VertexAI | null | undefined;
+function getVertexAI(): VertexAI | null {
+  if (_vertexAI !== undefined) return _vertexAI;
+  _vertexAI = PROJECT_ID
+    ? new VertexAI({
+        project: PROJECT_ID,
+        location: LOCATION,
+        googleAuthOptions: { credentials: parseCredentials() },
+      })
+    : null;
+  return _vertexAI;
+}
 
 router.post('/chat', aiLimiter, async (req: Request, res: Response) => {
   const parsed = chatSchema.safeParse(req.body);
@@ -83,6 +88,7 @@ router.post('/chat', aiLimiter, async (req: Request, res: Response) => {
     }
   }
 
+  const vertexAI = getVertexAI();
   if (!vertexAI) {
     if (!DEMO_MODE_ENABLED) {
       res.status(503).json({ error: 'Assistente de IA não configurado em produção.' });
@@ -247,6 +253,7 @@ router.post('/generate', aiLimiter, async (req: Request, res: Response) => {
     return;
   }
 
+  const vertexAI = getVertexAI();
   // Modo demonstração — Vertex AI não configurado
   if (!vertexAI) {
     if (!DEMO_MODE_ENABLED) {
