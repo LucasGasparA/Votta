@@ -16,7 +16,7 @@ jobs:
 
       - name: Deploy backend
         working-directory: Back
-        run: railway up --service backend --detach
+        run: railway up --service back --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
