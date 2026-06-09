@@ -4,7 +4,8 @@ nixPkgs = ["python312", "python312Packages.pip", "gcc"]
 [phases.install]
 cmds = [
   "npm ci",
-  "pip3 install --user -r requirements.txt"
+  "python3.12 -m venv /app/.venv",
+  "/app/.venv/bin/pip install --no-cache-dir -r requirements.txt"
 ]
 
 [phases.build]

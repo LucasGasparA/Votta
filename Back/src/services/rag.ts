@@ -54,7 +54,7 @@ export async function retrieveLegalContext(query: string, nResults = RAG_RESULTS
     return null;
   }
 
-  const pythonBin = process.env.PYTHON_BIN || 'python';
+  const pythonBin = process.env.PYTHON_BIN || '/app/.venv/bin/python';
   const payload = JSON.stringify({ query, n_results: nResults });
 
   return new Promise((resolve) => {
