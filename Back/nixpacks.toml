@@ -1,12 +1,4 @@
-[phases.setup]
-nixPkgs = ["python312", "python312Packages.pip", "gcc"]
-
-[phases.install]
-cmds = [
-  "npm ci",
-  "python3.12 -m venv /app/.venv",
-  "/app/.venv/bin/pip install --no-cache-dir -r requirements.txt"
-]
+providers = ["node"]
 
 [phases.build]
 cmds = [
