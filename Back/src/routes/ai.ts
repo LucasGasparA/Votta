@@ -35,12 +35,17 @@ const LOCATION             = process.env.GCP_LOCATION || 'us-central1';
 const MODEL                = process.env.GCP_MODEL    || 'gemini-2.5-pro';
 const GCP_CREDENTIALS_JSON = process.env.GCP_CREDENTIALS_JSON;
 const LLM_TIMEOUT_MS = 30_000;
+const IS_PROD = process.env.NODE_ENV === 'production';
+const DEMO_MODE_ENABLED = process.env.AI_DEMO_ENABLED === 'true' || !IS_PROD;
+
+let credentialsParseError: string | null = null;
 
 function parseCredentials() {
   if (!GCP_CREDENTIALS_JSON) return undefined;
   try {
     return JSON.parse(GCP_CREDENTIALS_JSON);
-  } catch {
+  } catch (error: any) {
+    credentialsParseError = error?.message ?? 'JSON inválido';
     console.error('GCP_CREDENTIALS_JSON inválido — verifique o valor no Railway');
     return undefined;
   }
@@ -79,10 +84,19 @@ router.post('/chat', aiLimiter, async (req: Request, res: Response) => {
   }
 
   if (!vertexAI) {
+    if (!DEMO_MODE_ENABLED) {
+      res.status(503).json({ error: 'Assistente de IA não configurado em produção.' });
+      return;
+    }
     res.json({
       type: 'response',
       text: `[Modo demonstração — configure GCP_PROJECT_ID para usar o Vertex AI]\n\nSua pergunta: "${message}"\n\nResposta simulada: Para esta proposição, recomenda-se verificar a conformidade com o Art. 145, VI da Lei Orgânica Municipal e o Art. 30 da Constituição Federal, que trata das competências municipais.`,
     });
+    return;
+  }
+
+  if (credentialsParseError) {
+    res.status(503).json({ error: 'Credenciais do Vertex AI inválidas. Verifique a configuração do servidor.' });
     return;
   }
 
@@ -235,9 +249,18 @@ router.post('/generate', aiLimiter, async (req: Request, res: Response) => {
 
   // Modo demonstração — Vertex AI não configurado
   if (!vertexAI) {
+    if (!DEMO_MODE_ENABLED) {
+      res.status(503).json({ error: 'Geração por IA não configurada em produção.' });
+      return;
+    }
     const content = normalizeProposalContent(buildDemoContent(proposal));
     await saveGeneratedContent(proposalId, content);
     res.json({ content });
+    return;
+  }
+
+  if (credentialsParseError) {
+    res.status(503).json({ error: 'Credenciais do Vertex AI inválidas. Verifique a configuração do servidor.' });
     return;
   }
 

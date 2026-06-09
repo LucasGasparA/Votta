@@ -1,2 +1,14 @@
 [phases.setup]
 nixPkgs = ["...", "python312", "python312Packages.pip", "gcc"]
+
+[phases.install]
+cmds = [
+  "npm ci",
+  "python -m pip install --user -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+  "npx prisma generate",
+  "npm run build"
+]
