@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const _base = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
+const API_URL = _base.endsWith('/api') ? _base : `${_base}/api`;
 
 const STATUS_MESSAGES = {
   400: 'Os dados enviados são inválidos. Verifique os campos e tente novamente.',
