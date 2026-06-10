@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link, useOutletContext, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -107,7 +107,7 @@ const Painel = () => {
     }
   }, [pagina])
 
-  const aoExcluir = async (proposalId) => {
+  const aoExcluir = useCallback(async (proposalId) => {
     try {
       await api.del('/proposals/' + proposalId)
       setRawProposals(prev => {
@@ -120,15 +120,16 @@ const Painel = () => {
     } catch (e) {
       toast.error(e.message)
     }
-  }
+  }, [])
 
   const navigate        = useNavigate()
   const totalPendentes  = Number(estatisticas[2]?.value ?? 0)
   const primeiroNome    = usuario?.name?.split(' ')[0] ?? ''
   const temMais         = proposicoes.length < total
-  const listaExibida    = somentePendentes
-    ? proposicoes.filter(p => p.status === 'pendente_revisao')
-    : proposicoes
+  const listaExibida    = useMemo(
+    () => somentePendentes ? proposicoes.filter(p => p.status === 'pendente_revisao') : proposicoes,
+    [somentePendentes, proposicoes]
+  )
 
   return (
     <div className="min-h-full bg-slate-50/70 dark:bg-[#141624]">

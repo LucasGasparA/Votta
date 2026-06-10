@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, CheckCircle, Clock, FileText, PlusCircle, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -175,4 +175,7 @@ const ListaMinutas = ({
   )
 }
 
-export default ListaMinutas
+// Painel.jsx precisa de dois ajustes para este memo ser eficaz:
+// 1. aoExcluir → useCallback(async (id) => { ... }, [])  (usa functional updates, deps vazia)
+// 2. listaExibida → useMemo(() => somentePendentes ? proposicoes.filter(...) : proposicoes, [somentePendentes, proposicoes])
+export default memo(ListaMinutas)

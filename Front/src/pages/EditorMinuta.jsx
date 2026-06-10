@@ -11,9 +11,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
 import { useSettings } from '../hooks/useSettings.js'
+import { useProposalChat } from '../hooks/useProposalChat.js'
+import { useProposalVersions } from '../hooks/useProposalVersions.js'
+import { useProposalExport } from '../hooks/useProposalExport.js'
 import { formatDate } from '../lib/formatDate.js'
-import { exportToPDF } from '../services/exportarPdf.js'
-import { exportToDocx } from '../services/exportarDocx.js'
 
 const SECTIONS = [
   { id: 'ementa',    label: 'Ementa',    icon: AlignLeft,  hint: 'A ementa resume de forma clara e objetiva o conteúdo da proposição.' },
@@ -54,67 +55,8 @@ const PROPOSAL_TYPE_LABELS = {
   indicacao:       'Indicação',
 }
 
-const UNCERTAINTY_PATTERNS = [
-  'não encontrei', 'não há referência', 'não tenho informação suficiente',
-  'consulte a procuradoria', 'não localizei', 'sem base normativa',
-  'não é possível confirmar', 'recomendo consultar', 'não tenho certeza',
-  'incerto', 'não identifico base',
-]
 
-const QUICK_SUGGESTIONS = {
-  pl_ordinaria: [
-    'Verifique a constitucionalidade desta proposta',
-    'Quais artigos da LOM se aplicam aqui?',
-    'Esta lei precisa de estudo de impacto fiscal?',
-    'Sugira uma cláusula de vigência adequada',
-  ],
-  pl_complementar: [
-    'Qual o quórum exigido para lei complementar?',
-    'Verifique os requisitos formais desta proposta',
-    'Esta matéria exige lei complementar?',
-    'Sugira artigos de transição adequados',
-  ],
-  decreto: [
-    'O prefeito tem competência para este decreto?',
-    'Verifique se não há reserva de lei aqui',
-    'Qual a diferença para um decreto regulamentar?',
-    'Sugira fundamentos normativos adequados',
-  ],
-  indicacao: [
-    'Quem é o destinatário correto desta indicação?',
-    'A câmara tem competência para indicar isto?',
-    'Sugira fundamentos normativos para a indicação',
-    'Qual o efeito jurídico de uma indicação?',
-  ],
-}
-
-const DEFAULT_SUGGESTIONS = [
-  'Verifique a conformidade com a LOM',
-  'Quais artigos da CF/88 se aplicam?',
-  'Esta proposta tem impacto orçamentário?',
-  'Revise a técnica redacional desta minuta',
-]
-
-
-const THINKING_MESSAGES = [
-  'Consultando a Lei Orgânica Municipal...',
-  'Verificando conformidade constitucional...',
-  'Analisando jurisprudência aplicável...',
-  'Buscando referências normativas...',
-  'Revisando técnica legislativa...',
-]
-
-function detectUncertainty(text) {
-  const lower = text.toLowerCase()
-  return UNCERTAINTY_PATTERNS.some(p => lower.includes(p))
-}
-
-function hasCitation(text) {
-  return /art\.|lom\b|cf\b|lei\s|§\s|\binciso\b|\balínea\b/i.test(text)
-}
-
-
-function getDynamicSuggestions(tipoProposicao) {
+function obterSugestoesDinamicas(tipoProposicao) {
   const base = [
     {
       type: 'alert',
@@ -176,7 +118,7 @@ function getDynamicSuggestions(tipoProposicao) {
 }
 
 // Aplica formatação no textarea: envolve seleção com prefixo/sufixo
-function applyFormat(ref, prefix, suffix = prefix) {
+function aplicarFormatacao(ref, prefix, suffix = prefix) {
   const el = ref.current
   if (!el) return
   const { selectionStart: s, selectionEnd: e, value } = el
@@ -203,35 +145,14 @@ const EditorMinuta = () => {
   const [municipioProposicao, setMunicipioProposicao] = useState(null)
   const { settings: editorSettings } = useSettings()
   const [secaoAtiva, setSecaoAtiva]       = useState('ementa')
-  const [chatAberto, setChatAberto]             = useState(false)
-  const [minimizado, setMinimizado]           = useState(false)
-  const [mensagemAssistente, setMensagemAssistente] = useState('')
-  const [historicoChat, setHistoricoChat]           = useState(() => {
-    try {
-      const saved = sessionStorage.getItem(`legisla:chat:${id}`)
-      return saved ? JSON.parse(saved) : []
-    } catch { return [] }
-  })
-  const [carregandoChat, setCarregandoChat]           = useState(false)
-  const [mensagemPensando, setMensagemPensando]           = useState(THINKING_MESSAGES[0])
-  const [bannerIncerteza, setBannerIncerteza] = useState(null)
 
-  const [exibirModalVersoes, setExibirModalVersoes]   = useState(false)
-  const [versoes, setVersoes]                     = useState([])
-  const [carregandoVersoes, setCarregandoVersoes]       = useState(false)
-  const [confirmandoVersaoId, setConfirmandoVersaoId] = useState(null)
-
-const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
-  const [exportacaoRevisada, setExportacaoRevisada]   = useState(false)
   const [exibirModalNaoSalvo, setExibirModalNaoSalvo] = useState(false)
   const [destinoNavegacao, setDestinoNavegacao] = useState(null)
   const [editandoTitulo, setEditandoTitulo]         = useState(false)
   const [chaveDoc, setChaveDoc]                     = useState(0)
-  const [exportando, setExportando]           = useState(false)
 
   const titleInputRef = useRef(null)
 
-  const chatEndRef      = useRef(null)
   const activeTextareaRef = useRef(null)
 
   const [doc, setDoc] = useState({
@@ -286,27 +207,6 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   }, [id])
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [historicoChat])
-
-  useEffect(() => {
-    try {
-      const limited = historicoChat.slice(-50)
-      sessionStorage.setItem(`legisla:chat:${id}`, JSON.stringify(limited))
-    } catch { /* quota exceeded — ignore */ }
-  }, [historicoChat, id])
-
-  useEffect(() => {
-    if (!carregandoChat) return
-    let idx = 0
-    const timer = setInterval(() => {
-      idx = (idx + 1) % THINKING_MESSAGES.length
-      setMensagemPensando(THINKING_MESSAGES[idx])
-    }, 2500)
-    return () => clearInterval(timer)
-  }, [carregandoChat])
-
-  useEffect(() => {
     if (!editorSettings.unsavedReminder) return
     const onBeforeUnload = (e) => {
       if (temAlteracoes) {
@@ -321,7 +221,43 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
   const pendingDocRef = useRef({ ementa: '', preambulo: '', artigos: [], vigencia: '', revogacao: '' })
   const flushTimerRef = useRef(null)
 
-  const scheduleDocFlush = useCallback(() => {
+  const {
+    chatAberto, setChatAberto,
+    minimizado, setMinimizado,
+    mensagemAssistente, setMensagemAssistente,
+    historicoChat,
+    carregandoChat,
+    mensagemPensando,
+    bannerIncerteza, setBannerIncerteza,
+    chatEndRef,
+    limparChat,
+    aoPerguntarAssistente,
+    aoSugerirRapido,
+    aoAcionarSugestao,
+    quickSuggestions,
+  } = useProposalChat(id, pendingDocRef, tipoProposicao)
+
+  const {
+    exibirModalVersoes, setExibirModalVersoes,
+    versoes,
+    carregandoVersoes,
+    confirmandoVersaoId, setConfirmandoVersaoId,
+    abrirModalVersoes,
+    restaurarVersao,
+  } = useProposalVersions(id, { pendingDocRef, setDoc, setChaveDoc, setTemAlteracoes })
+
+  const municipioDocumento = municipioProposicao || municipioSelecionado
+  const formatoExportacao  = editorSettings.exportFormat || 'PDF'
+
+  const {
+    exibirModalExportacao, setExibirModalExportacao,
+    exportacaoRevisada, setExportacaoRevisada,
+    exportando,
+    aoClicarExportar,
+    confirmarExportacao,
+  } = useProposalExport({ tituloProposicao, pendingDocRef, municipioDocumento, formatoExportacao })
+
+  const agendarSalvamento = useCallback(() => {
     clearTimeout(flushTimerRef.current)
     flushTimerRef.current = setTimeout(() => {
       setDoc({ ...pendingDocRef.current })
@@ -331,16 +267,16 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
   const aoMudarCampo = useCallback((field, value) => {
     pendingDocRef.current = { ...pendingDocRef.current, [field]: value }
-    scheduleDocFlush()
-  }, [scheduleDocFlush])
+    agendarSalvamento()
+  }, [agendarSalvamento])
 
   const aoMudarArtigo = useCallback((artId, newText) => {
     pendingDocRef.current = {
       ...pendingDocRef.current,
       artigos: pendingDocRef.current.artigos.map(a => a.id === artId ? { ...a, texto: newText } : a),
     }
-    scheduleDocFlush()
-  }, [scheduleDocFlush])
+    agendarSalvamento()
+  }, [agendarSalvamento])
 
   const aoSalvarTitulo = async (newTitle) => {
     const trimmed = newTitle.trim()
@@ -414,91 +350,6 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
     return () => clearInterval(timer)
   }, [temAlteracoes, aoSalvar])
 
-  const carregarVersoes = async () => {
-    setCarregandoVersoes(true)
-    try {
-      const data = await api.get('/proposals/' + id + '/versions')
-      setVersoes(data)
-    } catch {
-      toast.error('Não foi possível carregar o histórico de versões.')
-    } finally {
-      setCarregandoVersoes(false)
-    }
-  }
-
-  const abrirModalVersoes = () => {
-    setExibirModalVersoes(true)
-    setConfirmandoVersaoId(null)
-    carregarVersoes()
-  }
-
-  const restaurarVersao = (version) => {
-    try {
-      const restored = JSON.parse(version.content)
-      pendingDocRef.current = restored
-      setDoc(restored)
-      setChaveDoc(k => k + 1)
-      setTemAlteracoes(true)
-      setExibirModalVersoes(false)
-      toast.success(`Versão ${version.versionNumber} restaurada. Salve para confirmar.`)
-    } catch {
-      toast.error('Não foi possível restaurar esta versão.')
-    }
-  }
-
-  const limparChat = () => {
-    setHistoricoChat([])
-    try { sessionStorage.removeItem(`legisla:chat:${id}`) } catch { /* noop */ }
-  }
-
-  const aoPerguntarAssistente = async (overrideMsg) => {
-    const msg = (overrideMsg ?? mensagemAssistente).trim()
-    if (!msg || carregandoChat) return
-    if (!overrideMsg) setMensagemAssistente('')
-    setMensagemPensando(THINKING_MESSAGES[0])
-    setHistoricoChat(prev => [...prev, { role: 'user', text: msg }])
-    setCarregandoChat(true)
-    try {
-      const res = await api.post('/ai/chat', {
-        proposalId: id,
-        message: msg,
-        promptContext: JSON.stringify(pendingDocRef.current),
-      })
-      setHistoricoChat(prev => [...prev, { role: 'assistant', text: res.text, hasCit: hasCitation(res.text) }])
-      if (detectUncertainty(res.text)) {
-        setBannerIncerteza('Não encontrei referência normativa clara para este ponto. Consulte a Procuradoria antes de prosseguir.')
-      }
-    } catch (e) {
-      const msg = e.message ?? ''
-      const isTimeout = msg.toLowerCase().includes('demorou') || msg.toLowerCase().includes('timeout')
-      setHistoricoChat(prev => [...prev, {
-        role: 'error',
-        text: isTimeout
-          ? 'O assistente demorou para responder. Tente novamente.'
-          : 'Nosso assistente está temporariamente indisponível. Tente em alguns minutos.',
-      }])
-    } finally {
-      setCarregandoChat(false)
-    }
-  }
-
-  const aoSugerirRapido = (text) => aoPerguntarAssistente(text)
-
-  const aoAcionarSugestao = (suggestion) => {
-    setChatAberto(true)
-    setMinimizado(false)
-    if (suggestion.type === 'citation') {
-      setHistoricoChat(prev => [...prev, { role: 'assistant', text: suggestion.text, hasCit: true }])
-      setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-      toast.success('Citação adicionada ao chat.')
-    } else {
-      const prefix = suggestion.type === 'improvement'
-        ? 'Por favor, elabore esta sugestão para a minuta atual: '
-        : 'Preciso de mais detalhes sobre este alerta: '
-      aoPerguntarAssistente(prefix + suggestion.text)
-    }
-  }
-
   const adicionarArtigo = () => {
     const ids = pendingDocRef.current.artigos.map(a => a.id)
     const n = ids.length > 0 ? Math.max(...ids) + 1 : 1
@@ -511,31 +362,11 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
     setTemAlteracoes(true)
   }
 
-  const alertasPendentes  = useMemo(() => validacoes.filter(v => v.type === 'warning' || v.type === 'error'), [validacoes])
-  const citacoesUsadas  = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
-  const municipioDocumento = municipioProposicao || municipioSelecionado
+  const alertasPendentes = useMemo(() => validacoes.filter(v => v.type === 'warning' || v.type === 'error'), [validacoes])
+  const citacoesUsadas   = useMemo(() => doc.artigos.flatMap(a => a.citacoes || []), [doc.artigos])
   const docVazio = useMemo(() =>
     !doc.ementa?.trim() && !doc.preambulo?.trim() && !doc.artigos?.length && !doc.vigencia?.trim() && !doc.revogacao?.trim()
   , [doc])
-  const formatoExportacao = editorSettings.exportFormat || 'PDF'
-
-  const aoClicarExportar = () => { setExportacaoRevisada(false); setExibirModalExportacao(true) }
-  const confirmarExportacao = () => {
-    setExibirModalExportacao(false)
-    setExportando(true)
-    const isDocx = formatoExportacao === 'DOCX'
-    toast.promise(
-      (isDocx
-        ? exportToDocx(tituloProposicao, pendingDocRef.current, municipioDocumento)
-        : exportToPDF(tituloProposicao, pendingDocRef.current, municipioDocumento)
-      ).finally(() => setExportando(false)),
-      {
-        loading: isDocx ? 'Gerando DOCX...' : 'Gerando PDF...',
-        success: isDocx ? 'DOCX exportado!'  : 'PDF exportado!',
-        error:   isDocx ? 'Erro ao gerar DOCX' : 'Erro ao gerar PDF',
-      }
-    )
-  }
 
   if (carregando) {
     return (
@@ -622,7 +453,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                 key={title}
                 title={title}
                 aria-label={title}
-                onClick={() => applyFormat(activeTextareaRef, prefix, suffix)}
+                onClick={() => aplicarFormatacao(activeTextareaRef, prefix, suffix)}
                 className="p-1.5 rounded text-primary-500 dark:text-slate-400 hover:bg-white dark:hover:bg-[#1c1f38] hover:text-primary-700 dark:hover:text-slate-200 hover:shadow-sm transition-all"
               >
                 <Icon size={14} />
@@ -850,7 +681,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
         {/* Painel lateral de sugestões */}
         {(() => {
-          const suggestions = getDynamicSuggestions(tipoProposicao)
+          const suggestions = obterSugestoesDinamicas(tipoProposicao)
           if (!suggestions.length) return null
           return (
             <aside className="hidden xl:flex flex-col w-64 border-l border-primary-200 dark:border-[#2d3158] bg-white dark:bg-[#1c1f38] overflow-y-auto flex-shrink-0 print:hidden">
@@ -968,7 +799,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-1.5">
-                          {(QUICK_SUGGESTIONS[tipoProposicao] ?? DEFAULT_SUGGESTIONS).map((s, i) => (
+                          {quickSuggestions.map((s, i) => (
                             <motion.button
                               key={i}
                               whileHover={{ scale: 1.02 }}

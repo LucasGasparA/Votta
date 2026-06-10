@@ -4,7 +4,7 @@ import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Shield, ChevronLef
 import { motion, AnimatePresence } from 'framer-motion'
 import Logo from '../Logo'
 
-function getInitials(name) {
+function obterIniciais(name) {
   if (!name) return '?'
   return name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
 }
@@ -13,7 +13,7 @@ const AVATAR_COLORS = [
   '#3D7BCC', '#7c3aed', '#059669', '#d97706', '#dc2626', '#0891b2', '#ea580c',
 ]
 
-function nameToColor(name) {
+function nomeParaCor(name) {
   if (!name) return AVATAR_COLORS[0]
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -67,7 +67,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
     },
   ]
 
-  const corAvatar = nameToColor(usuario?.name)
+  const corAvatar = nomeParaCor(usuario?.name)
 
   const aoSolicitarLogout = () => {
     setShowUserMenu(false)
@@ -251,7 +251,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               style={{ background: corAvatar }}
               title={usuario.name}
             >
-              {getInitials(usuario.name)}
+              {obterIniciais(usuario.name)}
             </button>
           )}
         </div>
@@ -271,7 +271,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                   className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
                   style={{ background: corAvatar }}
                 >
-                  {getInitials(usuario.name)}
+                  {obterIniciais(usuario.name)}
                 </div>
                 <ChevronDown
                   size={14}
