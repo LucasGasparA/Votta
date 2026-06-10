@@ -28,7 +28,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
         <p style="color:#555;line-height:1.6;margin:0 0 16px">
           Sua conta foi criada com sucesso. Você já pode começar a elaborar minutas legislativas com assistência jurídica por IA.
         </p>
-        <a href="${process.env.APP_URL}"
+        <a href="${process.env.FRONTEND_URL}"
            style="display:inline-block;background:#b83b3d;color:#fff;text-decoration:none;
                   padding:14px 28px;border-radius:10px;font-weight:600;font-size:14px">
           Começar agora
@@ -43,7 +43,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 }
 
 export async function sendPasswordResetEmail(to: string, token: string) {
-  const link = `${process.env.APP_URL}/reset-password?token=${token}`;
+  const link = `${process.env.FRONTEND_URL}/redefinir-senha?token=${token}`;
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
