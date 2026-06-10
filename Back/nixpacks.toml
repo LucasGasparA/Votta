@@ -1,3 +1,6 @@
+[phases.setup]
+nixPkgs = ["python312", "python312Packages.pip", "gcc"]
+
 [phases.build]
 cmds = [
   "npx prisma generate",
