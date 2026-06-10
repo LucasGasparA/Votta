@@ -83,7 +83,7 @@ router.get('/', async (req: Request, res: Response) => {
       prisma.proposal.findMany({
         where: { userId },
         orderBy: { updatedAt: 'desc' },
-        include: { municipality: true },
+
         skip,
         take: limit,
       }),

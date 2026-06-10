@@ -3,6 +3,7 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/layout/Layout'
 import { api } from './api/client.js'
 import { TemaProvider } from './context/TemaContext'
+import { SettingsProvider } from './context/SettingsContext'
 
 const Login               = lazy(() => import('./pages/Login'))
 const Painel              = lazy(() => import('./pages/Painel'))
@@ -80,6 +81,7 @@ function App() {
 
   return (
     <TemaProvider>
+    <SettingsProvider>
     <Router>
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
@@ -122,6 +124,7 @@ function App() {
       </Routes>
       </Suspense>
     </Router>
+    </SettingsProvider>
     </TemaProvider>
   )
 }

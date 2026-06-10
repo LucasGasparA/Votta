@@ -10,6 +10,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
+import { useSettings } from '../hooks/useSettings.js'
+import { formatDate } from '../lib/formatDate.js'
 import { exportToPDF } from '../services/exportarPdf.js'
 import { exportToDocx } from '../services/exportarDocx.js'
 
@@ -93,11 +95,6 @@ const DEFAULT_SUGGESTIONS = [
   'Revise a técnica redacional desta minuta',
 ]
 
-const DEFAULT_EDITOR_SETTINGS = {
-  exportFormat: 'PDF',
-  validationAlerts: true,
-  unsavedReminder: true,
-}
 
 const THINKING_MESSAGES = [
   'Consultando a Lei Orgânica Municipal...',
@@ -116,10 +113,6 @@ function hasCitation(text) {
   return /art\.|lom\b|cf\b|lei\s|§\s|\binciso\b|\balínea\b/i.test(text)
 }
 
-function formatVersionDate(dateStr) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-}
 
 function getDynamicSuggestions(tipoProposicao) {
   const base = [
@@ -208,13 +201,7 @@ const EditorMinuta = () => {
   const [tipoProposicao, setTipoProposicao]         = useState('')
   const [statusProposicao, setStatusProposicao]     = useState('DRAFT')
   const [municipioProposicao, setMunicipioProposicao] = useState(null)
-  const [editorSettings, setEditorSettings] = useState(() => {
-    try {
-      return { ...DEFAULT_EDITOR_SETTINGS, ...JSON.parse(localStorage.getItem('legisla:settings') || '{}') }
-    } catch {
-      return DEFAULT_EDITOR_SETTINGS
-    }
-  })
+  const { settings: editorSettings } = useSettings()
   const [secaoAtiva, setSecaoAtiva]       = useState('ementa')
   const [chatAberto, setChatAberto]             = useState(false)
   const [minimizado, setMinimizado]           = useState(false)
@@ -297,16 +284,6 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
       .catch(() => toast.error('Não foi possível carregar a proposição.'))
       .finally(() => setCarregando(false))
   }, [id])
-
-  useEffect(() => {
-    api.get('/settings')
-      .then(data => {
-        const merged = { ...DEFAULT_EDITOR_SETTINGS, ...data }
-        setEditorSettings(merged)
-        try { localStorage.setItem('legisla:settings', JSON.stringify(merged)) } catch { /* noop */ }
-      })
-      .catch(() => {})
-  }, [])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -797,7 +774,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
             {secaoAtiva === 'ementa' && (
               <div>
-                <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
+                <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
                   onChange={e => aoMudarCampo('ementa', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Resumo do objeto da lei..." />
                 <p className="text-xs text-primary-400 dark:text-slate-500 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
@@ -806,7 +783,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
 
             {secaoAtiva === 'preambulo' && (
               <div>
-                <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
+                <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
                   onChange={e => aoMudarCampo('preambulo', e.target.value)}
                   className="input-field min-h-[90px] font-serif resize-none" placeholder="Texto introdutório..." />
                 <p className="text-xs text-primary-400 dark:text-slate-500 mt-2">Fórmula legislativa padrão conforme LOM.</p>
@@ -834,7 +811,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                         <div className="flex items-start gap-4">
                           <span className="px-2.5 py-1 bg-primary-100 dark:bg-[#232745] text-primary-700 dark:text-slate-300 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
                           <div className="flex-1">
-                            <textarea defaultValue={artigo.texto}
+                            <textarea key={`${chaveDoc}-${artigo.id}`} defaultValue={artigo.texto}
                               onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
                               onFocus={e => { activeTextareaRef.current = e.target }}
                               className="w-full px-3 py-2.5 border-2 border-primary-100 dark:border-[#2d3158] dark:bg-[#232745] dark:text-slate-100 rounded-lg focus:border-primary-400 dark:focus:border-[#3d4270] focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
@@ -858,13 +835,13 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
             )}
 
             {secaoAtiva === 'vigencia' && (
-              <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.vigencia}
+              <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.vigencia}
                 onChange={e => aoMudarCampo('vigencia', e.target.value)}
                 className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula de vigência..." />
             )}
 
             {secaoAtiva === 'revogacao' && (
-              <textarea ref={activeTextareaRef} defaultValue={pendingDocRef.current.revogacao}
+              <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.revogacao}
                 onChange={e => aoMudarCampo('revogacao', e.target.value)}
                 className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula revogatória..." />
             )}
@@ -1226,7 +1203,7 @@ const [exibirModalExportacao, setExibirModalExportacao] = useState(false)
                                   <span className="text-xs font-semibold bg-oro-100 text-oro-700 px-2 py-0.5 rounded-full">Atual</span>
                                 )}
                               </div>
-                              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">{formatVersionDate(v.createdAt)}</p>
+                              <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">{formatDate(v.createdAt)}</p>
                             </div>
                             {v.versionNumber !== maxV && confirmandoVersaoId !== v.id && (
                               <button

@@ -57,6 +57,7 @@ model Proposal {
   @@index([userId])
   @@index([municipalityId])
   @@index([status])
+  @@index([userId, updatedAt])
 }
 
 model ProposalVersion {
@@ -68,6 +69,7 @@ model ProposalVersion {
   createdAt     DateTime @default(now())
 
   @@unique([proposalId, versionNumber])
+  @@index([proposalId])
 }
 
 model AuditLog {

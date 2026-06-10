@@ -1,81 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
 import { Download, Bell, Sun, Moon, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
 import Alternador from '../components/ui/Alternador.jsx'
-import { api } from '../api/client.js'
-import { useTema } from '../context/TemaContext'
-
-const DEFAULT_SETTINGS = {
-  exportFormat:          'PDF',
-  includePageNumbers:    true,
-  includeGenerationDate: true,
-  validationAlerts:      true,
-  unsavedReminder:       true,
-  emailNotifications:    false,
-  theme:                 'light',
-}
+import { useSettings } from '../hooks/useSettings.js'
 
 const Configuracoes = () => {
-  const { definirTema } = useTema()
-  const [settings, setSettings] = useState(() => {
-    try {
-      const saved = localStorage.getItem('legisla:settings')
-      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS
-    } catch {
-      return DEFAULT_SETTINGS
-    }
-  })
-  const [indicadorSalvo, setIndicadorSalvo] = useState(false)
-  const [carregando, setCarregando] = useState(true)
-  const isFirstRender = useRef(true)
-
-  useEffect(() => {
-    api.get('/settings')
-      .then(data => {
-        const merged = { ...DEFAULT_SETTINGS, ...data }
-        setSettings(merged)
-        try { localStorage.setItem('legisla:settings', JSON.stringify(merged)) } catch { /* ignora */ }
-      })
-      .catch(() => {
-        // mantém o que veio do localStorage
-      })
-      .finally(() => {
-        setCarregando(false)
-        isFirstRender.current = false
-      })
-  }, [])
-
-  const atualizar = (key, value) => {
-    setSettings(p => ({ ...p, [key]: value }))
-    if (key === 'theme') definirTema(value)
-  }
-
-  useEffect(() => {
-    if (isFirstRender.current || carregando) return
-    const t = setTimeout(async () => {
-      try {
-        await api.put('/settings', settings)
-        try { localStorage.setItem('legisla:settings', JSON.stringify(settings)) } catch { /* ignora */ }
-        setIndicadorSalvo(true)
-        setTimeout(() => setIndicadorSalvo(false), 2000)
-      } catch {
-        toast.error('Não foi possível salvar as preferências.')
-      }
-    }, 600)
-    return () => clearTimeout(t)
-  }, [settings, carregando])
-
-  const salvarAgora = async () => {
-    try {
-      await api.put('/settings', settings)
-      try { localStorage.setItem('legisla:settings', JSON.stringify(settings)) } catch { /* ignora */ }
-      setIndicadorSalvo(true)
-      setTimeout(() => setIndicadorSalvo(false), 2000)
-    } catch {
-      toast.error('Não foi possível salvar as preferências.')
-    }
-  }
+  const { settings, atualizar, salvarAgora, carregando, indicadorSalvo } = useSettings()
 
   if (carregando) {
     return (

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Shield, LogIn, FilePlus, FileEdit, Trash2, Zap, Download, Activity } from 'lucide-react'
 import { api } from '../api/client.js'
+import { formatDate } from '../lib/formatDate.js'
 
 const ACTION_ICONS = {
   LOGIN:              LogIn,
@@ -36,14 +37,6 @@ function textoSecundario(log) {
   return null
 }
 
-function formatarData(dateStr) {
-  const d = new Date(dateStr)
-  return (
-    d.toLocaleDateString('pt-BR') +
-    ' às ' +
-    d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-  )
-}
 
 const LogAuditoria = () => {
   const [logs, setLogs]       = useState([])
@@ -112,7 +105,7 @@ const LogAuditoria = () => {
                   <p className="text-sm font-medium text-primary-800 dark:text-slate-200">{rotuloAcao(log.action)}</p>
                   {sub && <p className="text-xs text-primary-400 dark:text-slate-500 truncate mt-0.5">{sub}</p>}
                 </div>
-                <p className="text-xs text-primary-400 dark:text-slate-500 ml-auto flex-shrink-0">{formatarData(log.createdAt)}</p>
+                <p className="text-xs text-primary-400 dark:text-slate-500 ml-auto flex-shrink-0">{formatDate(log.createdAt)}</p>
               </div>
             )
           })}
