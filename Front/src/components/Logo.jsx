@@ -1,22 +1,16 @@
-import logoSrc from '../assets/logo.png'
+import vottaLogoUrl from '../assets/Votta-logo.svg'
+import vLogoUrl from '../assets/V-logo.svg'
 
 const Logo = ({ size = 32, withText = false, className = '' }) => {
+  const src = withText ? vottaLogoUrl : vLogoUrl
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center ${className}`}>
       <img
-        src={logoSrc}
+        src={src}
         alt="Votta"
         style={{ height: size, width: 'auto' }}
         draggable={false}
       />
-      {withText && (
-        <span
-          className="font-display font-bold tracking-tight text-primary-600"
-          style={{ fontSize: size * 0.6 }}
-        >
-          Votta
-        </span>
-      )}
     </div>
   )
 }
