@@ -93,7 +93,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             </button>
           ) : (
             <>
-              <Logo size={28} withText={true} className="flex-1 min-w-0" />
+              <Logo size={36} withText={true} className="flex-1 min-w-0" />
 
               {mobile && (
                 <button
