@@ -25,9 +25,6 @@
     @apply focus-visible:ring-primary-500 focus-visible:ring-offset-[#141624];
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
-  }
 }
 
 @layer components {
@@ -54,8 +51,28 @@
            focus:ring-primary-200 transition-all duration-200;
   }
 
+  .page-title {
+    @apply text-2xl md:text-3xl font-semibold text-slate-950 dark:text-slate-100;
+  }
+
+  .section-heading {
+    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .modal-title {
+    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .document-title {
+    @apply font-document font-bold;
+  }
+
+  .document-body {
+    @apply font-document;
+  }
+
   .section-title {
-    @apply text-3xl font-display font-bold text-primary-800 mb-6 
+    @apply text-3xl font-semibold text-primary-800 mb-6 
            border-l-4 border-oro-500 pl-4;
   }
 }

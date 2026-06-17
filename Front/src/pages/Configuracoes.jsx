@@ -34,7 +34,7 @@ const Configuracoes = () => {
       {/* Cabeçalho */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">Configurações</h1>
+          <h1 className="page-title">Configurações</h1>
           <p className="text-sm text-primary-400 dark:text-slate-500 mt-1">Personalize como o sistema funciona para você.</p>
         </div>
         <AnimatePresence>
