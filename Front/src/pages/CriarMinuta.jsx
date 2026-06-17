@@ -216,7 +216,7 @@ const CriarMinuta = () => {
     const StepIcon = step.Icon
     const pct  = Math.round(((etapaGeracao + 1) / GENERATION_STEPS.length) * 100)
     return (
-      <div className="fixed inset-0 bg-primary-50 dark:bg-[#141624] flex flex-col items-center justify-center p-6 z-50">
+      <div className="fixed inset-0 bg-primary-50 dark:bg-dark-bg flex flex-col items-center justify-center p-6 z-50">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
 
           {/* Ícone animado */}
@@ -286,7 +286,7 @@ const CriarMinuta = () => {
   if (!municipioVerificado) return null
 
   return (
-    <div className="min-h-full bg-slate-50/70 dark:bg-[#141624] px-6 py-5">
+    <div className="min-h-full bg-slate-50/70 dark:bg-dark-bg px-6 py-5">
       <div className="max-w-3xl mx-auto">
 
       {/* Header */}
@@ -329,8 +329,8 @@ const CriarMinuta = () => {
                     ${index < etapaAtual
                       ? 'bg-primary-600 text-white cursor-pointer hover:bg-primary-700'
                       : index === etapaAtual
-                        ? 'border-2 border-primary-600 text-primary-600 bg-white dark:bg-[#141624]'
-                        : 'border-2 border-slate-200 dark:border-[#2d3158] text-slate-300 dark:text-slate-600 bg-white dark:bg-[#141624] cursor-default'
+                        ? 'border-2 border-primary-600 text-primary-600 bg-white dark:bg-dark-bg'
+                        : 'border-2 border-slate-200 dark:border-dark-border text-slate-300 dark:text-slate-600 bg-white dark:bg-dark-bg cursor-default'
                     }`}
                 >
                   {index < etapaAtual ? <Check size={12} /> : index + 1}
@@ -342,7 +342,7 @@ const CriarMinuta = () => {
               </div>
               {index < steps.length - 1 && (
                 <div className={`flex-1 h-px mx-2 mb-4 sm:mb-5 transition-all duration-500
-                  ${index < etapaAtual ? 'bg-primary-400' : 'bg-slate-200 dark:bg-[#2d3158]'}`} />
+                  ${index < etapaAtual ? 'bg-primary-400' : 'bg-slate-200 dark:bg-dark-border'}`} />
               )}
             </div>
           ))}
@@ -357,7 +357,7 @@ const CriarMinuta = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direcao * -30 }}
           transition={{ duration: 0.2 }}
-          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158] mb-4"
+          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:bg-dark-surface dark:border-dark-border mb-4"
         >
 
             {/* Passo 0 */}
@@ -372,9 +372,9 @@ const CriarMinuta = () => {
                     type="button"
                     onClick={() => { atualizar('type', type.value); setTentouProximo(false) }}
                     className={`text-left p-5 border-2 rounded-xl transition-all duration-200 flex items-center gap-4
-                      ${selected ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]' : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'}`}
+                      ${selected ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated' : 'border-primary-100 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'}`}
                   >
-                    <div className={`flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${selected ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-[#232745] dark:text-slate-300'}`}>
+                    <div className={`flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${selected ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-dark-elevated dark:text-slate-300'}`}>
                       <TypeIcon size={20} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -437,7 +437,7 @@ const CriarMinuta = () => {
                   <label htmlFor="objective" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-0.5">
                     Objetivo Principal
                   </label>
-                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270] mb-1.5">
+                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 dark:bg-dark-elevated rounded-lg border border-primary-100 dark:border-dark-borderStrong mb-1.5">
                     <Scale className="text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" size={14} />
                     <p className="text-xs text-slate-400 dark:text-slate-500">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
                   </div>
@@ -476,8 +476,8 @@ const CriarMinuta = () => {
                         onClick={() => atualizar('competence', value)}
                         className={`flex items-center justify-between text-left p-4 border-2 rounded-xl transition-all duration-200
                           ${dadosFormulario.competence === value
-                            ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                            : 'border-slate-200 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
+                            ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
+                            : 'border-slate-200 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'
                           }`}
                       >
                         <div className="min-w-0">
@@ -498,7 +498,7 @@ const CriarMinuta = () => {
                   )}
                 </div>
 
-                <div className="border-t border-primary-100 dark:border-[#2d3158] pt-5">
+                <div className="border-t border-primary-100 dark:border-dark-border pt-5">
                   <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-3">Esta proposição tem impacto orçamentário?</label>
                   <div className="grid grid-cols-2 gap-3">
                     {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
@@ -508,8 +508,8 @@ const CriarMinuta = () => {
                         onClick={() => atualizar('hasFinancialImpact', value)}
                         className={`text-left p-4 border-2 rounded-xl transition-all duration-200
                           ${dadosFormulario.hasFinancialImpact === value
-                            ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                            : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-300 dark:hover:border-[#3d4270]'
+                            ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
+                            : 'border-primary-100 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'
                           }`}
                       >
                         <p className="font-semibold text-primary-800 dark:text-slate-100 text-sm mb-0.5">{label}</p>
@@ -552,14 +552,14 @@ const CriarMinuta = () => {
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />
-                  <div className="mt-1.5 w-full bg-primary-100 dark:bg-[#232745] rounded-full h-1">
+                  <div className="mt-1.5 w-full bg-primary-100 dark:bg-dark-elevated rounded-full h-1">
                     <div
                       className={`h-1 rounded-full transition-all duration-300 ${tamanhoJustificativa >= 50 ? 'bg-primary-500' : 'bg-oro-500'}`}
                       style={{ width: `${Math.min((tamanhoJustificativa / 50) * 100, 100)}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270]">
+                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-dark-elevated rounded-lg border border-primary-100 dark:border-dark-borderStrong">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
                   <p className="text-sm text-primary-600 dark:text-slate-300">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
                 </div>
@@ -574,7 +574,7 @@ const CriarMinuta = () => {
               onClick={etapaAnterior}
               disabled={etapaAtual === 0}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all
-                ${etapaAtual === 0 ? 'text-primary-300 dark:text-slate-600 cursor-not-allowed' : 'text-primary-600 dark:text-slate-300 hover:bg-primary-100 dark:hover:bg-[#232745]'}`}
+                ${etapaAtual === 0 ? 'text-primary-300 dark:text-slate-600 cursor-not-allowed' : 'text-primary-600 dark:text-slate-300 hover:bg-primary-100 dark:hover:bg-dark-elevated'}`}
             >
               <ArrowLeft size={16} />
               Anterior
@@ -596,7 +596,7 @@ const CriarMinuta = () => {
                 onClick={proximaEtapa}
                 disabled={!podeAvancar()}
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition-all
-                  ${podeAvancar() ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md font-semibold' : 'bg-slate-100 dark:bg-[#232745] text-slate-300 dark:text-slate-600 cursor-not-allowed font-medium'}`}
+                  ${podeAvancar() ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md font-semibold' : 'bg-slate-100 dark:bg-dark-elevated text-slate-300 dark:text-slate-600 cursor-not-allowed font-medium'}`}
               >
                 Próximo
                 <ArrowRight size={16} />
@@ -606,7 +606,7 @@ const CriarMinuta = () => {
                 onClick={aoFinalizar}
                 disabled={!podeAvancar() || enviando}
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm transition-all
-                  ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 dark:bg-[#232745] text-primary-300 dark:text-slate-600 cursor-not-allowed'}`}
+                  ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 dark:bg-dark-elevated text-primary-300 dark:text-slate-600 cursor-not-allowed'}`}
               >
                 <Check size={16} />
                 {enviando ? 'Gerando...' : 'Gerar Minuta'}
@@ -648,7 +648,7 @@ const CriarMinuta = () => {
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-sm p-6"
             >
               <div className="w-12 h-12 bg-oro-50 dark:bg-oro-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle size={22} className="text-oro-500" />
@@ -662,8 +662,8 @@ const CriarMinuta = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setExibirModalCancelar(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-dark-borderStrong
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated active:scale-[0.97] transition-all"
                 >
                   Continuar
                 </button>

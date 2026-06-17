@@ -6,7 +6,7 @@ const Alternador = ({ checked, onChange, disabled = false }) => (
     disabled={disabled}
     onClick={() => !disabled && onChange(!checked)}
     className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors duration-150
-      ${checked ? 'bg-primary-600' : 'bg-primary-200 dark:bg-[#3d4270]'}
+      ${checked ? 'bg-primary-600' : 'bg-primary-200 dark:bg-dark-borderStrong'}
       ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400'}`}
   >
     <span

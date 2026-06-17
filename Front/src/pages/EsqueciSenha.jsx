@@ -24,10 +24,10 @@ export default function EsqueciSenha() {
     }
   }
 
-  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-[#232745]'
+  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-dark-elevated dark:border-dark-borderStrong dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-dark-elevated'
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col items-center justify-center px-6 pb-16">
+    <div className="min-h-screen bg-white dark:bg-dark-bg flex flex-col items-center justify-center px-6 pb-16">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,7 +44,7 @@ export default function EsqueciSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-[#232745]">
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-dark-elevated">
               <Mail size={24} className="text-emerald-500" />
             </div>
             <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">

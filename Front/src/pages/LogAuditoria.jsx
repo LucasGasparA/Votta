@@ -64,7 +64,7 @@ const LogAuditoria = () => {
       {status === 'loading' && (
         <div className="space-y-3">
           {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse h-14 rounded-xl bg-primary-100 dark:bg-[#232745]" />
+            <div key={i} className="animate-pulse h-14 rounded-xl bg-primary-100 dark:bg-dark-elevated" />
           ))}
         </div>
       )}
@@ -81,7 +81,7 @@ const LogAuditoria = () => {
           <p className="text-sm mb-4">Não foi possível carregar o histórico.</p>
           <button
             onClick={buscarLogs}
-            className="px-4 py-2 text-sm rounded-xl border border-primary-200 dark:border-[#3d4270] text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+            className="px-4 py-2 text-sm rounded-xl border border-primary-200 dark:border-dark-borderStrong text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated active:scale-[0.97] transition-all"
           >
             Tentar novamente
           </button>
@@ -96,9 +96,9 @@ const LogAuditoria = () => {
             return (
               <div
                 key={log.id}
-                className="bg-white dark:bg-[#1c1f38] rounded-xl border border-primary-100 dark:border-[#2d3158] px-5 py-4 flex items-center gap-4"
+                className="bg-white dark:bg-dark-surface rounded-xl border border-primary-100 dark:border-dark-border px-5 py-4 flex items-center gap-4"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-dark-elevated flex items-center justify-center flex-shrink-0">
                   <Icon size={16} className="text-primary-500" />
                 </div>
                 <div className="flex-1 min-w-0">

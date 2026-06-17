@@ -132,7 +132,7 @@ const Painel = () => {
   )
 
   return (
-    <div className="min-h-full bg-slate-50/70 dark:bg-[#141624]">
+    <div className="min-h-full bg-slate-50/70 dark:bg-dark-bg">
       <div className="max-w-7xl mx-auto px-4 py-5 md:px-8 md:py-8">
         <motion.header
           initial={{ opacity: 0, y: -8 }}
@@ -161,20 +161,20 @@ const Painel = () => {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex flex-col gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 sm:flex-row sm:items-center sm:justify-between"
+            className="mb-6 flex flex-col gap-3 rounded-lg border border-oro-200 bg-oro-50 px-4 py-3 text-oro-900 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex items-start gap-3">
-              <AlertTriangle size={18} className="mt-0.5 flex-shrink-0 text-amber-600" />
+              <AlertTriangle size={18} className="mt-0.5 flex-shrink-0 text-oro-600" />
               <div>
                 <p className="text-sm font-semibold">
                   {totalPendentes} {totalPendentes === 1 ? 'proposição precisa' : 'proposições precisam'} de revisão.
                 </p>
-                <p className="text-xs text-amber-800">Revise antes de exportar ou marcar como aprovada.</p>
+                <p className="text-xs text-oro-800">Revise antes de exportar ou marcar como aprovada.</p>
               </div>
             </div>
             <button
               onClick={() => setSomentePendentes(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-xs font-semibold text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-xs font-semibold text-oro-800 border border-oro-200 hover:bg-oro-100 transition-colors"
             >
               Ver pendentes
               <ArrowRight size={14} />
@@ -212,7 +212,7 @@ const Painel = () => {
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-lg border border-slate-200 bg-white p-8 dark:bg-[#1c1f38] dark:border-[#2d3158]"
+            className="rounded-lg border border-slate-200 bg-white p-8 dark:bg-dark-surface dark:border-dark-border"
           >
             <FileText size={28} className="text-primary-500 mb-4" />
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Comece pela primeira proposição</h2>
@@ -242,7 +242,7 @@ const Painel = () => {
                 {somentePendentes && (
                   <button
                     onClick={() => setSomentePendentes(false)}
-                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-800 dark:hover:bg-[#232745] dark:hover:text-slate-200 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-800 dark:hover:bg-dark-elevated dark:hover:text-slate-200 transition-colors"
                   >
                     <X size={13} />
                     Limpar filtro
@@ -270,19 +270,19 @@ const Painel = () => {
             </section>
 
             <aside className="space-y-3">
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-[#1c1f38] dark:border-[#2d3158]">
+              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-dark-surface dark:border-dark-border">
                 <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Atalhos</h2>
                 <div className="mt-3 space-y-1">
                   <Link
                     to="/criar-minuta"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
+                    className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-dark-elevated transition-colors"
                   >
                     <span className="inline-flex items-center gap-2"><FileText size={15} /> Nova proposição</span>
                     <ArrowRight size={14} />
                   </Link>
                   <button
                     onClick={() => setSomentePendentes(true)}
-                    className="w-full flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
+                    className="w-full flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-dark-elevated transition-colors"
                   >
                     <span className="inline-flex items-center gap-2"><AlertTriangle size={15} /> Revisar pendentes</span>
                     {totalPendentes > 0 && (
@@ -292,7 +292,7 @@ const Painel = () => {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-[#1c1f38] dark:border-[#2d3158]">
+              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-dark-surface dark:border-dark-border">
                 <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Status do ambiente</h2>
                 <dl className="mt-3 space-y-3 text-sm">
                   <div className="flex items-center justify-between gap-3">

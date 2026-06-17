@@ -16,7 +16,7 @@ export default function Cadastro() {
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const [carregando,        setCarregando]        = useState(false)
 
-  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-[#232745]'
+  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-dark-elevated dark:border-dark-borderStrong dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-dark-elevated'
 
   const senhasNaoCoincidem = confirmacao.length > 0 && senha !== confirmacao
 
@@ -39,7 +39,7 @@ export default function Cadastro() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-dark-bg flex flex-col">
 
       {/* Barra superior */}
       <div className="flex items-center justify-between p-5">
@@ -52,7 +52,7 @@ export default function Cadastro() {
         </Link>
         <Link
           to="/login"
-          className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-xl border transition-colors border-primary-100 text-primary-700 dark:border-[#2d3158] dark:text-slate-300"
+          className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-xl border transition-colors border-primary-100 text-primary-700 dark:border-dark-border dark:text-slate-300"
         >
           Entrar
         </Link>
