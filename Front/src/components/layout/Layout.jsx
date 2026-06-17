@@ -81,7 +81,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
     return (
       <>
         {/* ── Cabeçalho: logo + botão recolher ── */}
-        <div className="border-b border-primary-100 dark:border-[#2d3158] flex items-center flex-shrink-0 p-4 gap-3">
+        <div className="border-b border-primary-100 dark:border-dark-border flex items-center flex-shrink-0 p-4 gap-3">
           {isCollapsed && !mobile ? (
             <button
               onClick={() => setCollapsed(false)}
@@ -99,7 +99,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Fechar menu"
-                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-600 dark:hover:text-slate-300 transition-colors flex-shrink-0"
+                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-dark-elevated hover:text-primary-600 dark:hover:text-slate-300 transition-colors flex-shrink-0"
                 >
                   <X size={18} />
                 </button>
@@ -138,7 +138,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           {navGroups.map((group, groupIndex) => (
             <div key={group.label}>
               {groupIndex > 0 && (
-                <div className={`${isCollapsed ? 'my-2' : 'my-3'} border-t border-primary-100 dark:border-[#2d3158]`} />
+                <div className={`${isCollapsed ? 'my-2' : 'my-3'} border-t border-primary-100 dark:border-dark-border`} />
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
@@ -156,7 +156,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                           relative flex items-center transition-all duration-150 text-sm rounded-lg
                           ${isCollapsed
                             ? `justify-center p-3 ${isActive ? 'bg-primary-600 text-white' : 'text-slate-400 hover:text-slate-700'}`
-                            : `gap-3 pl-3 pr-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
+                            : `gap-3 pl-3 pr-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-dark-elevated'}`
                           }
                         `}
                       >
@@ -176,7 +176,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                         flex items-center transition-all duration-150 text-sm rounded-lg
                         ${isCollapsed
                           ? `justify-center p-3 ${isActive ? 'bg-primary-600 text-white' : 'text-slate-400 hover:text-slate-700'}`
-                          : `gap-3 px-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#232745]'}`
+                          : `gap-3 px-3 py-2 font-medium ${isActive ? 'bg-primary-600 text-white hover:bg-primary-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-dark-elevated'}`
                         }
                       `}
                     >
@@ -196,11 +196,11 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-white dark:bg-[#141624] print:block print:bg-white">
+    <div className="h-screen flex overflow-hidden bg-white dark:bg-dark-bg print:block print:bg-white">
 
       {/* Sidebar desktop */}
       <aside
-        className={`hidden lg:flex bg-white dark:bg-[#191c33] border-r border-primary-100 dark:border-[#2d3158] flex-col shadow-sm flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
+        className={`hidden lg:flex bg-white dark:bg-dark-sidebar border-r border-primary-100 dark:border-dark-border flex-col shadow-sm flex-shrink-0 print:hidden transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}
       >
         <SidebarContent />
       </aside>
@@ -222,7 +222,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-white dark:bg-[#191c33] border-r border-primary-100 dark:border-[#2d3158] flex flex-col shadow-xl print:hidden"
+              className="lg:hidden fixed inset-y-0 left-0 z-40 w-60 bg-white dark:bg-dark-sidebar border-r border-primary-100 dark:border-dark-border flex flex-col shadow-xl print:hidden"
             >
               <SidebarContent mobile={true} />
             </motion.aside>
@@ -234,11 +234,11 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#191c33] border-b border-primary-100 dark:border-[#2d3158] shadow-sm flex-shrink-0 print:hidden">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-dark-sidebar border-b border-primary-100 dark:border-dark-border shadow-sm flex-shrink-0 print:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menu"
-            className="p-2 rounded-lg text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 transition-colors"
+            className="p-2 rounded-lg text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-dark-elevated hover:text-primary-700 transition-colors"
           >
             <Menu size={22} />
           </button>
@@ -258,13 +258,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
 
         {/* Desktop top bar */}
         {usuario && (
-          <div className="hidden lg:flex items-center justify-between px-6 py-2.5 bg-white dark:bg-[#191c33] border-b border-primary-100 dark:border-[#2d3158] flex-shrink-0 print:hidden">
+          <div className="hidden lg:flex items-center justify-between px-6 py-2.5 bg-white dark:bg-dark-sidebar border-b border-primary-100 dark:border-dark-border flex-shrink-0 print:hidden">
             <p className="text-sm font-semibold text-primary-700 dark:text-slate-300">{pageTitle}</p>
 
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowUserMenu(p => !p) }}
-                className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-[#232745] rounded-xl px-2 py-1.5 transition-all"
+                className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-dark-elevated rounded-xl px-2 py-1.5 transition-all"
                 aria-label="Menu do usuário"
               >
                 <div
@@ -286,21 +286,21 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-[#1c1f38] rounded-xl shadow-lg border border-primary-100 dark:border-[#2d3158] py-1 overflow-hidden z-50"
+                    className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-dark-surface rounded-xl shadow-lg border border-primary-100 dark:border-dark-border py-1 overflow-hidden z-50"
                   >
-                    <div className="px-4 py-2.5 border-b border-primary-100 dark:border-[#2d3158]">
+                    <div className="px-4 py-2.5 border-b border-primary-100 dark:border-dark-border">
                       <p className="text-sm font-semibold text-primary-800 dark:text-slate-100 leading-tight truncate">{usuario.name}</p>
                       <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5 truncate">{usuario.email}</p>
                     </div>
                     <Link
                       to="/configuracoes"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary-700 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated transition-colors"
                     >
                       <Settings size={15} />
                       Configurações
                     </Link>
-                    <div className="border-t border-primary-100 dark:border-[#2d3158] my-1" />
+                    <div className="border-t border-primary-100 dark:border-dark-border my-1" />
                     <button
                       onClick={aoSolicitarLogout}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rosso-600 hover:bg-rosso-50 dark:hover:bg-rosso-900/20 transition-colors text-left"
@@ -333,9 +333,9 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-sm p-6"
             >
-              <div className="w-12 h-12 bg-primary-50 dark:bg-[#232745] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-primary-50 dark:bg-dark-elevated rounded-full flex items-center justify-center mx-auto mb-4">
                 <LogOut size={22} className="text-primary-600" />
               </div>
               <h2 className="modal-title text-center mb-2">
@@ -347,8 +347,8 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-dark-borderStrong
+                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated active:scale-[0.97] transition-all"
                 >
                   Cancelar
                 </button>

@@ -56,8 +56,8 @@ const Configuracoes = () => {
 
         {/* ── Card Exportação ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-dark-border">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-dark-elevated flex items-center justify-center flex-shrink-0">
               <Download size={16} className="text-primary-600" />
             </div>
             <div>
@@ -65,7 +65,7 @@ const Configuracoes = () => {
               <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Configurações padrão para exportação de documentos</p>
             </div>
           </div>
-          <div className="divide-y divide-primary-50 dark:divide-[#2d3158]">
+          <div className="divide-y divide-primary-50 dark:divide-dark-border">
             <div className="flex items-center justify-between px-5 py-4">
               <label htmlFor="exportFormat" className="text-sm text-primary-700 dark:text-slate-300 font-medium">
                 Formato padrão
@@ -74,7 +74,7 @@ const Configuracoes = () => {
                 id="exportFormat"
                 value={settings.exportFormat}
                 onChange={e => atualizar('exportFormat', e.target.value)}
-                className="text-sm border border-primary-200 dark:border-[#3d4270] rounded-lg px-3 py-1.5 text-primary-700 dark:text-slate-200 focus:border-primary-400 focus:outline-none bg-white dark:bg-[#232745] transition-colors"
+                className="text-sm border border-primary-200 dark:border-dark-borderStrong rounded-lg px-3 py-1.5 text-primary-700 dark:text-slate-200 focus:border-primary-400 focus:outline-none bg-white dark:bg-dark-elevated transition-colors"
               >
                 <option value="PDF">PDF</option>
                 <option value="DOCX">DOCX</option>
@@ -97,8 +97,8 @@ const Configuracoes = () => {
 
         {/* ── Card Notificações ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
-            <div className="w-8 h-8 rounded-lg bg-oro-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-dark-border">
+            <div className="w-8 h-8 rounded-lg bg-oro-50 dark:bg-dark-elevated flex items-center justify-center flex-shrink-0">
               <Bell size={16} className="text-oro-600" />
             </div>
             <div>
@@ -106,7 +106,7 @@ const Configuracoes = () => {
               <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Gerencie os avisos e alertas do sistema</p>
             </div>
           </div>
-          <div className="divide-y divide-primary-50 dark:divide-[#2d3158]">
+          <div className="divide-y divide-primary-50 dark:divide-dark-border">
             <div className="flex items-center justify-between px-5 py-4 gap-6">
               <div>
                 <p className="text-sm text-primary-700 dark:text-slate-300 font-medium">Alertas de validação automática</p>
@@ -133,8 +133,8 @@ const Configuracoes = () => {
 
         {/* ── Card Aparência ── */}
         <div className="card">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
+          <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-dark-border">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-dark-elevated flex items-center justify-center flex-shrink-0">
               {settings.theme === 'dark' ? <Moon size={16} className="text-primary-400" /> : <Sun size={16} className="text-primary-400" />}
             </div>
             <div>
@@ -150,8 +150,8 @@ const Configuracoes = () => {
                 aria-pressed={settings.theme === 'light'}
                 className={`relative rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98]
                   ${settings.theme === 'light'
-                    ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                    : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-200 bg-white dark:bg-[#1c1f38]'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
+                    : 'border-primary-100 dark:border-dark-border hover:border-primary-200 bg-white dark:bg-dark-surface'
                   }`}
               >
                 <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-primary-100">
@@ -174,13 +174,13 @@ const Configuracoes = () => {
                 aria-pressed={settings.theme === 'dark'}
                 className={`relative rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98]
                   ${settings.theme === 'dark'
-                    ? 'border-primary-500 bg-primary-50 dark:bg-[#232745]'
-                    : 'border-primary-100 dark:border-[#2d3158] hover:border-primary-200 bg-white dark:bg-[#1c1f38]'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
+                    : 'border-primary-100 dark:border-dark-border hover:border-primary-200 bg-white dark:bg-dark-surface'
                   }`}
               >
-                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-[#2d3158]">
-                  <div className="w-7 bg-[#191c33] flex-shrink-0" />
-                  <div className="flex-1 bg-[#141624]" />
+                <div className="h-10 rounded-lg overflow-hidden flex mb-3 shadow-sm border border-dark-border">
+                  <div className="w-7 bg-dark-sidebar flex-shrink-0" />
+                  <div className="flex-1 bg-dark-bg" />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-primary-700 dark:text-slate-300">Escuro</span>

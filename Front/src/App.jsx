@@ -70,7 +70,7 @@ function App() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
         <div className="flex items-center gap-3 text-primary-600">
           <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
           <span className="text-sm font-medium">Carregando...</span>
@@ -84,7 +84,7 @@ function App() {
     <SettingsProvider>
     <Router>
       <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-[#141624]">
+        <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
           <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }>

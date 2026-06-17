@@ -36,7 +36,7 @@ export default function Login({ aoEntrar }) {
 
   return (
     <>
-      <div className="h-screen overflow-hidden bg-[#F8F9FA] dark:bg-[#141624] flex items-center justify-center px-6">
+      <div className="h-screen overflow-hidden bg-[#F8F9FA] dark:bg-dark-bg flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ export default function Login({ aoEntrar }) {
                   onChange={e => { setEmail(e.target.value); setCamposComErro(p => p.filter(c => c !== 'email')) }}
                   placeholder="seu@email.com"
                   required
-                  className={`input-field py-3.5 text-sm bg-[#F8F9FA] dark:bg-[#141624] ${camposComErro.includes('email') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
+                  className={`input-field py-3.5 text-sm bg-[#F8F9FA] dark:bg-dark-bg ${camposComErro.includes('email') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
                 />
               </div>
 
@@ -82,7 +82,7 @@ export default function Login({ aoEntrar }) {
                     placeholder="Senha"
                     minLength={6}
                     required
-                    className={`input-field py-3.5 pr-12 text-sm bg-[#F8F9FA] dark:bg-[#141624] ${camposComErro.includes('senha') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
+                    className={`input-field py-3.5 pr-12 text-sm bg-[#F8F9FA] dark:bg-dark-bg ${camposComErro.includes('senha') ? 'border-rosso-400 focus:border-rosso-400 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]' : ''}`}
                   />
                   <button
                     type="button"
@@ -112,7 +112,7 @@ export default function Login({ aoEntrar }) {
               <button
                 type="submit"
                 disabled={carregando}
-                className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-[#1D6FED] hover:bg-[#1560D4] text-white"
+                className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary-600 hover:bg-primary-700 text-white"
               >
                 {carregando ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
