@@ -402,7 +402,7 @@ const EditorMinuta = () => {
                     if (e.key === 'Enter') aoSalvarTitulo(e.target.value)
                     if (e.key === 'Escape') setEditandoTitulo(false)
                   }}
-                  className="text-base font-display font-bold text-primary-800 dark:text-slate-100 bg-primary-50 dark:bg-[#232745]
+                  className="text-base font-semibold text-primary-800 dark:text-slate-100 bg-primary-50 dark:bg-[#232745]
                     border-b-2 border-primary-400 dark:border-[#3d4270] outline-none px-1 min-w-0 w-48 md:w-64"
                   autoFocus
                 />
@@ -413,7 +413,7 @@ const EditorMinuta = () => {
                     setTimeout(() => titleInputRef.current?.select(), 50)
                   }}
                   title="Clique para renomear"
-                  className="text-base font-display font-bold text-primary-800 dark:text-slate-100 truncate
+                  className="text-base font-semibold text-primary-800 dark:text-slate-100 truncate
                     hover:text-primary-600 dark:hover:text-slate-300 hover:underline decoration-dashed underline-offset-2
                     transition-colors text-left max-w-[140px] sm:max-w-[220px] md:max-w-xs"
                 >
@@ -598,7 +598,7 @@ const EditorMinuta = () => {
               return (
                 <div className="flex items-center gap-2 mb-5">
                   <Icon size={20} className="text-primary-400" />
-                  <h2 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100">{section?.label}</h2>
+                  <h2 className="section-heading text-primary-800 dark:text-slate-100">{section?.label}</h2>
                 </div>
               )
             })()}
@@ -739,7 +739,7 @@ const EditorMinuta = () => {
                     <Scale size={15} />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-sm leading-tight">Assistente Jurídico</h3>
+                    <h3 className="font-semibold text-sm leading-tight">Assistente Jurídico</h3>
                     <p className="text-[10px] text-primary-200 leading-tight">Citações normativas em tempo real</p>
                   </div>
                 </div>
@@ -955,10 +955,10 @@ const EditorMinuta = () => {
       </AnimatePresence>
 
       {/* Print layout */}
-      <div className="hidden print:block font-serif text-black bg-white p-10 max-w-4xl mx-auto">
+      <div className="hidden print:block document-body text-black bg-white p-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-bold uppercase tracking-wide">Estado de Santa Catarina</h1>
-          <h2 className="text-xl font-bold uppercase tracking-wide">
+          <h1 className="document-title text-2xl uppercase tracking-wide">Estado de Santa Catarina</h1>
+          <h2 className="document-title text-xl uppercase tracking-wide">
             Câmara Municipal de {municipioDocumento?.nomeOficial || municipioDocumento?.nome || 'Nova Veneza'}
           </h2>
           <div className="mt-4 border-t border-black pt-4 text-right w-1/2 ml-auto">
@@ -996,7 +996,7 @@ const EditorMinuta = () => {
               className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-xl max-w-md w-full mx-4 flex flex-col max-h-[80vh]"
             >
               <div className="flex items-center justify-between p-5 border-b border-primary-100 dark:border-[#2d3158] flex-shrink-0">
-                <h2 className="text-base font-display font-bold text-primary-800 dark:text-slate-100">Histórico de versões</h2>
+                <h2 className="modal-title text-base text-primary-800 dark:text-slate-100">Histórico de versões</h2>
                 <button
                   onClick={() => setExibirModalVersoes(false)}
                   aria-label="Fechar histórico de versões"
@@ -1090,7 +1090,7 @@ const EditorMinuta = () => {
               <div className="flex items-center justify-between p-6 border-b border-primary-100 dark:border-[#2d3158]">
                 <div className="flex items-center gap-3">
                   <ClipboardCheck size={20} className="text-primary-500" />
-                  <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100">Revisão Final</h2>
+                  <h2 className="modal-title text-primary-800 dark:text-slate-100">Revisão Final</h2>
                 </div>
                 <button onClick={() => setExibirModalExportacao(false)} className="text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-[#232745]">
                   <X size={20} />
@@ -1179,7 +1179,7 @@ const EditorMinuta = () => {
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle size={22} className="text-amber-500" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
+              <h2 className="modal-title text-center mb-2">
                 Alterações não salvas
               </h2>
               <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">

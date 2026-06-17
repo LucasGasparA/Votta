@@ -28,7 +28,7 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-display font-bold text-primary-800 dark:text-slate-100 mb-2">
+        <h1 className="page-title text-primary-800 dark:text-slate-100 mb-2">
           Selecionar Município
         </h1>
         <p className="text-primary-600 dark:text-slate-400">
@@ -50,7 +50,7 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
             </div>
             <div>
               <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Município Atual</p>
-              <h3 className="text-xl font-display font-bold text-primary-900 dark:text-slate-100">
+              <h3 className="section-heading text-primary-900 dark:text-slate-100">
                 {current.nome}, {current.uf}
               </h3>
             </div>
@@ -76,7 +76,7 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
               <MapPin className="text-primary-500" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-display font-bold text-primary-900 dark:text-slate-100">Nova Veneza</h3>
+              <h3 className="section-heading text-primary-900 dark:text-slate-100">Nova Veneza</h3>
               <p className="text-sm text-primary-600 dark:text-primary-400">SC</p>
             </div>
           </div>

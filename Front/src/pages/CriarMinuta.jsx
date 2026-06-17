@@ -236,7 +236,7 @@ const CriarMinuta = () => {
             </AnimatePresence>
           </div>
 
-          <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
+          <h2 className="modal-title mb-2">
             Gerando sua minuta...
           </h2>
 
@@ -653,7 +653,7 @@ const CriarMinuta = () => {
               <div className="w-12 h-12 bg-oro-50 dark:bg-oro-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle size={22} className="text-oro-500" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
+              <h2 className="modal-title text-center mb-2">
                 Cancelar preenchimento?
               </h2>
               <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">

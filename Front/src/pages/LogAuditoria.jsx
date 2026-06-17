@@ -58,7 +58,7 @@ const LogAuditoria = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-8">
-      <h1 className="text-xl font-display font-bold text-primary-800 dark:text-slate-100 mb-1">Trilha de Auditoria</h1>
+      <h1 className="page-title mb-1">Trilha de Auditoria</h1>
       <p className="text-sm text-primary-400 dark:text-slate-500 mb-6">Registro de todas as ações realizadas na sua conta</p>
 
       {status === 'loading' && (

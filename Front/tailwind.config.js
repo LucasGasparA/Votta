@@ -48,6 +48,8 @@ export default {
       fontFamily: {
         'display': ['Crimson Pro', 'serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
+        'serif': ['Crimson Pro', 'Georgia', 'serif'],
+        'document': ['Crimson Pro', 'Georgia', 'serif'],
       },
     },
   },

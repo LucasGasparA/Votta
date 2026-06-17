@@ -338,7 +338,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               <div className="w-12 h-12 bg-primary-50 dark:bg-[#232745] rounded-full flex items-center justify-center mx-auto mb-4">
                 <LogOut size={22} className="text-primary-600" />
               </div>
-              <h2 className="text-lg font-display font-bold text-primary-800 dark:text-slate-100 text-center mb-2">
+              <h2 className="modal-title text-center mb-2">
                 Sair do sistema?
               </h2>
               <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">
