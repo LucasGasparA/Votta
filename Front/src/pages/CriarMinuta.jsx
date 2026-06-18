@@ -47,7 +47,7 @@ const COMPETENCE_OPTIONS = [
   {
     value: 'incerto',
     label: 'Não tenho certeza',
-    description: 'O assistente jurídico vai verificar automaticamente com base na Lei Orgânica e na CF/88.',
+    description: 'O Assistente Legislativo IA vai verificar automaticamente com base na Lei Orgânica e na CF/88.',
   },
 ]
 
@@ -95,8 +95,8 @@ const CriarMinuta = () => {
 
   useEffect(() => {
     if (!municipioSelecionado) {
-      toast.error('Selecione um município antes de criar uma proposição.')
-      navigate('/selecionar-municipio')
+      toast.error('Selecione um município em Configurações antes de criar uma proposição.')
+      navigate('/configuracoes')
     } else {
       setMunicipioVerificado(true)
     }
@@ -216,7 +216,7 @@ const CriarMinuta = () => {
     const StepIcon = step.Icon
     const pct  = Math.round(((etapaGeracao + 1) / GENERATION_STEPS.length) * 100)
     return (
-      <div className="fixed inset-0 bg-primary-50 dark:bg-dark-bg flex flex-col items-center justify-center p-6 z-50">
+      <div className="fixed inset-0 bg-primary-50 flex flex-col items-center justify-center p-6 z-50">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
 
           {/* Ícone animado */}
@@ -236,8 +236,8 @@ const CriarMinuta = () => {
             </AnimatePresence>
           </div>
 
-          <h2 className="modal-title mb-2">
-            Gerando sua minuta...
+          <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
+            Gerando minuta com IA...
           </h2>
 
           {/* Texto da etapa com transição */}
@@ -286,20 +286,20 @@ const CriarMinuta = () => {
   if (!municipioVerificado) return null
 
   return (
-    <div className="min-h-full bg-slate-50/70 dark:bg-dark-bg px-6 py-5">
+    <div className="min-h-full bg-slate-50/70 px-6 py-5">
       <div className="max-w-3xl mx-auto">
 
       {/* Header */}
       <div className="mb-5">
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4 mb-5">
           <div>
-            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
+            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1">
               Etapa {etapaAtual + 1} de {steps.length}
             </p>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
+            <h1 className="text-2xl font-bold text-slate-900 leading-tight">
               {steps[etapaAtual].title}
             </h1>
-            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">{steps[etapaAtual].description}</p>
+            <p className="text-slate-400 text-xs mt-1">{steps[etapaAtual].description}</p>
           </div>
           <button
             onClick={() => {
@@ -309,7 +309,7 @@ const CriarMinuta = () => {
               if (sujo) setExibirModalCancelar(true)
               else navigate('/painel')
             }}
-            className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors mt-1"
+            className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600 transition-colors mt-1"
           >
             <X size={15} />
             Cancelar
@@ -329,20 +329,20 @@ const CriarMinuta = () => {
                     ${index < etapaAtual
                       ? 'bg-primary-600 text-white cursor-pointer hover:bg-primary-700'
                       : index === etapaAtual
-                        ? 'border-2 border-primary-600 text-primary-600 bg-white dark:bg-dark-bg'
-                        : 'border-2 border-slate-200 dark:border-dark-border text-slate-300 dark:text-slate-600 bg-white dark:bg-dark-bg cursor-default'
+                        ? 'border-2 border-primary-600 text-primary-600 bg-white '
+                        : 'border-2 border-slate-200 text-slate-300 bg-white cursor-default'
                     }`}
                 >
                   {index < etapaAtual ? <Check size={12} /> : index + 1}
                 </button>
                 <span className={`hidden sm:block text-[10px] mt-1 text-center w-16 leading-tight transition-all
-                  ${index === etapaAtual ? 'text-primary-700 dark:text-slate-200 font-semibold' : index < etapaAtual ? 'text-slate-400 dark:text-slate-500' : 'text-slate-300 dark:text-slate-600'}`}>
+                  ${index === etapaAtual ? 'text-primary-700 font-semibold' : index < etapaAtual ? 'text-slate-400 ' : 'text-slate-300 '}`}>
                   {step.short}
                 </span>
               </div>
               {index < steps.length - 1 && (
                 <div className={`flex-1 h-px mx-2 mb-4 sm:mb-5 transition-all duration-500
-                  ${index < etapaAtual ? 'bg-primary-400' : 'bg-slate-200 dark:bg-dark-border'}`} />
+                  ${index < etapaAtual ? 'bg-primary-400' : 'bg-slate-200 '}`} />
               )}
             </div>
           ))}
@@ -357,7 +357,7 @@ const CriarMinuta = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direcao * -30 }}
           transition={{ duration: 0.2 }}
-          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:bg-dark-surface dark:border-dark-border mb-4"
+          className="card-base p-5 mb-4"
         >
 
             {/* Passo 0 */}
@@ -371,18 +371,18 @@ const CriarMinuta = () => {
                     key={type.value}
                     type="button"
                     onClick={() => { atualizar('type', type.value); setTentouProximo(false) }}
-                    className={`text-left p-5 border-2 rounded-xl transition-all duration-200 flex items-center gap-4
-                      ${selected ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated' : 'border-primary-100 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'}`}
+                    className={`text-left p-5 border-2 rounded-2xl transition-all duration-200 flex items-center gap-4
+                      ${selected ? 'border-primary-500 bg-primary-50 ' : 'border-primary-100 hover:border-primary-300 '}`}
                   >
-                    <div className={`flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${selected ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-dark-elevated dark:text-slate-300'}`}>
+                    <div className={`flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${selected ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500 '}`}>
                       <TypeIcon size={20} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{type.label}</h3>
+                        <h3 className="font-semibold text-slate-800 text-sm leading-tight">{type.label}</h3>
                         <button
                           type="button"
-                          className="flex-shrink-0 text-slate-300 hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-400 transition-colors"
+                          className="flex-shrink-0 text-slate-300 hover:text-slate-500 transition-colors"
                           onClick={e => e.stopPropagation()}
                           onMouseEnter={e => {
                             const r = e.currentTarget.getBoundingClientRect()
@@ -410,16 +410,16 @@ const CriarMinuta = () => {
             {etapaAtual === 1 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="theme" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-0.5">
+                  <label htmlFor="theme" className="block text-sm font-semibold text-slate-700 mb-0.5">
                     Tema da Proposição
                   </label>
-                  <p className="text-xs text-slate-300 dark:text-slate-600 mb-1.5">Descreva em poucas palavras o assunto central da proposição.</p>
+                  <p className="text-xs text-slate-300 mb-1.5">Descreva em poucas palavras o assunto central da proposição.</p>
                   <input
                     id="theme"
                     type="text"
                     value={dadosFormulario.theme}
                     onChange={e => atualizar('theme', e.target.value)}
-                    className={`input-field ${tentouProximo && !dadosFormulario.theme.trim() ? 'border-rosso-400' : ''}`}
+                    className={`input-base ${tentouProximo && !dadosFormulario.theme.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Coleta Seletiva de Lixo Reciclável"
                     autoFocus
                   />
@@ -434,18 +434,18 @@ const CriarMinuta = () => {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="objective" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-0.5">
+                  <label htmlFor="objective" className="block text-sm font-semibold text-slate-700 mb-0.5">
                     Objetivo Principal
                   </label>
-                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 dark:bg-dark-elevated rounded-lg border border-primary-100 dark:border-dark-borderStrong mb-1.5">
-                    <Scale className="text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0" size={14} />
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
+                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 rounded-2xl border border-primary-100 mb-1.5">
+                    <Scale className="text-slate-300 mt-0.5 flex-shrink-0" size={14} />
+                    <p className="text-xs text-slate-400 ">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
                   </div>
                   <textarea
                     id="objective"
                     value={dadosFormulario.objective}
                     onChange={e => atualizar('objective', e.target.value)}
-                    className={`input-field min-h-[80px] resize-none ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
+                    className={`textarea-base min-h-[80px] ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Instituir um programa municipal de coleta seletiva com pontos de entrega voluntária"
                   />
                   <div className="flex items-center justify-between mt-1">
@@ -466,7 +466,7 @@ const CriarMinuta = () => {
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <label className="text-sm font-medium text-primary-700 dark:text-slate-300">A matéria é de competência municipal?</label>
+                    <label className="text-sm font-medium text-primary-700 ">A matéria é de competência municipal?</label>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
                     {COMPETENCE_OPTIONS.map(({ value, label, description }) => (
@@ -474,15 +474,15 @@ const CriarMinuta = () => {
                         key={value}
                         type="button"
                         onClick={() => atualizar('competence', value)}
-                        className={`flex items-center justify-between text-left p-4 border-2 rounded-xl transition-all duration-200
+                        className={`flex items-center justify-between text-left p-4 border-2 rounded-2xl transition-all duration-200
                           ${dadosFormulario.competence === value
-                            ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
-                            : 'border-slate-200 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'
+                            ? 'border-primary-500 bg-primary-50 '
+                            : 'border-slate-200 hover:border-primary-300 '
                           }`}
                       >
                         <div className="min-w-0">
-                          <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">{label}</p>
-                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-snug">{description}</p>
+                          <p className="font-semibold text-slate-800 text-sm">{label}</p>
+                          <p className="text-xs text-slate-400 mt-0.5 leading-snug">{description}</p>
                         </div>
                         {dadosFormulario.competence === value && (
                           <Check size={16} className="text-primary-600 flex-shrink-0 ml-3" />
@@ -491,43 +491,43 @@ const CriarMinuta = () => {
                     ))}
                   </div>
                   {dadosFormulario.competence === 'incerto' && (
-                    <div className="flex items-start gap-3 p-3 mt-2 bg-oro-50 border border-oro-200 rounded-xl">
+                    <div className="flex items-start gap-3 p-3 mt-2 bg-oro-50 border border-oro-200 rounded-2xl">
                       <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={16} />
-                      <p className="text-xs text-oro-800">O assistente jurídico verificará a competência automaticamente.</p>
+                      <p className="text-xs text-oro-800">O Assistente Legislativo IA verificará a competência automaticamente.</p>
                     </div>
                   )}
                 </div>
 
-                <div className="border-t border-primary-100 dark:border-dark-border pt-5">
-                  <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-3">Esta proposição tem impacto orçamentário?</label>
+                <div className="border-t border-primary-100 pt-5">
+                  <label className="block text-sm font-medium text-primary-700 mb-3">Esta proposição tem impacto orçamentário?</label>
                   <div className="grid grid-cols-2 gap-3">
                     {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
                       <button
                         key={label}
                         type="button"
                         onClick={() => atualizar('hasFinancialImpact', value)}
-                        className={`text-left p-4 border-2 rounded-xl transition-all duration-200
+                        className={`text-left p-4 border-2 rounded-2xl transition-all duration-200
                           ${dadosFormulario.hasFinancialImpact === value
-                            ? 'border-primary-500 bg-primary-50 dark:bg-dark-elevated'
-                            : 'border-primary-100 dark:border-dark-border hover:border-primary-300 dark:hover:border-dark-borderStrong'
+                            ? 'border-primary-500 bg-primary-50 '
+                            : 'border-primary-100 hover:border-primary-300 '
                           }`}
                       >
-                        <p className="font-semibold text-primary-800 dark:text-slate-100 text-sm mb-0.5">{label}</p>
-                        <p className="text-xs text-primary-500 dark:text-slate-400">{desc}</p>
+                        <p className="font-semibold text-primary-800 text-sm mb-0.5">{label}</p>
+                        <p className="text-xs text-primary-500 ">{desc}</p>
                       </button>
                     ))}
                   </div>
                   {dadosFormulario.hasFinancialImpact && (
                     <div className="mt-3">
-                      <label className="block text-sm font-medium text-primary-700 dark:text-slate-300 mb-1.5">Estimativa de Impacto (R$)</label>
+                      <label className="block text-sm font-medium text-primary-700 mb-1.5">Estimativa de Impacto (R$)</label>
                       <input
                         type="text"
                         value={dadosFormulario.estimatedImpact}
                         onChange={e => atualizar('estimatedImpact', e.target.value)}
-                        className="input-field"
+                        className="input-base"
                         placeholder="Ex: 150.000,00"
                       />
-                      <p className="text-xs text-primary-400 dark:text-slate-500 mt-1">Será necessário anexar estimativa de impacto orçamentário-financeiro</p>
+                      <p className="text-xs text-primary-400 mt-1">Será necessário anexar estimativa de impacto orçamentário-financeiro</p>
                     </div>
                   )}
                 </div>
@@ -539,8 +539,8 @@ const CriarMinuta = () => {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="justification" className="block text-sm font-medium text-primary-700 dark:text-slate-300">Justificativa da Proposição</label>
-                    <span className={`text-xs font-medium ${tamanhoJustificativa >= 50 ? 'text-primary-600' : 'text-primary-400 dark:text-slate-500'}`}>
+                    <label htmlFor="justification" className="block text-sm font-medium text-primary-700 ">Justificativa da Proposição</label>
+                    <span className={`text-xs font-medium ${tamanhoJustificativa >= 50 ? 'text-primary-600' : 'text-primary-400 '}`}>
                       {tamanhoJustificativa} / mín. 50
                     </span>
                   </div>
@@ -548,20 +548,20 @@ const CriarMinuta = () => {
                     id="justification"
                     value={dadosFormulario.justification}
                     onChange={e => atualizar('justification', e.target.value)}
-                    className="input-field min-h-[120px] resize-none"
+                    className="textarea-base min-h-[120px]"
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />
-                  <div className="mt-1.5 w-full bg-primary-100 dark:bg-dark-elevated rounded-full h-1">
+                  <div className="mt-1.5 w-full bg-primary-100 rounded-full h-1">
                     <div
                       className={`h-1 rounded-full transition-all duration-300 ${tamanhoJustificativa >= 50 ? 'bg-primary-500' : 'bg-oro-500'}`}
                       style={{ width: `${Math.min((tamanhoJustificativa / 50) * 100, 100)}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-dark-elevated rounded-lg border border-primary-100 dark:border-dark-borderStrong">
+                <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-2xl border border-primary-100 ">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600 dark:text-slate-300">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
+                  <p className="text-sm text-primary-600 ">O Assistente Legislativo IA irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
                 </div>
               </div>
             )}
@@ -573,8 +573,8 @@ const CriarMinuta = () => {
             <button
               onClick={etapaAnterior}
               disabled={etapaAtual === 0}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all
-                ${etapaAtual === 0 ? 'text-primary-300 dark:text-slate-600 cursor-not-allowed' : 'text-primary-600 dark:text-slate-300 hover:bg-primary-100 dark:hover:bg-dark-elevated'}`}
+              className={`btn-ghost px-4 py-2
+                ${etapaAtual === 0 ? 'text-primary-300 cursor-not-allowed' : 'text-primary-600 hover:bg-primary-100 '}`}
             >
               <ArrowLeft size={16} />
               Anterior
@@ -584,7 +584,7 @@ const CriarMinuta = () => {
               <motion.div
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg"
+                className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-2xl"
               >
                 <Info size={12} />
                 {motivoBloqueio}
@@ -595,8 +595,8 @@ const CriarMinuta = () => {
               <button
                 onClick={proximaEtapa}
                 disabled={!podeAvancar()}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition-all
-                  ${podeAvancar() ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md font-semibold' : 'bg-slate-100 dark:bg-dark-elevated text-slate-300 dark:text-slate-600 cursor-not-allowed font-medium'}`}
+                className={`btn-primary px-5 py-2
+                  ${podeAvancar() ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md font-semibold' : 'bg-slate-100 text-slate-300 cursor-not-allowed font-medium'}`}
               >
                 Próximo
                 <ArrowRight size={16} />
@@ -605,11 +605,11 @@ const CriarMinuta = () => {
               <button
                 onClick={aoFinalizar}
                 disabled={!podeAvancar() || enviando}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm transition-all
-                  ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 dark:bg-dark-elevated text-primary-300 dark:text-slate-600 cursor-not-allowed'}`}
+                className={`btn-primary px-5 py-2
+                  ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 text-primary-300 cursor-not-allowed'}`}
               >
                 <Check size={16} />
-                {enviando ? 'Gerando...' : 'Gerar Minuta'}
+                {enviando ? 'Gerando...' : 'Gerar minuta com IA'}
               </button>
             )}
           </div>
@@ -628,7 +628,7 @@ const CriarMinuta = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12 }}
               style={{ left: tooltip.x, top: tooltip.y - 8, transform: 'translate(-50%, -100%)' }}
-              className="fixed z-50 w-64 bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 shadow-2xl leading-relaxed pointer-events-none"
+              className="fixed z-50 w-64 bg-slate-900 text-white text-xs rounded-2xl px-3 py-2.5 shadow-2xl leading-relaxed pointer-events-none"
             >
               {t.description}
             </motion.div>
@@ -642,35 +642,33 @@ const CriarMinuta = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="modal-backdrop"
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="modal-base max-w-sm"
             >
-              <div className="w-12 h-12 bg-oro-50 dark:bg-oro-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-oro-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle size={22} className="text-oro-500" />
               </div>
-              <h2 className="modal-title text-center mb-2">
+              <h2 className="text-lg font-display font-bold text-primary-800 text-center mb-2">
                 Cancelar preenchimento?
               </h2>
-              <p className="text-sm text-primary-500 dark:text-slate-400 text-center mb-6 leading-relaxed">
+              <p className="text-sm text-primary-500 text-center mb-6 leading-relaxed">
                 Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setExibirModalCancelar(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-dark-borderStrong
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated active:scale-[0.97] transition-all"
+                  className="btn-secondary flex-1 rounded-2xl"
                 >
                   Continuar
                 </button>
                 <button
                   onClick={() => { try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* noop */ } navigate('/painel') }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
-                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                  className="btn-danger flex-1 rounded-2xl"
                 >
                   Sim, cancelar
                 </button>

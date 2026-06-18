@@ -18,7 +18,7 @@ export default function RedefinirSenha() {
   const [carregando,         setCarregando]         = useState(false)
   const [concluido,          setConcluido]          = useState(false)
 
-  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-dark-elevated dark:border-dark-borderStrong dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-dark-elevated'
+  const inputBase = 'input-base py-3.5 rounded-2xl focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)]'
 
   const aoEnviar = async (e) => {
     e.preventDefault()
@@ -46,9 +46,9 @@ export default function RedefinirSenha() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-white dark:bg-dark-bg flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-sm text-center">
-          <p className="text-sm mb-4 text-primary-400 dark:text-slate-500">
+          <p className="text-sm mb-4 text-primary-400 ">
             Link de recuperação inválido ou expirado.
           </p>
           <Link to="/esqueci-senha" className="text-sm font-medium text-slate-700 hover:text-slate-900 underline transition-colors">
@@ -60,7 +60,7 @@ export default function RedefinirSenha() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-dark-bg flex flex-col items-center justify-center px-6 pb-16">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6 pb-16">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,19 +77,19 @@ export default function RedefinirSenha() {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-dark-elevated">
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 ">
               <CheckCircle size={24} className="text-emerald-600" />
             </div>
-            <h1 className="text-xl font-semibold mb-2 text-primary-900 dark:text-slate-100">
+            <h1 className="text-xl font-semibold mb-2 text-primary-900 ">
               Senha redefinida!
             </h1>
-            <p className="text-sm leading-relaxed mb-6 text-primary-700 dark:text-slate-300">
+            <p className="text-sm leading-relaxed mb-6 text-primary-700 ">
               Sua senha foi atualizada com sucesso.
               Agora você pode entrar com a nova senha.
             </p>
             <button
               onClick={() => navigate('/login')}
-              className="w-full py-3.5 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 bg-primary-500 hover:bg-primary-600 text-white"
+              className="btn-primary w-full py-3.5 rounded-2xl uppercase tracking-wider bg-primary-500 hover:bg-primary-600"
             >
               Ir para o login
             </button>
@@ -97,10 +97,10 @@ export default function RedefinirSenha() {
         ) : (
           /* Formulário */
           <>
-            <h1 className="text-xl font-semibold text-center mb-2 text-primary-900 dark:text-slate-100">
+            <h1 className="text-xl font-semibold text-center mb-2 text-primary-900 ">
               Criar nova senha
             </h1>
-            <p className="text-sm text-center mb-6 text-primary-400 dark:text-slate-500">
+            <p className="text-sm text-center mb-6 text-primary-400 ">
               Escolha uma senha com pelo menos 6 caracteres.
             </p>
 
@@ -122,7 +122,7 @@ export default function RedefinirSenha() {
                   type="button"
                   onClick={() => setMostrarSenha(v => !v)}
                   aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 leading-none"
                 >
                   {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -145,7 +145,7 @@ export default function RedefinirSenha() {
                   type="button"
                   onClick={() => setMostrarConfirmacao(v => !v)}
                   aria-label={mostrarConfirmacao ? 'Ocultar confirmação' : 'Mostrar confirmação'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 leading-none"
                 >
                   {mostrarConfirmacao ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -154,7 +154,7 @@ export default function RedefinirSenha() {
               <button
                 type="submit"
                 disabled={carregando}
-                className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary-500 hover:bg-primary-600 text-white"
+                className="btn-primary w-full py-3.5 mt-1 rounded-2xl uppercase tracking-wider bg-primary-500 hover:bg-primary-600"
               >
                 {carregando ? (
                   <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto"

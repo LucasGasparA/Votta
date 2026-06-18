@@ -2,12 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './components/layout/Layout'
 import { api } from './api/client.js'
-import { TemaProvider } from './context/TemaContext'
 import { SettingsProvider } from './context/SettingsContext'
 
 const Login               = lazy(() => import('./pages/Login'))
 const Painel              = lazy(() => import('./pages/Painel'))
-const SelecionarMunicipio = lazy(() => import('./pages/SelecionarMunicipio'))
 const CriarMinuta         = lazy(() => import('./pages/CriarMinuta'))
 const EditorMinuta        = lazy(() => import('./pages/EditorMinuta'))
 const EsqueciSenha        = lazy(() => import('./pages/EsqueciSenha'))
@@ -70,7 +68,7 @@ function App() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50">
         <div className="flex items-center gap-3 text-primary-600">
           <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
           <span className="text-sm font-medium">Carregando...</span>
@@ -80,11 +78,10 @@ function App() {
   }
 
   return (
-    <TemaProvider>
     <SettingsProvider>
     <Router>
       <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-primary-50 dark:bg-dark-bg">
+        <div className="min-h-screen flex items-center justify-center bg-primary-50">
           <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }>
@@ -104,16 +101,13 @@ function App() {
           path="/"
           element={
             estaAutenticado
-              ? <Layout municipioSelecionado={municipioSelecionado} aoSair={aoSair} usuario={usuario} />
+              ? <Layout municipioSelecionado={municipioSelecionado} aoSelecionarMunicipio={aoSelecionarMunicipio} aoSair={aoSair} usuario={usuario} />
               : <Navigate to="/login" />
           }
         >
           <Route index element={<Navigate to="/painel" />} />
           <Route path="painel" element={<Painel />} />
-          <Route
-            path="selecionar-municipio"
-            element={<SelecionarMunicipio aoSelecionar={aoSelecionarMunicipio} current={municipioSelecionado} />}
-          />
+          <Route path="selecionar-municipio" element={<Navigate to="/configuracoes" replace />} />
           <Route path="criar-minuta"           element={<CriarMinuta />} />
           <Route path="minuta/:id/editar"      element={<EditorMinuta />} />
           <Route path="configuracoes"          element={<Configuracoes />} />
@@ -125,7 +119,6 @@ function App() {
       </Suspense>
     </Router>
     </SettingsProvider>
-    </TemaProvider>
   )
 }
 

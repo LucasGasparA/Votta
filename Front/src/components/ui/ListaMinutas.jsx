@@ -5,17 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 
 const STATUS_CONFIG = {
-  em_andamento:     { label: 'Em andamento',       color: 'bg-primary-50 text-primary-700 border-primary-100', Icon: Clock },
-  pendente_revisao: { label: 'Aguardando revisão', color: 'bg-oro-50 text-oro-800 border-oro-100',             Icon: AlertTriangle },
-  concluido:        { label: 'Aprovada',           color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: CheckCircle },
+  em_andamento:     { label: 'Em andamento',       color: 'bg-primary-50 text-primary-700', Icon: Clock },
+  pendente_revisao: { label: 'Aguardando revisão', color: 'bg-oro-50 text-oro-800',         Icon: AlertTriangle },
+  concluido:        { label: 'Aprovada',           color: 'bg-emerald-50 text-emerald-700', Icon: CheckCircle },
 }
 
 const ListaMinutas = ({
   proposals,
   onDelete,
   title = 'Proposições recentes',
-  emptyTitle = 'Nenhuma proposição ainda',
-  emptyDescription = 'Crie sua primeira proposição legislativa em minutos com o fluxo guiado.',
+  emptyTitle = 'Nenhuma minuta legislativa ainda',
+  emptyDescription = 'Crie sua primeira minuta legislativa com apoio da IA e revise antes de exportar.',
 }) => {
   const [alvoExclusao, setAlvoExclusao] = useState(null)
   const timerRef = useRef(null)
@@ -56,52 +56,49 @@ const ListaMinutas = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08 }}
-      className="rounded-lg border border-slate-200 bg-white shadow-sm dark:bg-dark-surface dark:border-dark-border"
+      className="rounded-2xl bg-white shadow-sm "
     >
-      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-dark-border">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
-        <Link
-          to="/criar-minuta"
-          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-dark-elevated transition-colors"
-        >
-          <PlusCircle size={15} />
-          Nova
-        </Link>
+      <div className="px-6 pb-3 pt-6">
+        <h2 className="text-base font-semibold text-slate-950 ">{title}</h2>
+        <p className="mt-1 text-xs text-slate-500 ">
+          Acervo de minutas legislativas em elaboração e revisão.
+        </p>
       </div>
 
       {proposals.length === 0 ? (
-        <div className="px-5 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-dark-elevated dark:text-slate-300">
+        <div className="px-6 py-14 text-center">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-primary-500 ">
             <FileText size={22} />
           </div>
-          <p className="font-semibold text-slate-800 dark:text-slate-100">{emptyTitle}</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{emptyDescription}</p>
+          <p className="font-semibold text-slate-900 ">{emptyTitle}</p>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500 ">{emptyDescription}</p>
           <Link
             to="/criar-minuta"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+            className="btn-primary mt-5 py-2"
           >
             <PlusCircle size={15} />
-            Criar proposição
+            Criar minuta com IA
           </Link>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100 dark:divide-dark-border">
+        <div className="space-y-3 px-4 pb-4">
           {proposals.map((proposal) => {
             const cfg = obterStatus(proposal.status)
             const StatusIcon = cfg.Icon
+            const tituloExibido = proposal.title || 'Sem título'
 
             return (
-              <div key={proposal.id} className="grid grid-cols-[1fr_auto] gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-dark-elevated/60 transition-colors">
+              <div key={proposal.id} className="grid grid-cols-[1fr_auto] gap-4 rounded-2xl px-4 py-4 transition-colors hover:bg-slate-50 ">
                 <Link to={`/minuta/${proposal.id}/editar`} className="min-w-0">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 sm:flex dark:bg-dark-elevated dark:text-slate-300">
+                    <div className="mt-0.5 hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-primary-500 sm:flex ">
                       <FileText size={17} />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900 hover:text-primary-700 dark:text-slate-100 dark:hover:text-primary-300">
-                        {proposal.title}
+                      <p className="truncate text-base font-semibold text-slate-950 hover:text-primary-700 ">
+                        {tituloExibido}
                       </p>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-slate-500 ">
                         <span className="truncate">{proposal.type}</span>
                         <span aria-hidden="true">/</span>
                         <span>Atualizada em {proposal.lastUpdate}</span>
@@ -111,13 +108,13 @@ const ListaMinutas = ({
                 </Link>
 
                 <div className="flex items-center gap-2">
-                  <span className={`hidden sm:inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${cfg.color}`}>
+                  <span className={`hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${cfg.color}`}>
                     <StatusIcon size={12} strokeWidth={2.5} />
                     {cfg.label}
                   </span>
                   <button
-                    onClick={() => setAlvoExclusao({ id: proposal.id, title: proposal.title })}
-                    aria-label={`Excluir proposição: ${proposal.title}`}
+                    onClick={() => setAlvoExclusao({ id: proposal.id, title: tituloExibido })}
+                    aria-label={`Excluir proposição: ${tituloExibido}`}
                     className="rounded-md p-2 text-slate-400 hover:bg-rosso-50 hover:text-rosso-600 transition-colors"
                   >
                     <Trash2 size={15} />
@@ -135,34 +132,34 @@ const ListaMinutas = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="modal-backdrop"
           >
             <motion.div
               initial={{ scale: 0.96, y: 14 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.96, y: 14 }}
-              className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-dark-surface"
+              className="modal-base max-w-sm"
             >
-              <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-rosso-50 dark:bg-rosso-900/20">
+              <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-rosso-50 ">
                 <Trash2 size={21} className="text-rosso-500" />
               </div>
-              <h2 className="text-center text-lg font-semibold text-slate-900 dark:text-slate-100">Excluir proposição?</h2>
-              <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
+              <h2 className="text-center text-lg font-semibold text-slate-900 ">Excluir proposição?</h2>
+              <p className="mt-2 text-center text-sm text-slate-500 ">
                 Esta ação remove a proposição e não pode ser desfeita.
               </p>
-              <p className="mt-4 truncate rounded-md bg-slate-50 px-3 py-2 text-center text-sm font-medium text-slate-800 dark:bg-dark-elevated dark:text-slate-200">
+              <p className="mt-4 truncate rounded-2xl bg-slate-50 px-3 py-2 text-center text-sm font-medium text-slate-800 ">
                 {alvoExclusao.title}
               </p>
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => setAlvoExclusao(null)}
-                  className="flex-1 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-dark-borderStrong dark:text-slate-300 dark:hover:bg-dark-elevated transition-colors"
+                  className="btn-secondary flex-1 px-3"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmarExclusao}
-                  className="flex-1 rounded-lg bg-rosso-500 px-3 py-2.5 text-sm font-semibold text-white hover:bg-rosso-600 transition-colors"
+                  className="btn-danger flex-1 px-3"
                 >
                   Excluir
                 </button>
