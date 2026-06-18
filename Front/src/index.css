@@ -22,12 +22,9 @@
   .dark input,
   .dark textarea,
   .dark select {
-    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-[#141624];
+    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-dark-bg;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
-  }
 }
 
 @layer components {
@@ -86,8 +83,28 @@
     @apply w-full rounded-2xl bg-white p-6 shadow-2xl;
   }
 
+  .page-title {
+    @apply text-2xl md:text-3xl font-semibold text-slate-950 dark:text-slate-100;
+  }
+
+  .section-heading {
+    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .modal-title {
+    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .document-title {
+    @apply font-document font-bold;
+  }
+
+  .document-body {
+    @apply font-document;
+  }
+
   .section-title {
-    @apply text-3xl font-display font-bold text-primary-800 mb-6 
+    @apply text-3xl font-semibold text-primary-800 mb-6 
            border-l-4 border-oro-500 pl-4;
   }
 }
@@ -140,17 +157,17 @@
 ::-webkit-scrollbar-thumb { background: #BFDBFE; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #93C5FD; }
 
-.dark ::-webkit-scrollbar-track { background: #1c1f38; }
-.dark ::-webkit-scrollbar-thumb { background: #3d4270; border-radius: 4px; }
+.dark ::-webkit-scrollbar-track { background: theme('colors.dark.surface'); }
+.dark ::-webkit-scrollbar-thumb { background: theme('colors.dark.borderStrong'); border-radius: 4px; }
 .dark ::-webkit-scrollbar-thumb:hover { background: #5060a0; }
 
 /* ── Dark mode base ── */
 .dark body {
-  @apply bg-[#141624] text-slate-100;
+  @apply bg-dark-bg text-slate-100;
 }
 
 .dark .card {
-  @apply bg-[#1c1f38] border-[#2d3158];
+  @apply bg-dark-surface border-dark-border;
 }
 
 .dark .card-base {
@@ -158,7 +175,7 @@
 }
 
 .dark .btn-secondary {
-  @apply bg-[#1c1f38] text-slate-200 border-[#3d4270];
+  @apply bg-dark-surface text-slate-200 border-dark-borderStrong;
 }
 .dark .btn-secondary:hover {
   @apply border-[#5060a0];
@@ -173,7 +190,7 @@
 }
 
 .dark .input-field {
-  @apply bg-[#232745] border-[#3d4270] text-slate-100;
+  @apply bg-dark-elevated border-dark-borderStrong text-slate-100;
 }
 .dark .input-field:focus {
   @apply border-primary-500 ring-primary-900/30;

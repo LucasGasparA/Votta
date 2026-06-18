@@ -43,11 +43,21 @@ export default {
           700: '#b45309',
           800: '#92400e',
           900: '#78350f',
+        },
+        'dark': {
+          bg: '#141624',
+          surface: '#1c1f38',
+          elevated: '#232745',
+          border: '#2d3158',
+          borderStrong: '#3d4270',
+          sidebar: '#191c33',
         }
       },
       fontFamily: {
         'display': ['Crimson Pro', 'serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
+        'serif': ['Crimson Pro', 'Georgia', 'serif'],
+        'document': ['Crimson Pro', 'Georgia', 'serif'],
       },
     },
   },

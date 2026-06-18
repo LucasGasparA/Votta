@@ -28,7 +28,7 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-display font-bold text-primary-800 dark:text-slate-100 mb-2">
+        <h1 className="page-title text-primary-800 dark:text-slate-100 mb-2">
           Selecionar Município
         </h1>
         <p className="text-primary-600 dark:text-slate-400">
@@ -42,15 +42,15 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="card p-6 mb-6 border-2 border-primary-200 bg-primary-50 dark:bg-[#232745]"
+          className="card p-6 mb-6 border-2 border-primary-200 bg-primary-50 dark:bg-dark-elevated"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-100 dark:bg-[#2d3158] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary-100 dark:bg-dark-border rounded-lg flex items-center justify-center">
               <Check className="text-primary-500" size={20} />
             </div>
             <div>
               <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Município Atual</p>
-              <h3 className="text-xl font-display font-bold text-primary-900 dark:text-slate-100">
+              <h3 className="section-heading text-primary-900 dark:text-slate-100">
                 {current.nome}, {current.uf}
               </h3>
             </div>
@@ -72,21 +72,21 @@ const SelecionarMunicipio = ({ aoSelecionar, current }) => {
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-[#232745]">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-dark-elevated">
               <MapPin className="text-primary-500" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-display font-bold text-primary-900 dark:text-slate-100">Nova Veneza</h3>
+              <h3 className="section-heading text-primary-900 dark:text-slate-100">Nova Veneza</h3>
               <p className="text-sm text-primary-600 dark:text-primary-400">SC</p>
             </div>
           </div>
           {isSelected && (
-            <div className="w-8 h-8 bg-primary-100 dark:bg-[#2d3158] rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-primary-100 dark:bg-dark-border rounded-full flex items-center justify-center flex-shrink-0">
               <Check className="text-primary-500" size={16} />
             </div>
           )}
         </div>
-        <div className="mt-4 pt-4 border-t border-primary-100 dark:border-[#2d3158]">
+        <div className="mt-4 pt-4 border-t border-primary-100 dark:border-dark-border">
           <p className="text-xs text-primary-500 dark:text-slate-500">
             Código IBGE: <span className="font-mono font-medium">4211603</span>
           </p>
