@@ -59,29 +59,29 @@ const LogAuditoria = () => {
   return (
     <div className="max-w-2xl mx-auto px-6 py-8">
       <h1 className="page-title mb-1">Trilha de Auditoria</h1>
-      <p className="text-sm text-primary-400 dark:text-slate-500 mb-6">Registro de todas as ações realizadas na sua conta</p>
+      <p className="text-sm text-primary-400 mb-6">Registro de todas as ações realizadas na sua conta</p>
 
       {status === 'loading' && (
         <div className="space-y-3">
           {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse h-14 rounded-xl bg-primary-100 dark:bg-dark-elevated" />
+            <div key={i} className="animate-pulse h-14 rounded-2xl bg-primary-100 " />
           ))}
         </div>
       )}
 
       {status === 'empty' && (
-        <div className="flex flex-col items-center justify-center py-20 text-primary-400 dark:text-slate-500">
+        <div className="flex flex-col items-center justify-center py-20 text-primary-400 ">
           <Shield size={40} className="mb-4 opacity-40" />
           <p className="text-sm">Nenhuma ação registrada ainda</p>
         </div>
       )}
 
       {status === 'error' && (
-        <div className="flex flex-col items-center justify-center py-20 text-primary-400 dark:text-slate-500">
+        <div className="flex flex-col items-center justify-center py-20 text-primary-400 ">
           <p className="text-sm mb-4">Não foi possível carregar o histórico.</p>
           <button
             onClick={buscarLogs}
-            className="px-4 py-2 text-sm rounded-xl border border-primary-200 dark:border-dark-borderStrong text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-dark-elevated active:scale-[0.97] transition-all"
+            className="px-4 py-2 text-sm rounded-2xl border border-primary-200 text-primary-600 hover:bg-primary-50 active:scale-[0.97] transition-all"
           >
             Tentar novamente
           </button>
@@ -96,16 +96,16 @@ const LogAuditoria = () => {
             return (
               <div
                 key={log.id}
-                className="bg-white dark:bg-dark-surface rounded-xl border border-primary-100 dark:border-dark-border px-5 py-4 flex items-center gap-4"
+                className="bg-white rounded-2xl border border-primary-100 px-5 py-4 flex items-center gap-4"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-dark-elevated flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
                   <Icon size={16} className="text-primary-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-primary-800 dark:text-slate-200">{rotuloAcao(log.action)}</p>
-                  {sub && <p className="text-xs text-primary-400 dark:text-slate-500 truncate mt-0.5">{sub}</p>}
+                  <p className="text-sm font-medium text-primary-800 ">{rotuloAcao(log.action)}</p>
+                  {sub && <p className="text-xs text-primary-400 truncate mt-0.5">{sub}</p>}
                 </div>
-                <p className="text-xs text-primary-400 dark:text-slate-500 ml-auto flex-shrink-0">{formatDate(log.createdAt)}</p>
+                <p className="text-xs text-primary-400 ml-auto flex-shrink-0">{formatDate(log.createdAt)}</p>
               </div>
             )
           })}

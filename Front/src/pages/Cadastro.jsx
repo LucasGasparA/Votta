@@ -16,7 +16,7 @@ export default function Cadastro() {
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const [carregando,        setCarregando]        = useState(false)
 
-  const inputBase = 'input-base py-3.5 rounded-xl focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)]'
+  const inputBase = 'input-base py-3.5 rounded-2xl focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)]'
 
   const senhasNaoCoincidem = confirmacao.length > 0 && senha !== confirmacao
 
@@ -39,20 +39,20 @@ export default function Cadastro() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#141624] flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
 
       {/* Barra superior */}
       <div className="flex items-center justify-between p-5">
         <Link
           to="/login"
-          className="flex items-center gap-1.5 text-sm font-medium transition-colors text-primary-400 dark:text-slate-500"
+          className="flex items-center gap-1.5 text-sm font-medium transition-colors text-primary-400 "
         >
           <ArrowLeft size={16} />
           Voltar
         </Link>
         <Link
           to="/login"
-          className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-xl border transition-colors border-primary-100 text-primary-700 dark:border-[#2d3158] dark:text-slate-300"
+          className="px-5 py-2.5 text-xs font-semibold uppercase tracking-widest rounded-2xl border transition-colors border-primary-100 text-primary-700 "
         >
           Entrar
         </Link>
@@ -68,7 +68,7 @@ export default function Cadastro() {
         >
           <Logo size={40} withText={true} className="justify-center mb-7" />
 
-          <h1 className="text-xl font-semibold text-center mb-6 text-primary-900 dark:text-slate-100">
+          <h1 className="text-xl font-semibold text-center mb-6 text-primary-900 ">
             Criar conta
           </h1>
 
@@ -116,12 +116,12 @@ export default function Cadastro() {
                   type="button"
                   onClick={() => setMostrarSenha(v => !v)}
                   aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 leading-none"
                 >
                   {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p className="text-xs mt-1.5 text-primary-300 dark:text-slate-500">Mínimo 6 caracteres</p>
+              <p className="text-xs mt-1.5 text-primary-300 ">Mínimo 6 caracteres</p>
             </div>
 
             {/* Confirmar senha */}
@@ -141,7 +141,7 @@ export default function Cadastro() {
                 type="button"
                 onClick={() => setMostrarConfirmacao(v => !v)}
                 aria-label={mostrarConfirmacao ? 'Ocultar confirmação' : 'Mostrar confirmação'}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 dark:text-slate-500 leading-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 leading-none"
               >
                 {mostrarConfirmacao ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -153,7 +153,7 @@ export default function Cadastro() {
             <button
               type="submit"
               disabled={carregando}
-              className="btn-primary w-full py-3.5 mt-1 rounded-xl uppercase tracking-wider bg-primary-500 hover:bg-primary-600"
+              className="btn-primary w-full py-3.5 mt-1 rounded-2xl uppercase tracking-wider bg-primary-500 hover:bg-primary-600"
             >
               {carregando ? (
                 <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto"
@@ -162,7 +162,7 @@ export default function Cadastro() {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5 text-slate-600 dark:text-slate-400">
+          <p className="text-center text-sm mt-5 text-slate-600 ">
             Já tem conta?{' '}
             <Link to="/login" className="font-medium text-slate-800 hover:text-slate-900 underline transition-colors">
               Entrar

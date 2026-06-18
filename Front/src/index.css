@@ -10,55 +10,46 @@
   }
 
   body {
-    @apply bg-white text-slate-900 font-body antialiased;
+    @apply bg-slate-50 text-slate-900 font-body antialiased;
   }
 
   button, a, input, textarea, select {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
-
-  .dark button,
-  .dark a,
-  .dark input,
-  .dark textarea,
-  .dark select {
-    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-dark-bg;
-  }
-
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
            hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-primary-200 px-4 py-2.5 text-sm font-medium text-primary-600
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-primary-200 px-4 py-2.5 text-sm font-medium text-primary-600
            hover:bg-primary-50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-500
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-2.5 py-1.5 text-sm font-medium text-slate-500
            hover:bg-slate-50 hover:text-slate-800 transition-colors;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-rosso-500 px-4 py-2.5 text-sm font-semibold text-white
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rosso-500 px-4 py-2.5 text-sm font-semibold text-white
            hover:bg-rosso-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .card {
-    @apply bg-white rounded-xl border border-slate-100
+    @apply bg-white rounded-2xl border border-slate-100
            transition-all duration-200;
   }
 
   .card-base {
-    @apply rounded-lg border border-slate-200 bg-white shadow-sm transition-all;
+    @apply rounded-2xl border border-slate-200 bg-white shadow-sm transition-all;
   }
 
   .input-base {
-    @apply w-full rounded-lg border-2 border-primary-200 bg-white px-4 py-3 text-sm text-primary-900 transition-all
+    @apply w-full rounded-2xl border-2 border-primary-200 bg-white px-4 py-3 text-sm text-primary-900 transition-all
            focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200;
   }
 
@@ -71,7 +62,7 @@
   }
 
   .select-base {
-    @apply rounded-lg border border-primary-200 bg-white px-3 py-1.5 text-sm text-primary-700 transition-colors
+    @apply rounded-2xl border border-primary-200 bg-white px-3 py-1.5 text-sm text-primary-700 transition-colors
            focus:border-primary-400 focus:outline-none;
   }
 
@@ -84,15 +75,15 @@
   }
 
   .page-title {
-    @apply text-2xl md:text-3xl font-semibold text-slate-950 dark:text-slate-100;
+    @apply text-2xl md:text-3xl font-semibold text-slate-950;
   }
 
   .section-heading {
-    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+    @apply text-lg font-semibold text-slate-900;
   }
 
   .modal-title {
-    @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+    @apply text-lg font-semibold text-slate-900;
   }
 
   .document-title {
@@ -156,57 +147,3 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #BFDBFE; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #93C5FD; }
-
-.dark ::-webkit-scrollbar-track { background: theme('colors.dark.surface'); }
-.dark ::-webkit-scrollbar-thumb { background: theme('colors.dark.borderStrong'); border-radius: 4px; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #5060a0; }
-
-/* ── Dark mode base ── */
-.dark body {
-  @apply bg-dark-bg text-slate-100;
-}
-
-.dark .card {
-  @apply bg-dark-surface border-dark-border;
-}
-
-.dark .card-base {
-  @apply bg-[#1c1f38] border-[#2d3158];
-}
-
-.dark .btn-secondary {
-  @apply bg-dark-surface text-slate-200 border-dark-borderStrong;
-}
-.dark .btn-secondary:hover {
-  @apply border-[#5060a0];
-}
-
-.dark .btn-ghost {
-  @apply text-slate-400 hover:bg-[#232745] hover:text-slate-200;
-}
-
-.dark .modal-base {
-  @apply bg-[#1c1f38];
-}
-
-.dark .input-field {
-  @apply bg-dark-elevated border-dark-borderStrong text-slate-100;
-}
-.dark .input-field:focus {
-  @apply border-primary-500 ring-primary-900/30;
-}
-
-.dark .input-base {
-  @apply bg-[#232745] border-[#3d4270] text-slate-100;
-}
-.dark .input-base:focus {
-  @apply border-primary-500 ring-primary-900/30;
-}
-
-.dark .select-base {
-  @apply bg-[#232745] border-[#3d4270] text-slate-200;
-}
-
-.dark .section-title {
-  @apply text-slate-100;
-}

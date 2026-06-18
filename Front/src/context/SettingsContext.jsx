@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { api } from '../api/client.js'
-import { useTema } from './TemaContext'
 
 export const DEFAULT_SETTINGS = {
   exportFormat:          'PDF',
@@ -10,14 +9,11 @@ export const DEFAULT_SETTINGS = {
   validationAlerts:      true,
   unsavedReminder:       true,
   emailNotifications:    false,
-  theme:                 'light',
 }
 
 export const SettingsContext = createContext(null)
 
 export function SettingsProvider({ children }) {
-  const { definirTema } = useTema()
-
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem('legisla:settings')
@@ -46,7 +42,6 @@ export function SettingsProvider({ children }) {
 
   const atualizar = (key, value) => {
     setSettings(p => ({ ...p, [key]: value }))
-    if (key === 'theme') definirTema(value)
   }
 
   useEffect(() => {

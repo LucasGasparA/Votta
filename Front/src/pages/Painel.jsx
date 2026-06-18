@@ -7,6 +7,7 @@ import {
   Clock,
   FileText,
   Plus,
+  Sparkles,
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -65,7 +66,7 @@ function obterSaudacao() {
 const LIMIT = 20
 
 const Painel = () => {
-  const { municipioSelecionado, usuario } = useOutletContext() ?? {}
+  const { usuario } = useOutletContext() ?? {}
   const [estatisticas,   setEstatisticas]   = useState(construirEstatisticas([]))
   const [rawProposals,   setRawProposals]   = useState([])
   const [proposicoes,    setProposicoes]    = useState([])
@@ -132,35 +133,38 @@ const Painel = () => {
   )
 
   return (
-    <div className="min-h-full bg-slate-50/70 dark:bg-[#141624]">
-      <div className="max-w-7xl mx-auto px-4 py-5 md:px-8 md:py-8">
+    <div className="min-h-full bg-slate-50/60 ">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-9">
         <motion.header
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6"
+          className="mb-10 overflow-hidden rounded-2xl bg-white px-6 py-8 shadow-sm md:px-8 md:py-10"
         >
-          <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {municipioSelecionado ? `${municipioSelecionado.nome}, ${municipioSelecionado.uf}` : 'Nenhum município selecionado'}
-            </p>
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-950 dark:text-slate-100 mt-1">
-              {obterSaudacao()}{primeiroNome ? `, ${primeiroNome}` : ''}
-            </h1>
-          </div>
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl font-semibold leading-tight text-slate-950 md:text-4xl">
+                {obterSaudacao()}{primeiroNome ? `, ${primeiroNome}` : ''}
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 ">
+                Crie, acompanhe e revise minutas legislativas com uma experiência guiada para o trabalho parlamentar.
+              </p>
+            </div>
 
-          <button
-            onClick={() => navigate('/criar-minuta')}
-            className="btn-primary"
-          >
-            ✨ Criar minuta com IA
-          </button>
+            <button
+              onClick={() => navigate('/criar-minuta')}
+              className="btn-primary w-full px-5 py-3 text-sm md:w-auto"
+            >
+              <Sparkles size={15} className="text-oro-400" />
+              Criar minuta com IA
+            </button>
+          </div>
         </motion.header>
 
         {!carregando && totalPendentes > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex flex-col gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 sm:flex-row sm:items-center sm:justify-between"
+            className="mb-8 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex items-start gap-3">
               <AlertTriangle size={18} className="mt-0.5 flex-shrink-0 text-amber-600" />
@@ -173,7 +177,7 @@ const Painel = () => {
             </div>
             <button
               onClick={() => setSomentePendentes(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-xs font-semibold text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors"
             >
               Ver pendentes
               <ArrowRight size={14} />
@@ -185,14 +189,15 @@ const Painel = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-6"
+          className="mb-10 grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4"
         >
           {carregando
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="card-base p-4 animate-pulse">
-                  <div className="h-3 bg-slate-100 rounded w-24 mb-5" />
-                  <div className="h-8 bg-slate-100 rounded w-14 mb-3" />
-                  <div className="h-3 bg-slate-100 rounded w-20" />
+                <div key={i} className="animate-pulse rounded-2xl bg-white p-5 shadow-sm ">
+                  <div className="mb-5 h-1 w-10 rounded-full bg-slate-100 " />
+                  <div className="mb-3 h-3 w-24 rounded bg-slate-100 " />
+                  <div className="mb-3 h-9 w-16 rounded bg-slate-100 " />
+                  <div className="h-3 w-20 rounded bg-slate-100 " />
                 </div>
               ))
             : estatisticas.map((stat, index) => (
@@ -214,8 +219,8 @@ const Painel = () => {
             className="card-base p-8"
           >
             <FileText size={28} className="text-primary-500 mb-4" />
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Comece pela primeira minuta com IA</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
+            <h2 className="text-lg font-semibold text-slate-900 ">Comece pela primeira minuta com IA</h2>
+            <p className="text-sm text-slate-500 mt-1 max-w-xl">
               O fluxo guiado coleta tipo, tema, competência, impacto e justificativa antes de a IA gerar uma minuta para revisão.
             </p>
             <button
@@ -227,68 +232,37 @@ const Painel = () => {
             </button>
           </motion.section>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-6">
-            <section className="min-w-0">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                    {somentePendentes ? 'Fila de revisão' : 'Trabalho recente'}
-                  </h2>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    {somentePendentes ? 'Itens que ainda precisam de validação.' : 'Últimas proposições editadas.'}
-                  </p>
-                </div>
-                {somentePendentes && (
-                  <button
-                    onClick={() => setSomentePendentes(false)}
-                    className="btn-ghost gap-1 text-xs"
-                  >
-                    <X size={13} />
-                    Limpar filtro
-                  </button>
-                )}
+          <section>
+            {somentePendentes && (
+              <div className="mb-3 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setSomentePendentes(false)}
+                  className="btn-ghost gap-1 text-xs"
+                >
+                  <X size={13} />
+                  Limpar filtro
+                </button>
               </div>
-              <ListaMinutas
-                proposals={listaExibida}
-                onDelete={aoExcluir}
-                title={somentePendentes ? 'Pendentes de revisão' : 'Proposições recentes'}
-                emptyTitle={somentePendentes ? 'Nenhuma pendência encontrada' : undefined}
-                emptyDescription={somentePendentes ? 'As proposições carregadas não têm revisão pendente.' : undefined}
-              />
-              {!somentePendentes && temMais && (
-                <div className="mt-3 flex justify-center">
-                  <button
-                    onClick={carregarMais}
-                    disabled={carregandoMais}
-                    className="btn-secondary py-2"
-                  >
-                    {carregandoMais ? 'Carregando...' : `Carregar mais (${total - proposicoes.length} restantes)`}
-                  </button>
-                </div>
-              )}
-            </section>
-
-            <aside className="space-y-3">
-              <div className="card-base p-4">
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Status do ambiente</h2>
-                <dl className="mt-3 space-y-3 text-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <dt className="text-slate-500 dark:text-slate-400">Município</dt>
-                    <dd className="font-medium text-slate-800 dark:text-slate-200 truncate">
-                      {municipioSelecionado?.nome ?? 'Não definido'}
-                    </dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <dt className="text-slate-500 dark:text-slate-400">Total</dt>
-                    <dd className="font-medium text-slate-800 dark:text-slate-200">
-                      {total}
-                      {temMais && <span className="ml-1 text-xs text-slate-400">({proposicoes.length} exibidas)</span>}
-                    </dd>
-                  </div>
-                </dl>
+            )}
+            <ListaMinutas
+              proposals={listaExibida}
+              onDelete={aoExcluir}
+              title={somentePendentes ? 'Pendentes de revisão' : 'Proposições recentes'}
+              emptyTitle={somentePendentes ? 'Nenhuma pendência encontrada' : undefined}
+              emptyDescription={somentePendentes ? 'As proposições carregadas não têm revisão pendente.' : undefined}
+            />
+            {!somentePendentes && temMais && (
+              <div className="mt-3 flex justify-center">
+                <button
+                  onClick={carregarMais}
+                  disabled={carregandoMais}
+                  className="btn-secondary py-2"
+                >
+                  {carregandoMais ? 'Carregando...' : `Carregar mais (${total - proposicoes.length} restantes)`}
+                </button>
               </div>
-            </aside>
-          </div>
+            )}
+          </section>
         )}
       </div>
     </div>
