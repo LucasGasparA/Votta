@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Link, useOutletContext, useNavigate } from 'react-router-dom'
+import { useOutletContext, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowRight,
@@ -150,10 +150,9 @@ const Painel = () => {
 
           <button
             onClick={() => navigate('/criar-minuta')}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 active:scale-[0.98] transition-all"
+            className="btn-primary"
           >
-            <Plus size={17} />
-            Nova proposição
+            ✨ Criar minuta com IA
           </button>
         </motion.header>
 
@@ -190,7 +189,7 @@ const Painel = () => {
         >
           {carregando
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="rounded-lg border border-slate-200 bg-white p-4 animate-pulse">
+                <div key={i} className="card-base p-4 animate-pulse">
                   <div className="h-3 bg-slate-100 rounded w-24 mb-5" />
                   <div className="h-8 bg-slate-100 rounded w-14 mb-3" />
                   <div className="h-3 bg-slate-100 rounded w-20" />
@@ -212,19 +211,19 @@ const Painel = () => {
           <motion.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-lg border border-slate-200 bg-white p-8 dark:bg-[#1c1f38] dark:border-[#2d3158]"
+            className="card-base p-8"
           >
             <FileText size={28} className="text-primary-500 mb-4" />
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Comece pela primeira proposição</h2>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Comece pela primeira minuta com IA</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
-              O fluxo guiado coleta tipo, tema, competência, impacto e justificativa antes de gerar a minuta.
+              O fluxo guiado coleta tipo, tema, competência, impacto e justificativa antes de a IA gerar uma minuta para revisão.
             </p>
             <button
               onClick={() => navigate('/criar-minuta')}
-              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+              className="btn-primary mt-5"
             >
               <Plus size={16} />
-              Criar proposição
+              Criar minuta com IA
             </button>
           </motion.section>
         ) : (
@@ -242,7 +241,7 @@ const Painel = () => {
                 {somentePendentes && (
                   <button
                     onClick={() => setSomentePendentes(false)}
-                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-800 dark:hover:bg-[#232745] dark:hover:text-slate-200 transition-colors"
+                    className="btn-ghost gap-1 text-xs"
                   >
                     <X size={13} />
                     Limpar filtro
@@ -261,7 +260,7 @@ const Painel = () => {
                   <button
                     onClick={carregarMais}
                     disabled={carregandoMais}
-                    className="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors disabled:opacity-50"
+                    className="btn-secondary py-2"
                   >
                     {carregandoMais ? 'Carregando...' : `Carregar mais (${total - proposicoes.length} restantes)`}
                   </button>
@@ -270,29 +269,7 @@ const Painel = () => {
             </section>
 
             <aside className="space-y-3">
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-[#1c1f38] dark:border-[#2d3158]">
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Atalhos</h2>
-                <div className="mt-3 space-y-1">
-                  <Link
-                    to="/criar-minuta"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
-                  >
-                    <span className="inline-flex items-center gap-2"><FileText size={15} /> Nova proposição</span>
-                    <ArrowRight size={14} />
-                  </Link>
-                  <button
-                    onClick={() => setSomentePendentes(true)}
-                    className="w-full flex items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
-                  >
-                    <span className="inline-flex items-center gap-2"><AlertTriangle size={15} /> Revisar pendentes</span>
-                    {totalPendentes > 0 && (
-                      <span className="rounded-full bg-oro-100 px-2 py-0.5 text-xs font-semibold text-oro-700">{totalPendentes}</span>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:bg-[#1c1f38] dark:border-[#2d3158]">
+              <div className="card-base p-4">
                 <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Status do ambiente</h2>
                 <dl className="mt-3 space-y-3 text-sm">
                   <div className="flex items-center justify-between gap-3">

@@ -32,15 +32,23 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-primary-600 text-white font-medium rounded-lg 
-           hover:bg-primary-700 transition-all duration-200 
-           shadow-md hover:shadow-lg active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
+           hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-white text-primary-700 font-medium rounded-lg 
-           border-2 border-primary-300 hover:border-primary-500 
-           transition-all duration-200 hover:shadow-md active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-primary-200 px-4 py-2.5 text-sm font-medium text-primary-600
+           hover:bg-primary-50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-500
+           hover:bg-slate-50 hover:text-slate-800 transition-colors;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-rosso-500 px-4 py-2.5 text-sm font-semibold text-white
+           hover:bg-rosso-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .card {
@@ -48,10 +56,34 @@
            transition-all duration-200;
   }
 
+  .card-base {
+    @apply rounded-lg border border-slate-200 bg-white shadow-sm transition-all;
+  }
+
+  .input-base {
+    @apply w-full rounded-lg border-2 border-primary-200 bg-white px-4 py-3 text-sm text-primary-900 transition-all
+           focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200;
+  }
+
   .input-field {
-    @apply w-full px-4 py-3 border-2 border-primary-200 rounded-lg 
-           focus:border-primary-500 focus:outline-none focus:ring-2 
-           focus:ring-primary-200 transition-all duration-200;
+    @apply input-base;
+  }
+
+  .textarea-base {
+    @apply input-base resize-none;
+  }
+
+  .select-base {
+    @apply rounded-lg border border-primary-200 bg-white px-3 py-1.5 text-sm text-primary-700 transition-colors
+           focus:border-primary-400 focus:outline-none;
+  }
+
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40;
+  }
+
+  .modal-base {
+    @apply w-full rounded-2xl bg-white p-6 shadow-2xl;
   }
 
   .section-title {
@@ -121,6 +153,10 @@
   @apply bg-[#1c1f38] border-[#2d3158];
 }
 
+.dark .card-base {
+  @apply bg-[#1c1f38] border-[#2d3158];
+}
+
 .dark .btn-secondary {
   @apply bg-[#1c1f38] text-slate-200 border-[#3d4270];
 }
@@ -128,11 +164,30 @@
   @apply border-[#5060a0];
 }
 
+.dark .btn-ghost {
+  @apply text-slate-400 hover:bg-[#232745] hover:text-slate-200;
+}
+
+.dark .modal-base {
+  @apply bg-[#1c1f38];
+}
+
 .dark .input-field {
   @apply bg-[#232745] border-[#3d4270] text-slate-100;
 }
 .dark .input-field:focus {
   @apply border-primary-500 ring-primary-900/30;
+}
+
+.dark .input-base {
+  @apply bg-[#232745] border-[#3d4270] text-slate-100;
+}
+.dark .input-base:focus {
+  @apply border-primary-500 ring-primary-900/30;
+}
+
+.dark .select-base {
+  @apply bg-[#232745] border-[#3d4270] text-slate-200;
 }
 
 .dark .section-title {

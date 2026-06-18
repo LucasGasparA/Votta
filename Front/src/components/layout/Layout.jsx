@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, PlusCircle, Settings, LogOut, MapPin, Menu, X, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { Home, Sparkles, Settings, LogOut, MapPin, Menu, X, Shield, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Logo from '../Logo'
 
@@ -22,7 +22,7 @@ function nomeParaCor(name) {
 
 const PAGE_TITLES = {
   '/painel':                'Painel',
-  '/criar-minuta':          'Nova Proposição',
+  '/criar-minuta':          'Nova minuta com IA',
   '/selecionar-municipio':  'Selecionar Município',
   '/configuracoes':         'Configurações',
   '/auditoria':             'Trilha de Auditoria',
@@ -55,7 +55,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
       label: 'Trabalho',
       items: [
         { path: '/painel',       icon: Home,       label: 'Painel' },
-        { path: '/criar-minuta', icon: PlusCircle, label: 'Nova Proposição', highlight: true },
+        { path: '/criar-minuta', icon: Sparkles, label: 'Nova minuta com IA', highlight: true },
       ],
     },
     {
@@ -93,13 +93,18 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             </button>
           ) : (
             <>
-              <Logo size={36} withText={true} className="flex-1 min-w-0" />
+              <div className="flex-1 min-w-0">
+                <Logo size={36} withText={true} />
+                <p className="mt-1 truncate text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                  Minutas legislativas com IA
+                </p>
+              </div>
 
               {mobile && (
                 <button
                   onClick={() => setSidebarOpen(false)}
                   aria-label="Fechar menu"
-                  className="p-1.5 rounded-lg text-primary-400 dark:text-slate-500 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-600 dark:hover:text-slate-300 transition-colors flex-shrink-0"
+                  className="btn-ghost p-1.5 text-primary-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-slate-300 flex-shrink-0"
                 >
                   <X size={18} />
                 </button>
@@ -110,7 +115,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
                   onClick={() => setCollapsed(c => !c)}
                   aria-label="Recolher menu"
                   title="Recolher menu"
-                  className="p-1.5 rounded-lg text-primary-400 hover:bg-primary-50 hover:text-primary-600 transition-colors flex-shrink-0"
+                  className="btn-ghost p-1.5 text-primary-400 hover:text-primary-600 flex-shrink-0"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -238,7 +243,7 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
           <button
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menu"
-            className="p-2 rounded-lg text-primary-500 dark:text-slate-400 hover:bg-primary-50 dark:hover:bg-[#232745] hover:text-primary-700 transition-colors"
+            className="btn-ghost p-2 text-primary-500 dark:text-slate-400 hover:text-primary-700"
           >
             <Menu size={22} />
           </button>
@@ -327,13 +332,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="modal-backdrop"
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="modal-base max-w-sm"
             >
               <div className="w-12 h-12 bg-primary-50 dark:bg-[#232745] rounded-full flex items-center justify-center mx-auto mb-4">
                 <LogOut size={22} className="text-primary-600" />
@@ -347,15 +352,13 @@ const Layout = ({ municipioSelecionado, aoSair, usuario }) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                  className="btn-secondary flex-1 rounded-xl"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={() => { setShowLogoutConfirm(false); aoSair() }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
-                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                  className="btn-danger flex-1 rounded-xl"
                 >
                   Sair
                 </button>

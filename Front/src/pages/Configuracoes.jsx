@@ -15,7 +15,7 @@ const Configuracoes = () => {
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="card p-6 animate-pulse">
+            <div key={i} className="card-base p-6 animate-pulse">
               <div className="h-4 bg-primary-100 rounded w-32 mb-4" />
               <div className="space-y-3">
                 <div className="h-10 bg-primary-100 rounded" />
@@ -55,7 +55,7 @@ const Configuracoes = () => {
       <div className="space-y-4">
 
         {/* ── Card Exportação ── */}
-        <div className="card">
+        <div className="card-base">
           <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
             <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
               <Download size={16} className="text-primary-600" />
@@ -74,7 +74,7 @@ const Configuracoes = () => {
                 id="exportFormat"
                 value={settings.exportFormat}
                 onChange={e => atualizar('exportFormat', e.target.value)}
-                className="text-sm border border-primary-200 dark:border-[#3d4270] rounded-lg px-3 py-1.5 text-primary-700 dark:text-slate-200 focus:border-primary-400 focus:outline-none bg-white dark:bg-[#232745] transition-colors"
+                className="select-base"
               >
                 <option value="PDF">PDF</option>
                 <option value="DOCX">DOCX</option>
@@ -96,7 +96,7 @@ const Configuracoes = () => {
         </div>
 
         {/* ── Card Notificações ── */}
-        <div className="card">
+        <div className="card-base">
           <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
             <div className="w-8 h-8 rounded-lg bg-oro-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
               <Bell size={16} className="text-oro-600" />
@@ -132,7 +132,7 @@ const Configuracoes = () => {
         </div>
 
         {/* ── Card Aparência ── */}
-        <div className="card">
+        <div className="card-base">
           <div className="flex items-start gap-3 p-5 border-b border-primary-100 dark:border-[#2d3158]">
             <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-[#232745] flex items-center justify-center flex-shrink-0">
               {settings.theme === 'dark' ? <Moon size={16} className="text-primary-400" /> : <Sun size={16} className="text-primary-400" />}
@@ -202,7 +202,7 @@ const Configuracoes = () => {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={salvarAgora}
-          className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+          className="btn-primary rounded-xl px-6"
         >
           Salvar preferências
         </motion.button>

@@ -16,7 +16,7 @@ export default function Cadastro() {
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const [carregando,        setCarregando]        = useState(false)
 
-  const inputBase = 'w-full px-4 py-3.5 rounded-xl text-sm transition-all border border-primary-200 bg-white text-primary-900 dark:bg-[#232745] dark:border-[#3d4270] dark:text-slate-100 outline-none focus:border-primary-500 focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)] dark:focus:bg-[#232745]'
+  const inputBase = 'input-base py-3.5 rounded-xl focus:shadow-[0_0_0_3px_rgba(61,123,204,0.12)]'
 
   const senhasNaoCoincidem = confirmacao.length > 0 && senha !== confirmacao
 
@@ -153,7 +153,7 @@ export default function Cadastro() {
             <button
               type="submit"
               disabled={carregando}
-              className="w-full py-3.5 mt-1 rounded-xl text-sm font-semibold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary-500 hover:bg-primary-600 text-white"
+              className="btn-primary w-full py-3.5 mt-1 rounded-xl uppercase tracking-wider bg-primary-500 hover:bg-primary-600"
             >
               {carregando ? (
                 <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto"

@@ -47,7 +47,7 @@ const COMPETENCE_OPTIONS = [
   {
     value: 'incerto',
     label: 'Não tenho certeza',
-    description: 'O assistente jurídico vai verificar automaticamente com base na Lei Orgânica e na CF/88.',
+    description: 'O Assistente Legislativo IA vai verificar automaticamente com base na Lei Orgânica e na CF/88.',
   },
 ]
 
@@ -237,7 +237,7 @@ const CriarMinuta = () => {
           </div>
 
           <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
-            Gerando sua minuta...
+            Gerando minuta com IA...
           </h2>
 
           {/* Texto da etapa com transição */}
@@ -357,7 +357,7 @@ const CriarMinuta = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direcao * -30 }}
           transition={{ duration: 0.2 }}
-          className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158] mb-4"
+          className="card-base p-5 mb-4"
         >
 
             {/* Passo 0 */}
@@ -419,7 +419,7 @@ const CriarMinuta = () => {
                     type="text"
                     value={dadosFormulario.theme}
                     onChange={e => atualizar('theme', e.target.value)}
-                    className={`input-field ${tentouProximo && !dadosFormulario.theme.trim() ? 'border-rosso-400' : ''}`}
+                    className={`input-base ${tentouProximo && !dadosFormulario.theme.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Coleta Seletiva de Lixo Reciclável"
                     autoFocus
                   />
@@ -445,7 +445,7 @@ const CriarMinuta = () => {
                     id="objective"
                     value={dadosFormulario.objective}
                     onChange={e => atualizar('objective', e.target.value)}
-                    className={`input-field min-h-[80px] resize-none ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
+                    className={`textarea-base min-h-[80px] ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Instituir um programa municipal de coleta seletiva com pontos de entrega voluntária"
                   />
                   <div className="flex items-center justify-between mt-1">
@@ -493,7 +493,7 @@ const CriarMinuta = () => {
                   {dadosFormulario.competence === 'incerto' && (
                     <div className="flex items-start gap-3 p-3 mt-2 bg-oro-50 border border-oro-200 rounded-xl">
                       <AlertCircle className="text-oro-500 mt-0.5 flex-shrink-0" size={16} />
-                      <p className="text-xs text-oro-800">O assistente jurídico verificará a competência automaticamente.</p>
+                      <p className="text-xs text-oro-800">O Assistente Legislativo IA verificará a competência automaticamente.</p>
                     </div>
                   )}
                 </div>
@@ -524,7 +524,7 @@ const CriarMinuta = () => {
                         type="text"
                         value={dadosFormulario.estimatedImpact}
                         onChange={e => atualizar('estimatedImpact', e.target.value)}
-                        className="input-field"
+                        className="input-base"
                         placeholder="Ex: 150.000,00"
                       />
                       <p className="text-xs text-primary-400 dark:text-slate-500 mt-1">Será necessário anexar estimativa de impacto orçamentário-financeiro</p>
@@ -548,7 +548,7 @@ const CriarMinuta = () => {
                     id="justification"
                     value={dadosFormulario.justification}
                     onChange={e => atualizar('justification', e.target.value)}
-                    className="input-field min-h-[120px] resize-none"
+                    className="textarea-base min-h-[120px]"
                     placeholder="Fundamente a necessidade e relevância desta proposição..."
                     autoFocus
                   />
@@ -561,7 +561,7 @@ const CriarMinuta = () => {
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-[#232745] rounded-lg border border-primary-100 dark:border-[#3d4270]">
                   <Scale className="text-primary-400 mt-0.5 flex-shrink-0" size={18} />
-                  <p className="text-sm text-primary-600 dark:text-slate-300">O assistente irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
+                  <p className="text-sm text-primary-600 dark:text-slate-300">O Assistente Legislativo IA irá sugerir melhorias e citações normativas relevantes para fortalecer sua argumentação.</p>
                 </div>
               </div>
             )}
@@ -573,7 +573,7 @@ const CriarMinuta = () => {
             <button
               onClick={etapaAnterior}
               disabled={etapaAtual === 0}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all
+              className={`btn-ghost px-4 py-2
                 ${etapaAtual === 0 ? 'text-primary-300 dark:text-slate-600 cursor-not-allowed' : 'text-primary-600 dark:text-slate-300 hover:bg-primary-100 dark:hover:bg-[#232745]'}`}
             >
               <ArrowLeft size={16} />
@@ -595,7 +595,7 @@ const CriarMinuta = () => {
               <button
                 onClick={proximaEtapa}
                 disabled={!podeAvancar()}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition-all
+                className={`btn-primary px-5 py-2
                   ${podeAvancar() ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md font-semibold' : 'bg-slate-100 dark:bg-[#232745] text-slate-300 dark:text-slate-600 cursor-not-allowed font-medium'}`}
               >
                 Próximo
@@ -605,11 +605,11 @@ const CriarMinuta = () => {
               <button
                 onClick={aoFinalizar}
                 disabled={!podeAvancar() || enviando}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm transition-all
+                className={`btn-primary px-5 py-2
                   ${podeAvancar() && !enviando ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm' : 'bg-primary-100 dark:bg-[#232745] text-primary-300 dark:text-slate-600 cursor-not-allowed'}`}
               >
                 <Check size={16} />
-                {enviando ? 'Gerando...' : 'Gerar Minuta'}
+                {enviando ? 'Gerando...' : 'Gerar minuta com IA'}
               </button>
             )}
           </div>
@@ -642,13 +642,13 @@ const CriarMinuta = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="modal-backdrop"
           >
             <motion.div
               initial={{ scale: 0.95, y: 16 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 16 }}
-              className="bg-white dark:bg-[#1c1f38] rounded-2xl shadow-2xl w-full max-w-sm p-6"
+              className="modal-base max-w-sm"
             >
               <div className="w-12 h-12 bg-oro-50 dark:bg-oro-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle size={22} className="text-oro-500" />
@@ -662,15 +662,13 @@ const CriarMinuta = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setExibirModalCancelar(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-primary-200 dark:border-[#3d4270]
-                    text-primary-600 dark:text-slate-300 hover:bg-primary-50 dark:hover:bg-[#232745] active:scale-[0.97] transition-all"
+                  className="btn-secondary flex-1 rounded-xl"
                 >
                   Continuar
                 </button>
                 <button
                   onClick={() => { try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* noop */ } navigate('/painel') }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-rosso-500 text-white
-                    hover:bg-rosso-600 active:scale-[0.97] transition-all"
+                  className="btn-danger flex-1 rounded-xl"
                 >
                   Sim, cancelar
                 </button>

@@ -14,8 +14,8 @@ const ListaMinutas = ({
   proposals,
   onDelete,
   title = 'Proposições recentes',
-  emptyTitle = 'Nenhuma proposição ainda',
-  emptyDescription = 'Crie sua primeira proposição legislativa em minutos com o fluxo guiado.',
+  emptyTitle = 'Nenhuma minuta legislativa ainda',
+  emptyDescription = 'Crie sua primeira minuta legislativa com apoio da IA e revise antes de exportar.',
 }) => {
   const [alvoExclusao, setAlvoExclusao] = useState(null)
   const timerRef = useRef(null)
@@ -56,17 +56,10 @@ const ListaMinutas = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08 }}
-      className="rounded-lg border border-slate-200 bg-white shadow-sm dark:bg-[#1c1f38] dark:border-[#2d3158]"
+      className="card-base"
     >
       <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-[#2d3158]">
         <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
-        <Link
-          to="/criar-minuta"
-          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-[#232745] transition-colors"
-        >
-          <PlusCircle size={15} />
-          Nova
-        </Link>
       </div>
 
       {proposals.length === 0 ? (
@@ -78,10 +71,10 @@ const ListaMinutas = ({
           <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{emptyDescription}</p>
           <Link
             to="/criar-minuta"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+            className="btn-primary mt-5 py-2"
           >
             <PlusCircle size={15} />
-            Criar proposição
+            Criar minuta com IA
           </Link>
         </div>
       ) : (
@@ -135,13 +128,13 @@ const ListaMinutas = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+            className="modal-backdrop"
           >
             <motion.div
               initial={{ scale: 0.96, y: 14 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.96, y: 14 }}
-              className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#1c1f38]"
+              className="modal-base max-w-sm"
             >
               <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-rosso-50 dark:bg-rosso-900/20">
                 <Trash2 size={21} className="text-rosso-500" />
@@ -156,13 +149,13 @@ const ListaMinutas = ({
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => setAlvoExclusao(null)}
-                  className="flex-1 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-[#3d4270] dark:text-slate-300 dark:hover:bg-[#232745] transition-colors"
+                  className="btn-secondary flex-1 px-3"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmarExclusao}
-                  className="flex-1 rounded-lg bg-rosso-500 px-3 py-2.5 text-sm font-semibold text-white hover:bg-rosso-600 transition-colors"
+                  className="btn-danger flex-1 px-3"
                 >
                   Excluir
                 </button>

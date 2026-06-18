@@ -718,7 +718,7 @@ const EditorMinuta = () => {
         })()}
       </div>
 
-      {/* ── Widget Assistente Jurídico ── */}
+      {/* ── Widget Assistente Legislativo IA ── */}
 
       {/* Popup */}
       <AnimatePresence>
@@ -739,8 +739,8 @@ const EditorMinuta = () => {
                     <Scale size={15} />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-sm leading-tight">Assistente Jurídico</h3>
-                    <p className="text-[10px] text-primary-200 leading-tight">Citações normativas em tempo real</p>
+                    <h3 className="font-display font-bold text-sm leading-tight">Assistente Legislativo IA</h3>
+                    <p className="text-[10px] text-primary-200 leading-tight">Citações, revisão e técnica legislativa</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-0.5">
@@ -794,7 +794,7 @@ const EditorMinuta = () => {
                             <Scale size={22} className="text-primary-500" />
                           </div>
                           <div className="text-center">
-                            <p className="text-sm font-semibold text-primary-700 dark:text-slate-200">Assistente Jurídico</p>
+                            <p className="text-sm font-semibold text-primary-700 dark:text-slate-200">Assistente Legislativo IA</p>
                             <p className="text-xs text-primary-400 dark:text-slate-500 mt-0.5">Faça uma pergunta ou escolha uma sugestão</p>
                           </div>
                         </div>
@@ -898,7 +898,7 @@ const EditorMinuta = () => {
                     <div className="flex gap-2 items-end">
                       <div className="flex-1">
                         <label htmlFor="chat-input" className="sr-only">
-                          Mensagem ao assistente jurídico
+                          Mensagem ao Assistente Legislativo IA
                         </label>
                         <textarea
                           id="chat-input"
@@ -912,7 +912,7 @@ const EditorMinuta = () => {
                             }
                           }}
                           className="w-full px-3 py-2 border-2 border-primary-200 dark:border-[#3d4270] dark:bg-[#1c1f38] dark:text-slate-100 rounded-xl focus:border-primary-500 dark:focus:border-[#3d4270] focus:outline-none text-xs transition-colors resize-none leading-relaxed"
-                          placeholder="Faça uma pergunta jurídica..."
+                          placeholder="Pergunte sobre a minuta legislativa..."
                           disabled={carregandoChat}
                         />
                         <p className="text-[9px] text-primary-300 dark:text-slate-600 mt-0.5 text-right">Enter para enviar · Shift+Enter para nova linha</p>
@@ -945,11 +945,11 @@ const EditorMinuta = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setChatAberto(true)}
-            aria-label="Abrir Assistente Jurídico"
+            aria-label="Abrir Assistente Legislativo IA"
             className="fixed bottom-5 right-5 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center gap-2 px-3.5 py-3 transition-colors z-50 print:hidden"
           >
             <Scale size={18} />
-            <span className="hidden sm:inline text-sm font-semibold">Assistente Jurídico</span>
+            <span className="hidden sm:inline text-sm font-semibold">Assistente Legislativo IA</span>
           </motion.button>
         )}
       </AnimatePresence>
