@@ -7,10 +7,13 @@ import {
   Check,
   ClipboardList,
   FileCheck2,
+  FilePlus2,
   FileText,
+  Gavel,
   Info,
   Landmark,
   Lightbulb,
+  Megaphone,
   PenLine,
   Scale,
   ScrollText,
@@ -84,6 +87,34 @@ const PROPOSAL_TYPES = [
     label: 'Indicação',
     description: 'Sugestão ao Executivo para melhorias, obras ou serviços públicos.',
     Icon: Lightbulb,
+  },
+  {
+    value: 'requerimento',
+    label: 'Requerimento',
+    description: 'Pedido formal de informação ou providência à Mesa ou ao Executivo.',
+    Icon: ClipboardList,
+    comingSoon: true,
+  },
+  {
+    value: 'mocao',
+    label: 'Moção',
+    description: 'Manifestação do plenário de apoio, repúdio, congratulação ou pesar.',
+    Icon: Megaphone,
+    comingSoon: true,
+  },
+  {
+    value: 'resolucao',
+    label: 'Resolução',
+    description: 'Ato de competência interna da Câmara sobre sua organização e funcionamento.',
+    Icon: Gavel,
+    comingSoon: true,
+  },
+  {
+    value: 'emenda_lei_organica',
+    label: 'Emenda à Lei Orgânica',
+    description: 'Alteração do texto da Lei Orgânica Municipal, com quórum qualificado.',
+    Icon: FilePlus2,
+    comingSoon: true,
   },
 ]
 
@@ -286,20 +317,24 @@ const CriarMinuta = () => {
   if (!municipioVerificado) return null
 
   return (
-    <div className="min-h-full bg-slate-50/70 px-6 py-5">
-      <div className="max-w-3xl mx-auto">
+    <div className="h-full flex flex-col bg-slate-50/70">
 
-      {/* Header */}
-      <div className="mb-5">
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4 mb-5">
+      {/* ── Topo fixo: header + stepper ── */}
+      <div className="flex-shrink-0">
+        <div className="max-w-2xl mx-auto px-4 pt-6 pb-4">
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1">
-              Etapa {etapaAtual + 1} de {steps.length}
-            </p>
             <h1 className="text-2xl font-bold text-slate-900 leading-tight">
               {steps[etapaAtual].title}
             </h1>
-            <p className="text-slate-400 text-xs mt-1">{steps[etapaAtual].description}</p>
+            {etapaAtual !== 0 && (
+              <p className="text-slate-400 text-xs mt-1">{steps[etapaAtual].description}</p>
+            )}
+            {etapaAtual === 0 && (
+              <p className="text-xs text-slate-400 mt-3">
+                Preencha as informações a seguir. A Votta usa IA para estruturar a minuta completa ao final.
+              </p>
+            )}
           </div>
           <button
             onClick={() => {
@@ -347,9 +382,12 @@ const CriarMinuta = () => {
             </div>
           ))}
         </div>
+        </div>
       </div>
 
-      {/* Form */}
+      {/* ── Conteúdo central scrollável ── */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="max-w-2xl mx-auto px-4 py-8">
       <AnimatePresence mode="wait">
         <motion.div
           key={etapaAtual}
@@ -357,14 +395,40 @@ const CriarMinuta = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direcao * -30 }}
           transition={{ duration: 0.2 }}
-          className={`mb-4 ${etapaAtual === 0 ? '' : 'card-base p-5'}`}
+          className={`${etapaAtual === 0 || etapaAtual === 1 || etapaAtual === 2 ? '' : 'card-base p-5'}`}
         >
 
             {/* Passo 0 */}
             {etapaAtual === 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {PROPOSAL_TYPES.map(type => {
                   const TypeIcon = type.Icon
+
+                  if (type.comingSoon) {
+                    return (
+                      <button
+                        key={type.value}
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="text-left p-6 border border-slate-200 rounded-2xl flex items-center gap-4 opacity-70 cursor-not-allowed"
+                      >
+                        <div className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                          <TypeIcon size={22} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <h3 className="font-semibold text-slate-500 text-sm leading-tight">{type.label}</h3>
+                            <span className="flex-shrink-0 whitespace-nowrap text-oro-700 bg-oro-50 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                              Em breve
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  }
+
                   const selected = dadosFormulario.type === type.value
                   return (
                   <button
@@ -404,6 +468,10 @@ const CriarMinuta = () => {
                   )
                 })}
               </div>
+              <p className="text-xs text-slate-400 text-center mt-4">
+                O tipo escolhido define como a IA vai estruturar os artigos e a ementa.
+              </p>
+              </>
             )}
 
             {/* Passo 1 */}
@@ -413,7 +481,6 @@ const CriarMinuta = () => {
                   <label htmlFor="theme" className="block text-sm font-semibold text-slate-700 mb-0.5">
                     Tema da Proposição
                   </label>
-                  <p className="text-xs text-slate-300 mb-1.5">Descreva em poucas palavras o assunto central da proposição.</p>
                   <input
                     id="theme"
                     type="text"
@@ -437,14 +504,11 @@ const CriarMinuta = () => {
                   <label htmlFor="objective" className="block text-sm font-semibold text-slate-700 mb-0.5">
                     Objetivo Principal
                   </label>
-                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 rounded-2xl border border-primary-100 mb-1.5">
-                    <Scale className="text-slate-300 mt-0.5 flex-shrink-0" size={14} />
-                    <p className="text-xs text-slate-400 ">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
-                  </div>
                   <textarea
                     id="objective"
                     value={dadosFormulario.objective}
                     onChange={e => atualizar('objective', e.target.value)}
+                    maxLength={5000}
                     className={`textarea-base min-h-[80px] ${tentouProximo && !dadosFormulario.objective.trim() ? 'border-rosso-400' : ''}`}
                     placeholder="Ex: Instituir um programa municipal de coleta seletiva com pontos de entrega voluntária"
                   />
@@ -456,6 +520,10 @@ const CriarMinuta = () => {
                     <p className={`text-xs ${dadosFormulario.objective.length > 4800 ? 'text-rosso-500' : 'text-slate-400'}`}>
                       {dadosFormulario.objective.length}/5000
                     </p>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 bg-primary-50 rounded-2xl border border-primary-100 mt-2">
+                    <Scale className="text-slate-300 mt-0.5 flex-shrink-0" size={14} />
+                    <p className="text-xs text-slate-400 ">Objetivos claros facilitam a análise de competência e a redação da minuta.</p>
                   </div>
                 </div>
               </div>
@@ -474,10 +542,10 @@ const CriarMinuta = () => {
                         key={value}
                         type="button"
                         onClick={() => atualizar('competence', value)}
-                        className={`flex items-center justify-between text-left p-4 border-2 rounded-2xl transition-all duration-200
+                        className={`flex items-center justify-between text-left p-3 border rounded-2xl transition-all duration-200
                           ${dadosFormulario.competence === value
-                            ? 'border-primary-500 bg-primary-50 '
-                            : 'border-slate-200 hover:border-primary-300 '
+                            ? 'border-primary-400 bg-primary-50 '
+                            : 'border-slate-200 hover:border-primary-300 hover:bg-slate-50 '
                           }`}
                       >
                         <div className="min-w-0">
@@ -501,19 +569,18 @@ const CriarMinuta = () => {
                 <div className="border-t border-primary-100 pt-5">
                   <label className="block text-sm font-medium text-primary-700 mb-3">Esta proposição tem impacto orçamentário?</label>
                   <div className="grid grid-cols-2 gap-3">
-                    {[{ value: true, label: 'Sim', desc: 'Gera despesas ou afeta receitas' }, { value: false, label: 'Não', desc: 'Sem impacto financeiro direto' }].map(({ value, label, desc }) => (
+                    {[{ value: true, label: 'Sim' }, { value: false, label: 'Não' }].map(({ value, label }) => (
                       <button
                         key={label}
                         type="button"
                         onClick={() => atualizar('hasFinancialImpact', value)}
-                        className={`text-left p-4 border-2 rounded-2xl transition-all duration-200
+                        className={`text-center p-3 border rounded-2xl transition-all duration-200
                           ${dadosFormulario.hasFinancialImpact === value
-                            ? 'border-primary-500 bg-primary-50 '
-                            : 'border-primary-100 hover:border-primary-300 '
+                            ? 'border-primary-400 bg-primary-50 '
+                            : 'border-slate-200 hover:border-primary-300 hover:bg-slate-50 '
                           }`}
                       >
-                        <p className="font-semibold text-primary-800 text-sm mb-0.5">{label}</p>
-                        <p className="text-xs text-primary-500 ">{desc}</p>
+                        <p className="font-semibold text-primary-800 text-sm">{label}</p>
                       </button>
                     ))}
                   </div>
@@ -567,9 +634,13 @@ const CriarMinuta = () => {
             )}
         </motion.div>
       </AnimatePresence>
+        </div>
+      </div>
 
-      {/* Navegação */}
-      <div className="flex items-center justify-between gap-3 pb-6">
+      {/* ── Footer fixo ── */}
+      <div className="flex-shrink-0 bg-slate-50/70">
+        <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="flex items-center justify-between gap-3">
             <button
               onClick={etapaAnterior}
               disabled={etapaAtual === 0}
@@ -613,8 +684,8 @@ const CriarMinuta = () => {
               </button>
             )}
           </div>
-
-      </div>{/* fim max-w */}
+        </div>
+      </div>
 
       {/* Tooltip global — posicionado próximo ao ícone, escapa do overflow dos cards */}
       <AnimatePresence>
