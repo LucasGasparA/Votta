@@ -330,13 +330,13 @@ const CriarMinuta = () => {
                       ? 'bg-primary-600 text-white cursor-pointer hover:bg-primary-700'
                       : index === etapaAtual
                         ? 'border-2 border-primary-600 text-primary-600 bg-white '
-                        : 'border-2 border-slate-200 text-slate-300 bg-white cursor-default'
+                        : 'border-2 border-slate-300 text-slate-400 bg-white cursor-default'
                     }`}
                 >
                   {index < etapaAtual ? <Check size={12} /> : index + 1}
                 </button>
                 <span className={`hidden sm:block text-[10px] mt-1 text-center w-16 leading-tight transition-all
-                  ${index === etapaAtual ? 'text-primary-700 font-semibold' : index < etapaAtual ? 'text-slate-400 ' : 'text-slate-300 '}`}>
+                  ${index === etapaAtual ? 'text-primary-700 font-semibold' : index < etapaAtual ? 'text-slate-400 ' : 'text-slate-400 '}`}>
                   {step.short}
                 </span>
               </div>
@@ -357,7 +357,7 @@ const CriarMinuta = () => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direcao * -30 }}
           transition={{ duration: 0.2 }}
-          className="card-base p-5 mb-4"
+          className={`mb-4 ${etapaAtual === 0 ? '' : 'card-base p-5'}`}
         >
 
             {/* Passo 0 */}
@@ -371,11 +371,11 @@ const CriarMinuta = () => {
                     key={type.value}
                     type="button"
                     onClick={() => { atualizar('type', type.value); setTentouProximo(false) }}
-                    className={`text-left p-5 border-2 rounded-2xl transition-all duration-200 flex items-center gap-4
-                      ${selected ? 'border-primary-500 bg-primary-50 ' : 'border-primary-100 hover:border-primary-300 '}`}
+                    className={`text-left p-6 border-2 rounded-2xl transition-all duration-200 flex items-center gap-4
+                      ${selected ? 'border-primary-400 bg-primary-50 ' : 'border-primary-100 hover:border-primary-300 '}`}
                   >
-                    <div className={`flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg ${selected ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500 '}`}>
-                      <TypeIcon size={20} />
+                    <div className={`flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full ${selected ? 'bg-primary-600 text-white' : 'bg-primary-50 text-primary-600 '}`}>
+                      <TypeIcon size={22} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">

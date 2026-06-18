@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, Sparkles, Shield, Settings, LogOut, Menu, X, ChevronDown } from 'lucide-react'
+import { Home, FileText, Sparkles, Shield, Settings, LogOut, Menu, X, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Logo from '../Logo'
 
@@ -21,8 +21,9 @@ function nomeParaCor(name) {
 }
 
 const NAV_ITEMS = [
-  { path: '/painel',    icon: Home,   label: 'Início' },
-  { path: '/auditoria', icon: Shield, label: 'Auditoria' },
+  { path: '/painel',       icon: Home,     label: 'Início' },
+  { path: '/criar-minuta', icon: FileText, label: 'Minutas' },
+  { path: '/auditoria',    icon: Shield,   label: 'Auditoria' },
 ]
 
 const Layout = ({ municipioSelecionado, aoSelecionarMunicipio, aoSair, usuario }) => {
