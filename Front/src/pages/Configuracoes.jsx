@@ -1,4 +1,5 @@
-import { Download, Bell, Check, MapPin } from 'lucide-react'
+import { useState } from 'react'
+import { Download, Bell, Check, MapPin, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -12,9 +13,54 @@ const NOVA_VENEZA = {
   uf: 'SC',
 }
 
+function SecaoAccordion({ id, abertaId, aoAlternar, icon, iconWrap, titulo, descricao, children }) {
+  const aberta = abertaId === id
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm">
+      <button
+        type="button"
+        onClick={() => aoAlternar(aberta ? null : id)}
+        aria-expanded={aberta}
+        className="w-full flex items-center gap-3 p-5 text-left active:scale-[0.995] transition-transform duration-200"
+      >
+        <div className={`w-8 h-8 rounded-lg ${iconWrap} flex items-center justify-center flex-shrink-0`}>
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-sm font-semibold text-slate-900">{titulo}</h2>
+          <p className="text-xs text-slate-500 mt-0.5">{descricao}</p>
+        </div>
+        <ChevronDown
+          size={18}
+          className={`text-primary-500 flex-shrink-0 transition-transform duration-200 ${aberta ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {aberta && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-slate-100">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 const Configuracoes = () => {
   const { settings, atualizar, salvarAgora, carregando, indicadorSalvo } = useSettings()
   const { municipioSelecionado, aoSelecionarMunicipio } = useOutletContext() ?? {}
+
+  const [secaoAberta, setSecaoAberta] = useState(null)
 
   const municipioAtivo = municipioSelecionado?.ibgeId === NOVA_VENEZA.ibgeId
 
@@ -28,17 +74,13 @@ const Configuracoes = () => {
     return (
       <div className="p-8 max-w-2xl mx-auto">
         <div className="mb-8">
-          <div className="h-6 bg-primary-100 rounded w-40 animate-pulse mb-2" />
-          <div className="h-4 bg-primary-100 rounded w-64 animate-pulse" />
+          <div className="h-6 bg-slate-100 rounded w-40 animate-pulse mb-2" />
+          <div className="h-4 bg-slate-100 rounded w-64 animate-pulse" />
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="card-base p-6 animate-pulse">
-              <div className="h-4 bg-primary-100 rounded w-32 mb-4" />
-              <div className="space-y-3">
-                <div className="h-10 bg-primary-100 rounded" />
-                <div className="h-10 bg-primary-100 rounded" />
-              </div>
+            <div key={i} className="bg-white rounded-xl shadow-sm p-5 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-32" />
             </div>
           ))}
         </div>
@@ -52,8 +94,8 @@ const Configuracoes = () => {
       {/* Cabeçalho */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-display font-bold text-primary-800 ">Configurações</h1>
-          <p className="text-sm text-primary-400 mt-1">Personalize como o sistema funciona para você.</p>
+          <h1 className="text-xl font-display font-bold text-slate-900">Configurações</h1>
+          <p className="text-sm text-slate-500 mt-1">Personalize como o sistema funciona para você.</p>
         </div>
         <AnimatePresence>
           {indicadorSalvo && (
@@ -72,20 +114,19 @@ const Configuracoes = () => {
 
       <div className="space-y-4">
 
-        {/* ── Card Exportação ── */}
-        <div className="card-base">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 ">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
-              <Download size={16} className="text-primary-600" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-primary-800 ">Exportação</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Configurações padrão para exportação de documentos</p>
-            </div>
-          </div>
-          <div className="divide-y divide-primary-50 ">
-            <div className="flex items-center justify-between px-5 py-4">
-              <label htmlFor="exportFormat" className="text-sm text-primary-700 font-medium">
+        {/* ── Seção Exportação ── */}
+        <SecaoAccordion
+          id="exportacao"
+          abertaId={secaoAberta}
+          aoAlternar={setSecaoAberta}
+          icon={<Download size={16} className="text-primary-600" />}
+          iconWrap="bg-primary-50"
+          titulo="Exportação"
+          descricao="Configurações padrão para exportação de documentos"
+        >
+          <div className="divide-y divide-slate-100">
+            <div className="flex items-center justify-between px-5 py-5">
+              <label htmlFor="exportFormat" className="text-sm font-medium text-slate-800">
                 Formato padrão
               </label>
               <select
@@ -98,68 +139,66 @@ const Configuracoes = () => {
                 <option value="DOCX">DOCX</option>
               </select>
             </div>
-            <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm text-primary-700 font-medium">
+            <div className="flex items-center justify-between px-5 py-5 gap-6">
+              <span className="text-sm font-medium text-slate-800">
                 Incluir rodapé com número de página
               </span>
               <Alternador checked={settings.includePageNumbers} onChange={v => atualizar('includePageNumbers', v)} />
             </div>
-            <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm text-primary-700 font-medium">
+            <div className="flex items-center justify-between px-5 py-5 gap-6">
+              <span className="text-sm font-medium text-slate-800">
                 Incluir data de geração no documento
               </span>
               <Alternador checked={settings.includeGenerationDate} onChange={v => atualizar('includeGenerationDate', v)} />
             </div>
           </div>
-        </div>
+        </SecaoAccordion>
 
-        {/* ── Card Notificações ── */}
-        <div className="card-base">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 ">
-            <div className="w-8 h-8 rounded-lg bg-oro-50 flex items-center justify-center flex-shrink-0">
-              <Bell size={16} className="text-oro-600" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-primary-800 ">Notificações</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Gerencie os avisos e alertas do sistema</p>
-            </div>
-          </div>
-          <div className="divide-y divide-primary-50 ">
-            <div className="flex items-center justify-between px-5 py-4 gap-6">
+        {/* ── Seção Notificações ── */}
+        <SecaoAccordion
+          id="notificacoes"
+          abertaId={secaoAberta}
+          aoAlternar={setSecaoAberta}
+          icon={<Bell size={16} className="text-oro-600" />}
+          iconWrap="bg-oro-50"
+          titulo="Notificações"
+          descricao="Gerencie os avisos e alertas do sistema"
+        >
+          <div className="divide-y divide-slate-100">
+            <div className="flex items-center justify-between px-5 py-5 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Alertas de validação automática</p>
-                <p className="text-xs text-primary-400 mt-0.5">Avisos de conformidade ao editar a minuta</p>
+                <p className="text-sm font-medium text-slate-800">Alertas de validação automática</p>
+                <p className="text-sm text-slate-500 mt-0.5">Avisos de conformidade ao editar a minuta</p>
               </div>
               <Alternador checked={settings.validationAlerts} onChange={v => atualizar('validationAlerts', v)} />
             </div>
-            <div className="flex items-center justify-between px-5 py-4 gap-6">
+            <div className="flex items-center justify-between px-5 py-5 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Lembrete de rascunho não salvo</p>
-                <p className="text-xs text-primary-400 mt-0.5">Aviso ao sair com alterações pendentes</p>
+                <p className="text-sm font-medium text-slate-800">Lembrete de rascunho não salvo</p>
+                <p className="text-sm text-slate-500 mt-0.5">Aviso ao sair com alterações pendentes</p>
               </div>
               <Alternador checked={settings.unsavedReminder} onChange={v => atualizar('unsavedReminder', v)} />
             </div>
-            <div className="flex items-center justify-between px-5 py-4 gap-6">
+            <div className="flex items-center justify-between px-5 py-5 gap-6">
               <div>
-                <p className="text-sm text-primary-700 font-medium">Notificações por e-mail</p>
-                <p className="text-xs text-primary-400 mt-0.5">Resumo semanal de proposições (em breve)</p>
+                <p className="text-sm font-medium text-slate-800">Notificações por e-mail</p>
+                <p className="text-sm text-slate-500 mt-0.5">Resumo semanal de proposições (em breve)</p>
               </div>
               <Alternador checked={false} onChange={() => {}} disabled />
             </div>
           </div>
-        </div>
+        </SecaoAccordion>
 
-        {/* ── Card Município ── */}
-        <div className="card-base">
-          <div className="flex items-start gap-3 p-5 border-b border-primary-100 ">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
-              <MapPin size={16} className="text-primary-600" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-primary-800 ">Município</h2>
-              <p className="text-xs text-primary-400 mt-0.5">Município ativo para carregar o perfil normativo local</p>
-            </div>
-          </div>
+        {/* ── Seção Município ── */}
+        <SecaoAccordion
+          id="municipio"
+          abertaId={secaoAberta}
+          aoAlternar={setSecaoAberta}
+          icon={<MapPin size={16} className="text-primary-600" />}
+          iconWrap="bg-primary-50"
+          titulo="Município"
+          descricao="Município ativo para carregar o perfil normativo local"
+        >
           <div className="p-5">
             <button
               type="button"
@@ -176,8 +215,8 @@ const Configuracoes = () => {
                   <MapPin className="text-primary-500" size={20} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-primary-800 ">Nova Veneza, SC</p>
-                  <p className="text-xs text-primary-400 ">Código IBGE: <span className="font-mono font-medium">4211603</span></p>
+                  <p className="text-sm font-semibold text-slate-800">Nova Veneza, SC</p>
+                  <p className="text-xs text-slate-500">Código IBGE: <span className="font-mono font-medium">4211603</span></p>
                 </div>
               </div>
               {municipioAtivo && (
@@ -187,7 +226,7 @@ const Configuracoes = () => {
               )}
             </button>
           </div>
-        </div>
+        </SecaoAccordion>
 
       </div>
 
