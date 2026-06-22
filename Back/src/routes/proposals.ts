@@ -129,7 +129,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     const proposal = await prisma.proposal.create({
       data: {
-        title: title || 'Nova Proposição',
+        title: title || theme || 'Nova Proposição',
         type,
         theme,
         objective,

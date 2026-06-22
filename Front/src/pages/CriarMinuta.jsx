@@ -242,78 +242,6 @@ const CriarMinuta = () => {
   const percentualProgresso  = (etapaAtual / (steps.length - 1)) * 100
   const motivoBloqueio  = tentouProximo ? obterMotivoBloqueio() : null
 
-  if (gerando) {
-    const step = GENERATION_STEPS[etapaGeracao]
-    const StepIcon = step.Icon
-    const pct  = Math.round(((etapaGeracao + 1) / GENERATION_STEPS.length) * 100)
-    return (
-      <div className="fixed inset-0 bg-primary-50 flex flex-col items-center justify-center p-6 z-50">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center">
-
-          {/* Ícone animado */}
-          <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mb-5 animate-pulse">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={etapaGeracao}
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ duration: 0.25 }}
-                className="text-primary-600"
-                aria-hidden="true"
-              >
-                <StepIcon size={34} strokeWidth={1.8} />
-              </motion.span>
-            </AnimatePresence>
-          </div>
-
-          <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
-            Gerando minuta com IA...
-          </h2>
-
-          {/* Texto da etapa com transição */}
-          <div className="h-5 mb-5">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={etapaGeracao}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.3 }}
-                className="text-sm text-primary-500"
-              >
-                {step.text}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* Barra de progresso */}
-          <div className="w-full bg-primary-100 rounded-full h-2 mb-5">
-            <div
-              className="bg-primary-600 h-2 rounded-full transition-all duration-700"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-
-          <p className="text-xs text-primary-400 leading-relaxed">
-            Isso pode levar até 30 segundos.<br />Não feche esta página.
-          </p>
-        </div>
-
-        {/* Três pontinhos abaixo do card */}
-        <div className="flex items-center gap-2 mt-6">
-          {[0, 1, 2].map(i => (
-            <div
-              key={i}
-              className="w-2 h-2 rounded-full bg-primary-300 animate-bounce"
-              style={{ animationDelay: `${i * 0.15}s` }}
-            />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   if (!municipioVerificado) return null
 
   return (
@@ -748,6 +676,81 @@ const CriarMinuta = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Overlay de geração — modal sobre o wizard desfocado ── */}
+      {gerando && (() => {
+        const step = GENERATION_STEPS[etapaGeracao]
+        const StepIcon = step.Icon
+        const pct  = Math.round(((etapaGeracao + 1) / GENERATION_STEPS.length) * 100)
+        return (
+          <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/30">
+            <div className="flex flex-col items-center w-full max-w-md mx-4">
+              <div className="bg-white rounded-2xl shadow-2xl w-full p-8 flex flex-col items-center text-center">
+
+                {/* Ícone animado */}
+                <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mb-5 animate-pulse">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={etapaGeracao}
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.7 }}
+                      transition={{ duration: 0.25 }}
+                      className="text-primary-600"
+                      aria-hidden="true"
+                    >
+                      <StepIcon size={34} strokeWidth={1.8} />
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
+
+                <h2 className="text-xl font-display font-bold text-primary-800 mb-2">
+                  Gerando minuta com IA...
+                </h2>
+
+                {/* Texto da etapa com transição */}
+                <div className="h-5 mb-5">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={etapaGeracao}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-sm text-primary-500"
+                    >
+                      {step.text}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+
+                {/* Barra de progresso */}
+                <div className="w-full bg-primary-100 rounded-full h-2 mb-5">
+                  <div
+                    className="bg-primary-600 h-2 rounded-full transition-all duration-700"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                <p className="text-xs text-primary-400 leading-relaxed">
+                  Isso pode levar até 30 segundos.<br />Não feche esta página.
+                </p>
+              </div>
+
+              {/* Três pontinhos abaixo do card */}
+              <div className="flex items-center gap-2 mt-6">
+                {[0, 1, 2].map(i => (
+                  <div
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-primary-300 animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

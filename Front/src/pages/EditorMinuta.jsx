@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom'
 import {
   Save, Download, AlertTriangle, CheckCircle,
-  FileText, Scale, Send, ArrowLeft,
+  Scale, Send, ArrowLeft,
   BookOpen, List, Calendar, Minus, AlignLeft,
-  History, X, ClipboardCheck, Bold, Italic, ListOrdered,
-  ChevronDown, ChevronUp, ExternalLink,
+  History, X, ClipboardCheck,
+  ChevronDown, ChevronUp, Plus, Sparkles, Eye, Pencil,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -22,6 +22,7 @@ const SECTIONS = [
   { id: 'artigos',   label: 'Artigos',   icon: List,       hint: null },
   { id: 'vigencia',  label: 'Vigência',  icon: Calendar,   hint: null },
   { id: 'revogacao', label: 'Revogação', icon: Minus,      hint: null },
+  { id: 'visualizacao', label: 'Visualização', icon: Eye,  hint: null },
 ]
 
 const STATUS_CONFIG = {
@@ -54,6 +55,17 @@ const PROPOSAL_TYPE_LABELS = {
   decreto:         'Decreto Municipal',
   indicacao:       'Indicação',
 }
+
+const SUGGESTION_LEVELS = {
+  citation:    { label: 'Informação', dot: 'bg-primary-500', action: 'Ver referência' },
+  improvement: { label: 'Atenção',    dot: 'bg-oro-500',     action: 'Aplicar' },
+  alert:       { label: 'Crítico',    dot: 'bg-rosso-500',   action: 'Ver detalhes' },
+}
+
+// Campo editável visível em repouso: borda sempre presente, fundo branco e cursor de texto;
+// hover escurece a borda; foco destaca com borda primary + anel suave.
+const CLASSE_CAMPO =
+  'w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white cursor-text resize-none font-document text-[15px] leading-relaxed text-slate-800 placeholder:text-slate-400 transition-colors hover:border-slate-300 focus:border-primary-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-100 focus-visible:ring-offset-0'
 
 
 function obterSugestoesDinamicas(tipoProposicao) {
@@ -150,6 +162,7 @@ const EditorMinuta = () => {
   const [destinoNavegacao, setDestinoNavegacao] = useState(null)
   const [editandoTitulo, setEditandoTitulo]         = useState(false)
   const [chaveDoc, setChaveDoc]                     = useState(0)
+  const [sugestoesIgnoradas, setSugestoesIgnoradas] = useState([])
 
   const titleInputRef = useRef(null)
 
@@ -342,6 +355,21 @@ const EditorMinuta = () => {
     return () => window.removeEventListener('keydown', onKey)
   }, [aoSalvar])
 
+  // Atalhos de formatação — atuam apenas no campo de edição focado
+  useEffect(() => {
+    const onKey = (e) => {
+      const el = activeTextareaRef.current
+      if (!el || document.activeElement !== el) return
+      if (!(e.ctrlKey || e.metaKey)) return
+      const k = e.key.toLowerCase()
+      if (k === 'b') { e.preventDefault(); aplicarFormatacao(activeTextareaRef, '**', '**') }
+      else if (k === 'i') { e.preventDefault(); aplicarFormatacao(activeTextareaRef, '_', '_') }
+      else if (e.shiftKey && e.code === 'Digit7') { e.preventDefault(); aplicarFormatacao(activeTextareaRef, '1. ', '') }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   useEffect(() => {
     if (!temAlteracoes) return
     const timer = setInterval(() => {
@@ -368,9 +396,15 @@ const EditorMinuta = () => {
     !doc.ementa?.trim() && !doc.preambulo?.trim() && !doc.artigos?.length && !doc.vigencia?.trim() && !doc.revogacao?.trim()
   , [doc])
 
+  const sugestoesIA = useMemo(() => obterSugestoesDinamicas(tipoProposicao), [tipoProposicao])
+  const sugestoesVisiveis = useMemo(
+    () => sugestoesIA.filter(s => !sugestoesIgnoradas.includes(s.text)),
+    [sugestoesIA, sugestoesIgnoradas],
+  )
+
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary-50 ">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 ">
         <div className="flex items-center gap-3 text-primary-500 ">
           <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
           Carregando editor...
@@ -380,17 +414,18 @@ const EditorMinuta = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-primary-50 print:bg-white">
-      {/* Top Bar */}
-      <div className="bg-white border-b border-primary-200 px-3 md:px-6 py-3 flex-shrink-0 shadow-sm print:hidden">
-        <div className="flex items-center justify-between gap-2 md:gap-4">
+    <div className="h-screen flex flex-col bg-white print:bg-white">
+      {/* ── Header ── */}
+      <div className="flex-shrink-0 bg-white border-b border-slate-200 print:hidden">
+        {/* Linha 1 — título, status e ações */}
+        <div className="flex items-center justify-between gap-4 px-6 py-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navegacaoSegura('/painel')}
-              className="text-primary-400 hover:text-primary-600 transition-colors flex-shrink-0"
+              className="text-slate-400 hover:text-slate-700 transition-colors flex-shrink-0"
               aria-label="Voltar ao painel"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} />
             </button>
             <div className="min-w-0 flex items-center gap-2">
               {editandoTitulo ? (
@@ -402,8 +437,7 @@ const EditorMinuta = () => {
                     if (e.key === 'Enter') aoSalvarTitulo(e.target.value)
                     if (e.key === 'Escape') setEditandoTitulo(false)
                   }}
-                  className="text-base font-display font-bold text-primary-800 bg-primary-50 
-                    border-b-2 border-primary-400 outline-none px-1 min-w-0 w-48 md:w-64"
+                  className="text-base font-display font-bold text-slate-900 bg-slate-50 border-b-2 border-primary-400 outline-none px-1 min-w-0 w-64"
                   autoFocus
                 />
               ) : (
@@ -413,9 +447,7 @@ const EditorMinuta = () => {
                     setTimeout(() => titleInputRef.current?.select(), 50)
                   }}
                   title="Clique para renomear"
-                  className="text-base font-display font-bold text-primary-800 truncate
-                    hover:text-primary-600 hover:underline decoration-dashed underline-offset-2
-                    transition-colors text-left max-w-[140px] sm:max-w-[220px] md:max-w-xs"
+                  className="text-base font-display font-bold text-slate-900 truncate hover:text-primary-600 transition-colors text-left max-w-xs"
                 >
                   {tituloProposicao}
                 </button>
@@ -429,293 +461,333 @@ const EditorMinuta = () => {
                 />
               )}
             </div>
-            {/* Status visível no mobile */}
-            <div className="flex items-center gap-2 md:hidden">
-              {(() => {
-                const cfg = STATUS_CONFIG[statusProposicao] || STATUS_CONFIG.DRAFT
-                return (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.color}`}>
-                    {cfg.label}
-                  </span>
-                )
-              })()}
-            </div>
-          </div>
-
-          {/* Toolbar de formatação */}
-          <div className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-primary-50 rounded-2xl border border-primary-100 ">
-            {[
-              { icon: Bold,        title: 'Negrito',   prefix: '**', suffix: '**' },
-              { icon: Italic,      title: 'Itálico',   prefix: '_',  suffix: '_'  },
-              { icon: ListOrdered, title: 'Numeração', prefix: '1. ',suffix: ''   },
-            ].map(({ icon: Icon, title, prefix, suffix }) => (
-              <button
-                key={title}
-                title={title}
-                aria-label={title}
-                onClick={() => aplicarFormatacao(activeTextareaRef, prefix, suffix)}
-                className="p-1.5 rounded text-primary-500 hover:bg-white hover:text-primary-700 hover:shadow-sm transition-all"
-              >
-                <Icon size={14} />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Badge de status + botão avançar */}
             {(() => {
               const cfg = STATUS_CONFIG[statusProposicao] || STATUS_CONFIG.DRAFT
               return (
-                <div className="hidden md:flex items-center gap-2">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.color}`}>
-                    {cfg.label}
-                  </span>
-                  {cfg.next && (
-                    <button
-                      onClick={() => aoAlterarStatus(cfg.next)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold
-                        rounded-2xl transition-all active:scale-[0.97] ${cfg.nextColor}`}
-                    >
-                      <CheckCircle size={13} />
-                      {cfg.nextLabel}
-                    </button>
-                  )}
-                </div>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${cfg.color}`}>
+                  {cfg.label}
+                </span>
               )
             })()}
-            {ultimoSalvo ? (
-              <span className="text-xs text-primary-400 hidden lg:block">
-                Salvo às {ultimoSalvo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            ) : (
-              <span className="text-xs text-primary-400 hidden lg:block">Ctrl+S para salvar</span>
-            )}
-            <button
-              onClick={abrirModalVersoes}
-              aria-label="Ver histórico de versões"
-              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 text-sm border border-primary-200 text-primary-600 rounded-2xl hover:bg-primary-50 active:scale-[0.97] transition-all"
-            >
-              <History size={15} />
-              <span className="hidden md:inline">Versões</span>
-            </button>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-xs text-slate-400 mr-1">
+              {ultimoSalvo
+                ? `Salvo às ${ultimoSalvo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+                : 'Ctrl+S para salvar'}
+            </span>
             <button
               onClick={aoSalvar}
               disabled={salvando}
-              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 md:py-1.5 text-sm text-primary-600 hover:bg-primary-50 border border-primary-200 rounded-2xl transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
             >
-              <Save size={14} />
-              <span className="hidden sm:inline">{salvando ? 'Salvando...' : 'Salvar'}</span>
+              <Save size={15} />
+              {salvando ? 'Salvando...' : 'Salvar'}
+            </button>
+            <button
+              onClick={abrirModalVersoes}
+              aria-label="Ver histórico de versões"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <History size={15} />
+              Versões
             </button>
             <button
               onClick={aoClicarExportar}
               disabled={exportando}
-              className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 md:py-1.5 text-sm bg-primary-600 text-white rounded-2xl hover:bg-primary-700 active:scale-[0.97] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
             >
-              <Download size={14} />
-              <span className="hidden md:inline">{exportando ? 'Gerando...' : (formatoExportacao === 'DOCX' ? 'Exportar DOCX' : 'Exportar PDF')}</span>
+              <Download size={15} />
+              {exportando ? 'Gerando...' : (formatoExportacao === 'DOCX' ? 'Exportar DOCX' : 'Exportar PDF')}
             </button>
+            {(() => {
+              const cfg = STATUS_CONFIG[statusProposicao] || STATUS_CONFIG.DRAFT
+              if (!cfg.next) return null
+              return (
+                <button
+                  onClick={() => aoAlterarStatus(cfg.next)}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg bg-primary-600 text-white hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm"
+                >
+                  <Send size={14} />
+                  {cfg.nextLabel}
+                </button>
+              )
+            })()}
           </div>
         </div>
+
       </div>
 
       <div className="flex flex-1 overflow-hidden print:block">
-        {/* Main Editor */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 print:hidden">
+        {/* ── Documento ── */}
+        <div className="flex-1 overflow-y-auto bg-slate-50 print:hidden">
+          <div className="max-w-3xl mx-auto px-8 py-8">
 
-          {/* Banner de incerteza */}
-          <AnimatePresence>
-            {bannerIncerteza && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-300 rounded-2xl mb-5"
-              >
-                <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={18} />
-                <p className="text-sm text-amber-800 flex-1">{bannerIncerteza}</p>
-                <button onClick={() => setBannerIncerteza(null)} className="text-amber-400 hover:text-amber-600">
-                  <X size={16} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            {/* Banner de incerteza */}
+            <AnimatePresence>
+              {bannerIncerteza && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6"
+                >
+                  <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={18} />
+                  <p className="text-sm text-amber-800 flex-1">{bannerIncerteza}</p>
+                  <button onClick={() => setBannerIncerteza(null)} className="text-amber-400 hover:text-amber-600">
+                    <X size={16} />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* Seção Nav */}
-          <div className="rounded-2xl border border-primary-100 bg-white p-2.5 mb-4 shadow-sm ">
-            <div className="flex items-center gap-1 overflow-x-auto">
-              {SECTIONS.map(({ id: sId, label, icon: Icon }) => (
+            {/* Tabs de seção */}
+            <div className="flex items-center gap-6 border-b border-slate-200 mb-8">
+              {SECTIONS.map(({ id: sId, label }) => (
                 <button
                   key={sId}
                   onClick={() => setSecaoAtiva(sId)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-sm font-medium whitespace-nowrap transition-all active:scale-[0.97]
-                    ${secaoAtiva === sId ? 'bg-primary-100 text-primary-700 ' : 'text-primary-500 hover:bg-primary-50 hover:text-primary-700 '}`}
+                  className={`relative pb-3 text-sm font-medium transition-colors ${
+                    secaoAtiva === sId ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  }`}
                 >
-                  <Icon size={15} />
                   {label}
+                  {secaoAtiva === sId && (
+                    <span className="absolute -bottom-px left-0 right-0 h-0.5 rounded-full bg-primary-600" />
+                  )}
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* Banner — minuta vazia */}
-          {docVazio && (
-            <div className="flex items-start gap-3 p-4 mb-4 bg-amber-50 border border-amber-200 rounded-2xl">
-              <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={17} />
-              <p className="text-sm text-amber-800">
-                A minuta ainda não tem conteúdo. Se a geração por IA falhou, você pode digitar diretamente em cada seção abaixo.
-              </p>
-            </div>
-          )}
-
-          {/* Validações */}
-          {editorSettings.validationAlerts && (
-          <div className="space-y-2 mb-4">
-            {validacoes.map((v, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className={`p-3 rounded-2xl border-l-4 flex items-center gap-2.5 ${
-                  v.type === 'success' ? 'bg-primary-50 border-primary-400' : v.type === 'warning' ? 'bg-amber-50 border-amber-400' : 'bg-rosso-50 border-rosso-500'
-                }`}
-              >
-                {v.type === 'success'
-                  ? <CheckCircle className="text-primary-600 flex-shrink-0" size={15} />
-                  : <AlertTriangle className={v.type === 'warning' ? 'text-amber-500 flex-shrink-0' : 'text-rosso-600 flex-shrink-0'} size={15} />
-                }
-                <p className={`text-xs ${v.type === 'success' ? 'text-primary-800' : v.type === 'warning' ? 'text-amber-800' : 'text-rosso-800'}`}>{v.message}</p>
-              </motion.div>
-            ))}
-          </div>
-          )}
-
-          {/* Conteúdo */}
-          <div className="rounded-2xl border border-primary-100 bg-white p-5 md:p-7 shadow-sm " key={chaveDoc}>
-            {(() => {
-              const section = SECTIONS.find(s => s.id === secaoAtiva)
-              const Icon = section?.icon ?? FileText
-              return (
-                <div className="flex items-center gap-2 mb-5">
-                  <Icon size={20} className="text-primary-400" />
-                  <h2 className="text-xl font-display font-bold text-primary-800 ">{section?.label}</h2>
-                </div>
-              )
-            })()}
-
-            {secaoAtiva === 'ementa' && (
-              <div>
-                <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
-                  onChange={e => aoMudarCampo('ementa', e.target.value)}
-                  className="input-field min-h-[90px] font-serif resize-none" placeholder="Resumo do objeto da lei..." />
-                <p className="text-xs text-primary-400 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
+            {/* Banner — minuta vazia */}
+            {secaoAtiva !== 'visualizacao' && docVazio && (
+              <div className="flex items-start gap-3 p-4 mb-6 bg-amber-50 border border-amber-200 rounded-xl">
+                <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={17} />
+                <p className="text-sm text-amber-800">
+                  A minuta ainda não tem conteúdo. Se a geração por IA falhou, você pode digitar diretamente em cada seção abaixo.
+                </p>
               </div>
             )}
 
-            {secaoAtiva === 'preambulo' && (
-              <div>
-                <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
-                  onChange={e => aoMudarCampo('preambulo', e.target.value)}
-                  className="input-field min-h-[90px] font-serif resize-none" placeholder="Texto introdutório..." />
-                <p className="text-xs text-primary-400 mt-2">Fórmula legislativa padrão conforme LOM.</p>
+            {/* Validações */}
+            {secaoAtiva !== 'visualizacao' && editorSettings.validationAlerts && validacoes.length > 0 && (
+              <div className="space-y-2 mb-8">
+                {validacoes.map((v, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs ${
+                      v.type === 'error' ? 'bg-rosso-50 text-rosso-800' : 'bg-amber-50 text-amber-800'
+                    }`}
+                  >
+                    <AlertTriangle className={v.type === 'error' ? 'text-rosso-500 flex-shrink-0' : 'text-amber-500 flex-shrink-0'} size={14} />
+                    {v.message}
+                  </motion.div>
+                ))}
               </div>
             )}
 
-            {secaoAtiva === 'artigos' && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-primary-500 ">{doc.artigos.length} artigo(s)</p>
-                  <button onClick={adicionarArtigo}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary-100 text-primary-700 rounded-2xl hover:bg-primary-200 active:scale-[0.97] transition-all">
-                    + Adicionar Artigo
-                  </button>
-                </div>
-                {doc.artigos.length === 0 ? (
-                  <div className="text-center py-10 text-primary-400 ">
-                    <List size={32} className="mx-auto mb-3 opacity-40" />
-                    <p className="text-sm">Nenhum artigo ainda. Clique em "+ Adicionar Artigo".</p>
+            {/* Conteúdo do documento */}
+            <div key={chaveDoc}>
+              {secaoAtiva === 'ementa' && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ementa</p>
+                    <Pencil size={11} className="text-slate-300" />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {doc.artigos.map(artigo => (
-                      <div key={artigo.id} className="border border-primary-100 rounded-2xl p-5">
-                        <div className="flex items-start gap-4">
-                          <span className="px-2.5 py-1 bg-primary-100 text-primary-700 font-bold text-sm rounded flex-shrink-0 mt-1">{artigo.numero}</span>
-                          <div className="flex-1">
-                            <textarea key={`${chaveDoc}-${artigo.id}`} defaultValue={artigo.texto}
-                              onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
-                              onFocus={e => { activeTextareaRef.current = e.target }}
-                              className="w-full px-3 py-2.5 border-2 border-primary-100 rounded-2xl focus:border-primary-400 focus:outline-none font-serif text-sm min-h-[80px] resize-none transition-colors"
-                              placeholder="Texto do artigo..." />
-                            {artigo.citacoes?.length > 0 && (
-                              <div className="mt-2 flex flex-wrap gap-1.5">
-                                {artigo.citacoes.map((c, i) => (
-                                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-oro-100 text-oro-800 text-xs rounded-full">
-                                    <Scale size={10} />{typeof c === 'string' ? c : c.titulo || c.url || ''}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
+                  <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.ementa}
+                    onChange={e => aoMudarCampo('ementa', e.target.value)}
+                    className={`${CLASSE_CAMPO} min-h-[200px]`}
+                    placeholder="Dispõe sobre o objeto da lei..." />
+                  <p className="text-xs text-slate-400 mt-2">A ementa resume de forma clara e objetiva o conteúdo da proposição.</p>
+                </div>
+              )}
+
+              {secaoAtiva === 'preambulo' && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Preâmbulo</p>
+                    <Pencil size={11} className="text-slate-300" />
+                  </div>
+                  <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.preambulo}
+                    onChange={e => aoMudarCampo('preambulo', e.target.value)}
+                    className={`${CLASSE_CAMPO} min-h-[200px]`}
+                    placeholder="Texto introdutório..." />
+                  <p className="text-xs text-slate-400 mt-2">Fórmula legislativa padrão conforme LOM.</p>
+                </div>
+              )}
+
+              {secaoAtiva === 'artigos' && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Artigos · {doc.artigos.length}</p>
+                    <Pencil size={11} className="text-slate-300" />
+                  </div>
+                  {doc.artigos.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <List size={28} className="mx-auto mb-3 opacity-40" />
+                      <p className="text-sm">Nenhum artigo ainda.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-5">
+                      {doc.artigos.map((artigo, idx) => (
+                        <div key={artigo.id} className={idx > 0 ? 'pt-5 border-t border-slate-100' : ''}>
+                          <div className="flex gap-3">
+                            <span className="font-document font-bold text-slate-900 text-[15px] whitespace-nowrap pt-0.5">{artigo.numero}</span>
+                            <div className="flex-1 min-w-0">
+                              <textarea key={`${chaveDoc}-${artigo.id}`} defaultValue={artigo.texto}
+                                onChange={e => aoMudarArtigo(artigo.id, e.target.value)}
+                                onFocus={e => { activeTextareaRef.current = e.target }}
+                                className={`${CLASSE_CAMPO} min-h-[64px]`}
+                                placeholder="Texto do artigo..." />
+                              {artigo.citacoes?.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {artigo.citacoes.map((c, i) => (
+                                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-oro-50 text-oro-700 text-xs rounded-full">
+                                      <Scale size={10} />{typeof c === 'string' ? c : c.titulo || c.url || ''}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  )}
+                  <button onClick={adicionarArtigo}
+                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 active:scale-[0.98] transition-all">
+                    <Plus size={15} />
+                    Adicionar artigo
+                  </button>
+                </div>
+              )}
+
+              {secaoAtiva === 'vigencia' && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Vigência</p>
+                    <Pencil size={11} className="text-slate-300" />
                   </div>
-                )}
-              </div>
-            )}
+                  <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.vigencia}
+                    onChange={e => aoMudarCampo('vigencia', e.target.value)}
+                    className={`${CLASSE_CAMPO} min-h-[200px]`}
+                    placeholder="Cláusula de vigência..." />
+                </div>
+              )}
 
-            {secaoAtiva === 'vigencia' && (
-              <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.vigencia}
-                onChange={e => aoMudarCampo('vigencia', e.target.value)}
-                className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula de vigência..." />
-            )}
+              {secaoAtiva === 'revogacao' && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Revogação</p>
+                    <Pencil size={11} className="text-slate-300" />
+                  </div>
+                  <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.revogacao}
+                    onChange={e => aoMudarCampo('revogacao', e.target.value)}
+                    className={`${CLASSE_CAMPO} min-h-[200px]`}
+                    placeholder="Cláusula revogatória..." />
+                </div>
+              )}
 
-            {secaoAtiva === 'revogacao' && (
-              <textarea key={chaveDoc} ref={activeTextareaRef} defaultValue={pendingDocRef.current.revogacao}
-                onChange={e => aoMudarCampo('revogacao', e.target.value)}
-                className="input-field min-h-[80px] font-serif resize-none" placeholder="Cláusula revogatória..." />
-            )}
+              {secaoAtiva === 'visualizacao' && (() => {
+                const d = pendingDocRef.current
+                return (
+                  <div className="mx-auto max-w-2xl bg-white rounded-xl shadow-sm ring-1 ring-slate-200/70 px-10 py-12 font-document text-slate-800">
+                    {d.ementa?.trim() && (
+                      <div className="mb-8 ml-auto w-2/3">
+                        <p className="italic font-semibold leading-relaxed text-justify whitespace-pre-wrap">{d.ementa}</p>
+                      </div>
+                    )}
+                    {d.preambulo?.trim() && (
+                      <p className="mb-8 leading-relaxed text-justify whitespace-pre-wrap">{d.preambulo}</p>
+                    )}
+                    {d.artigos?.length > 0 && (
+                      <div className="mb-8 space-y-5">
+                        {d.artigos.map(a => (
+                          <p key={a.id} className="leading-relaxed text-justify">
+                            <span className="font-bold mr-2">{a.numero}</span>
+                            <span className="whitespace-pre-wrap">{a.texto}</span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    {d.vigencia?.trim() && (
+                      <p className="mb-6 leading-relaxed text-justify whitespace-pre-wrap">{d.vigencia}</p>
+                    )}
+                    {d.revogacao?.trim() && (
+                      <p className="leading-relaxed text-justify whitespace-pre-wrap">{d.revogacao}</p>
+                    )}
+                    {docVazio && (
+                      <p className="text-center text-sm text-slate-400">A minuta ainda não tem conteúdo para visualizar.</p>
+                    )}
+                  </div>
+                )
+              })()}
+            </div>
           </div>
         </div>
 
-        {/* Painel lateral de sugestões */}
-        {(() => {
-          const suggestions = obterSugestoesDinamicas(tipoProposicao)
-          if (!suggestions.length) return null
-          return (
-            <aside className="hidden xl:flex flex-col w-64 border-l border-primary-200 bg-white overflow-y-auto flex-shrink-0 print:hidden">
-              <div className="p-4 border-b border-primary-100 ">
-                <p className="text-[10px] text-primary-400 uppercase tracking-wide font-semibold">
-                  Sugestões para esta proposição
-                </p>
+        {/* ── Painel lateral de IA ── */}
+        <aside className="hidden lg:flex flex-col w-80 border-l border-slate-200 bg-white flex-shrink-0 print:hidden">
+          <div className="px-5 py-4 border-b border-slate-100 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <Sparkles size={15} className="text-primary-500" />
+              <h2 className="text-sm font-semibold text-slate-900">Sugestões da IA</h2>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {sugestoesVisiveis.length === 0
+                ? 'Nenhuma sugestão pendente'
+                : `${sugestoesVisiveis.length} ${sugestoesVisiveis.length === 1 ? 'sugestão encontrada' : 'sugestões encontradas'}`}
+            </p>
+          </div>
+
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
+            {sugestoesVisiveis.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle size={24} className="mx-auto text-slate-300 mb-2" />
+                <p className="text-xs text-slate-400">Você revisou todas as sugestões.</p>
               </div>
-              <div className="p-3 space-y-2.5">
-                {suggestions.map((s, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-2xl border-l-4 text-xs ${
-                      s.type === 'citation'
-                        ? 'bg-oro-50 border-oro-400'
-                        : s.type === 'improvement'
-                        ? 'bg-amber-50 border-amber-400'
-                        : 'bg-rosso-50 border-rosso-400'
-                    }`}
-                  >
-                    <p className="text-primary-700 mb-2 leading-relaxed">{s.text}</p>
+            ) : sugestoesVisiveis.map((s) => {
+              const lvl = SUGGESTION_LEVELS[s.type] ?? SUGGESTION_LEVELS.alert
+              return (
+                <div key={s.text} className="rounded-xl border border-slate-200 p-3">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${lvl.dot}`} />
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{lvl.label}</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-slate-700">{s.text}</p>
+                  <div className="mt-2.5 flex items-center gap-3">
                     <button
                       onClick={() => aoAcionarSugestao(s)}
-                      className="flex items-center gap-1 text-primary-500 hover:text-primary-700 font-medium transition-colors"
+                      className="text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors"
                     >
-                      <ExternalLink size={11} />
-                      {s.action}
+                      {lvl.action}
+                    </button>
+                    <button
+                      onClick={() => setSugestoesIgnoradas(prev => [...prev, s.text])}
+                      className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                    >
+                      Ignorar
                     </button>
                   </div>
-                ))}
-              </div>
-            </aside>
-          )
-        })()}
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="p-4 border-t border-slate-100 flex-shrink-0">
+            <button
+              onClick={() => { setChatAberto(true); setMinimizado(false) }}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all"
+            >
+              <Sparkles size={14} className="text-primary-500" />
+              Perguntar à IA
+            </button>
+          </div>
+        </aside>
       </div>
 
       {/* ── Widget Assistente Legislativo IA ── */}
@@ -931,26 +1003,6 @@ const EditorMinuta = () => {
               )}
             </AnimatePresence>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* FAB — some quando o chat está aberto */}
-      <AnimatePresence>
-        {!chatAberto && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setChatAberto(true)}
-            aria-label="Abrir Assistente Legislativo IA"
-            className="fixed bottom-5 right-5 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center gap-2 px-3.5 py-3 transition-colors z-50 print:hidden"
-          >
-            <Scale size={18} />
-            <span className="hidden sm:inline text-sm font-semibold">Assistente Legislativo IA</span>
-          </motion.button>
         )}
       </AnimatePresence>
 
