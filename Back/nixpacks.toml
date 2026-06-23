@@ -3,8 +3,7 @@ nixPkgs = ["gcc", "stdenv.cc.cc.lib"]
 
 [phases.build]
 cmds = [
-  "python3 -m venv /app/.venv",
-  "/app/.venv/bin/pip install --no-cache-dir -r requirements.txt",
+  "pip install -r requirements.txt",
   "npx prisma generate",
   "npm run build"
 ]
