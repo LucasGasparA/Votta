@@ -3,6 +3,13 @@ import os
 import sys
 from typing import Any, Dict, List
 
+print(f"DEBUG LD_LIBRARY_PATH={os.environ.get('LD_LIBRARY_PATH')}", file=sys.stderr)
+for _p in ["/root/.nix-profile/lib", "/root/.nix-profile/lib64", "/usr/lib/x86_64-linux-gnu"]:
+    try:
+        print(f"DEBUG ls {_p} -> {os.listdir(_p)}", file=sys.stderr)
+    except Exception as _e:
+        print(f"DEBUG ls {_p} failed: {_e}", file=sys.stderr)
+
 import chromadb
 import vertexai
 from chromadb import Documents, EmbeddingFunction, Embeddings
